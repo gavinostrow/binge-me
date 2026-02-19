@@ -1,20 +1,28 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import Tab1 from './Tabs/Tab1';
-import Tab2 from './Tabs/Tab2';
-import Tab3 from './Tabs/Tab3';
+"use client";
 
-const BingeApp = () => {
-    return (
-        <Router>
-            <Switch>
-                <Route path='/tab1' component={Tab1} />
-                <Route path='/tab2' component={Tab2} />
-                <Route path='/tab3' component={Tab3} />
-                <Route path='/' exact component={Tab1} /> {/* Default route */}
-            </Switch>
-        </Router>
-    );
-};
+import { useApp } from "@/lib/AppContext";
+import BottomNav from "./BottomNav";
+import FeedTab from "./tabs/FeedTab";
+import MyListsTab from "./tabs/MyListsTab";
+import AddTab from "./tabs/AddTab";
+import WhatsNextTab from "./tabs/WhatsNextTab";
+import ProfileTab from "./tabs/ProfileTab";
 
-export default BingeApp;
+export default function BingeApp() {
+  const { activeTab } = useApp();
+
+  return (
+    <div className="min-h-screen bg-bg-primary max-w-app mx-auto relative">
+      <main className="pb-20">
+        <div className="animate-fadeIn" key={activeTab}>
+          {activeTab === "feed" && <FeedTab />}
+          {activeTab === "lists" && <MyListsTab />}
+          {activeTab === "add" && <AddTab />}
+          {activeTab === "next" && <WhatsNextTab />}
+          {activeTab === "profile" && <ProfileTab />}
+        </div>
+      </main>
+      <BottomNav />
+    </div>
+  );
+}
