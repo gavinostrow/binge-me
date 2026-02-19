@@ -1,17 +1,12 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import LoginPage from './LoginPage'; // Make sure to create this component
-import MainApp from './MainApp'; // Make sure to create this component
+"use client";
 
-const App = () => {
-    return (
-        <Router>
-            <Switch>
-                <Route path="/login" component={LoginPage} />
-                <Route path="/" component={MainApp} />
-            </Switch>
-        </Router>
-    );
-};
+import { AppProvider } from "@/lib/AppContext";
+import BingeApp from "@/components/BingeApp";
 
-export default App;
+export default function Home() {
+  return (
+    <AppProvider>
+      <BingeApp />
+    </AppProvider>
+  );
+}
