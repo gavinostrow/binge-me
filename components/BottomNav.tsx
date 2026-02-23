@@ -4,11 +4,11 @@ import { TabId } from "@/lib/types";
 import { useApp } from "@/lib/AppContext";
 
 const tabs: { id: TabId; label: string; icon: string }[] = [
-  { id: "feed", label: "Feed", icon: "grid" },
+  { id: "profile", label: "Profile", icon: "person" },
   { id: "lists", label: "My Lists", icon: "list" },
   { id: "add", label: "Add", icon: "plus" },
   { id: "next", label: "Next", icon: "shuffle" },
-  { id: "profile", label: "Profile", icon: "person" },
+  { id: "feed", label: "Feed", icon: "grid" },
 ];
 
 function TabIcon({ icon, active }: { icon: string; active: boolean }) {

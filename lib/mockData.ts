@@ -91,44 +91,44 @@ export const friends: User[] = [
 export const allUsers = [currentUser, ...friends];
 
 export const movies: Movie[] = [
-  { id: "m1", title: "Dune: Part Two", year: 2024, genre: "Sci-Fi" },
-  { id: "m2", title: "Oppenheimer", year: 2023, genre: "Drama" },
-  { id: "m3", title: "The Batman", year: 2022, genre: "Action" },
-  { id: "m4", title: "Everything Everywhere All at Once", year: 2022, genre: "Sci-Fi" },
-  { id: "m5", title: "Parasite", year: 2019, genre: "Thriller" },
-  { id: "m6", title: "Interstellar", year: 2014, genre: "Sci-Fi" },
-  { id: "m7", title: "Get Out", year: 2017, genre: "Horror" },
-  { id: "m8", title: "La La Land", year: 2016, genre: "Romance" },
-  { id: "m9", title: "The Social Network", year: 2010, genre: "Drama" },
-  { id: "m10", title: "Mad Max: Fury Road", year: 2015, genre: "Action" },
-  { id: "m11", title: "Hereditary", year: 2018, genre: "Horror" },
-  { id: "m12", title: "Moonlight", year: 2016, genre: "Drama" },
-  { id: "m13", title: "Spider-Man: Across the Spider-Verse", year: 2023, genre: "Action" },
-  { id: "m14", title: "The Grand Budapest Hotel", year: 2014, genre: "Comedy" },
-  { id: "m15", title: "Arrival", year: 2016, genre: "Sci-Fi" },
-  { id: "m16", title: "Whiplash", year: 2014, genre: "Drama" },
-  { id: "m17", title: "The Lighthouse", year: 2019, genre: "Horror" },
-  { id: "m18", title: "Knives Out", year: 2019, genre: "Comedy" },
-  { id: "m19", title: "1917", year: 2019, genre: "Action" },
-  { id: "m20", title: "Portrait of a Lady on Fire", year: 2019, genre: "Romance" },
+  { id: "m1", title: "Dune: Part Two", year: 2024, genre: "Sci-Fi", posterUrl: "https://image.tmdb.org/t/p/w300/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg" },
+  { id: "m2", title: "Oppenheimer", year: 2023, genre: "Drama", posterUrl: "https://image.tmdb.org/t/p/w300/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg" },
+  { id: "m3", title: "The Batman", year: 2022, genre: "Action", posterUrl: "https://image.tmdb.org/t/p/w300/74xTEgt7R36Fpooo50r9T25onhq.jpg" },
+  { id: "m4", title: "Everything Everywhere All at Once", year: 2022, genre: "Sci-Fi", posterUrl: "https://image.tmdb.org/t/p/w300/w3LxiVYdWWRvEVdn5RYq6jIqkb1.jpg" },
+  { id: "m5", title: "Parasite", year: 2019, genre: "Thriller", posterUrl: "https://image.tmdb.org/t/p/w300/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg" },
+  { id: "m6", title: "Interstellar", year: 2014, genre: "Sci-Fi", posterUrl: "https://image.tmdb.org/t/p/w300/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" },
+  { id: "m7", title: "Get Out", year: 2017, genre: "Horror", posterUrl: "https://image.tmdb.org/t/p/w300/tFXcEccSQMf3lfhfXKSU9iRBpa3.jpg" },
+  { id: "m8", title: "La La Land", year: 2016, genre: "Romance", posterUrl: "https://image.tmdb.org/t/p/w300/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg" },
+  { id: "m9", title: "The Social Network", year: 2010, genre: "Drama", posterUrl: "https://image.tmdb.org/t/p/w300/n0ybibhJtQ5icDqTp8eRytcIHso.jpg" },
+  { id: "m10", title: "Mad Max: Fury Road", year: 2015, genre: "Action", posterUrl: "https://image.tmdb.org/t/p/w300/8tZYtuWezp8JbcsvHYO0O46tFbo.jpg" },
+  { id: "m11", title: "Hereditary", year: 2018, genre: "Horror", posterUrl: "https://image.tmdb.org/t/p/w300/p9YFzCnEWJE8DXuKFWv8LJWMLXF.jpg" },
+  { id: "m12", title: "Moonlight", year: 2016, genre: "Drama", posterUrl: "https://image.tmdb.org/t/p/w300/qAwFbszPa7EA4C1AHiCCPu1Q7Bs.jpg" },
+  { id: "m13", title: "Spider-Man: Across the Spider-Verse", year: 2023, genre: "Action", posterUrl: "https://image.tmdb.org/t/p/w300/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg" },
+  { id: "m14", title: "The Grand Budapest Hotel", year: 2014, genre: "Comedy", posterUrl: "https://image.tmdb.org/t/p/w300/eWdyYQreja6JGCzqHWXpWHDrrPo.jpg" },
+  { id: "m15", title: "Arrival", year: 2016, genre: "Sci-Fi", posterUrl: "https://image.tmdb.org/t/p/w300/x2FJsf1ElAgr63Y3PNPtJrcmpoe.jpg" },
+  { id: "m16", title: "Whiplash", year: 2014, genre: "Drama", posterUrl: "https://image.tmdb.org/t/p/w300/7fn624j5lj3xTme2SgiLCeuedmO.jpg" },
+  { id: "m17", title: "The Lighthouse", year: 2019, genre: "Horror", posterUrl: "https://image.tmdb.org/t/p/w300/3nSCwqFXfx4dUnMsOdqPCOcY9lS.jpg" },
+  { id: "m18", title: "Knives Out", year: 2019, genre: "Comedy", posterUrl: "https://image.tmdb.org/t/p/w300/pThyQovXQrws2hmoomgeBRl4OHJ.jpg" },
+  { id: "m19", title: "1917", year: 2019, genre: "Action", posterUrl: "https://image.tmdb.org/t/p/w300/iZf0KyrE25z1sage4SYQLCjnohP.jpg" },
+  { id: "m20", title: "Portrait of a Lady on Fire", year: 2019, genre: "Romance", posterUrl: "https://image.tmdb.org/t/p/w300/3xSIBJDDzSNN9TiGJTKiMFMkCuO.jpg" },
 ];
 
 export const shows: Show[] = [
-  { id: "s1", title: "Breaking Bad", year: 2008, genre: "Drama", totalSeasons: 5 },
-  { id: "s2", title: "Succession", year: 2018, genre: "Drama", totalSeasons: 4 },
-  { id: "s3", title: "The Bear", year: 2022, genre: "Drama", totalSeasons: 3 },
-  { id: "s4", title: "Severance", year: 2022, genre: "Sci-Fi", totalSeasons: 2 },
-  { id: "s5", title: "Shogun", year: 2024, genre: "Drama", totalSeasons: 1 },
-  { id: "s6", title: "Better Call Saul", year: 2015, genre: "Drama", totalSeasons: 6 },
-  { id: "s7", title: "Arcane", year: 2021, genre: "Action", totalSeasons: 2 },
-  { id: "s8", title: "Fleabag", year: 2016, genre: "Comedy", totalSeasons: 2 },
-  { id: "s9", title: "The Last of Us", year: 2023, genre: "Drama", totalSeasons: 2 },
-  { id: "s10", title: "True Detective", year: 2014, genre: "Thriller", totalSeasons: 4 },
-  { id: "s11", title: "The White Lotus", year: 2021, genre: "Drama", totalSeasons: 3 },
-  { id: "s12", title: "Atlanta", year: 2016, genre: "Comedy", totalSeasons: 4 },
-  { id: "s13", title: "Stranger Things", year: 2016, genre: "Sci-Fi", totalSeasons: 4 },
-  { id: "s14", title: "Chernobyl", year: 2019, genre: "Drama", totalSeasons: 1 },
-  { id: "s15", title: "The Sopranos", year: 1999, genre: "Drama", totalSeasons: 6 },
+  { id: "s1", title: "Breaking Bad", year: 2008, genre: "Drama", totalSeasons: 5, posterUrl: "https://image.tmdb.org/t/p/w300/ggFHVNu6YYI5L9pCfOacjizRGt.jpg" },
+  { id: "s2", title: "Succession", year: 2018, genre: "Drama", totalSeasons: 4, posterUrl: "https://image.tmdb.org/t/p/w300/e2X8NUtOAXjTBwR3Dvo3bpYMvOz.jpg" },
+  { id: "s3", title: "The Bear", year: 2022, genre: "Drama", totalSeasons: 3, posterUrl: "https://image.tmdb.org/t/p/w300/sHFlbKS3WLqMnp9t2ghADIJFnuQ.jpg" },
+  { id: "s4", title: "Severance", year: 2022, genre: "Sci-Fi", totalSeasons: 2, posterUrl: "https://image.tmdb.org/t/p/w300/lOg4ywEAhIWLFsFMVQSXVzh2gJY.jpg" },
+  { id: "s5", title: "Shogun", year: 2024, genre: "Drama", totalSeasons: 1, posterUrl: "https://image.tmdb.org/t/p/w300/7O4iVfOMQmdCSxhOg1WnzG1AgYT.jpg" },
+  { id: "s6", title: "Better Call Saul", year: 2015, genre: "Drama", totalSeasons: 6, posterUrl: "https://image.tmdb.org/t/p/w300/fC2HDm5t0kR9HFQNZy3junwxazT.jpg" },
+  { id: "s7", title: "Arcane", year: 2021, genre: "Action", totalSeasons: 2, posterUrl: "https://image.tmdb.org/t/p/w300/fqldf2t8ztc9aiwn3k6mlX3tvRT.jpg" },
+  { id: "s8", title: "Fleabag", year: 2016, genre: "Comedy", totalSeasons: 2, posterUrl: "https://image.tmdb.org/t/p/w300/4iRHedgQYoFHs7kTBSFpNWfaRhY.jpg" },
+  { id: "s9", title: "The Last of Us", year: 2023, genre: "Drama", totalSeasons: 2, posterUrl: "https://image.tmdb.org/t/p/w300/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg" },
+  { id: "s10", title: "True Detective", year: 2014, genre: "Thriller", totalSeasons: 4, posterUrl: "https://image.tmdb.org/t/p/w300/rdoORmAZWMHDiGSaTbksLv1PVTV.jpg" },
+  { id: "s11", title: "The White Lotus", year: 2021, genre: "Drama", totalSeasons: 3, posterUrl: "https://image.tmdb.org/t/p/w300/vRbFBTreHVsOqRDEFiGRFGlYqlz.jpg" },
+  { id: "s12", title: "Atlanta", year: 2016, genre: "Comedy", totalSeasons: 4, posterUrl: "https://image.tmdb.org/t/p/w300/6kSWMkWrRnUuX1WB8Wr5gJxAMEk.jpg" },
+  { id: "s13", title: "Stranger Things", year: 2016, genre: "Sci-Fi", totalSeasons: 4, posterUrl: "https://image.tmdb.org/t/p/w300/49WJfeN0moxb9IPfGn8AIqMGskD.jpg" },
+  { id: "s14", title: "Chernobyl", year: 2019, genre: "Drama", totalSeasons: 1, posterUrl: "https://image.tmdb.org/t/p/w300/hlLXt2tOPT6RRnjiUmoxyG1LTFi.jpg" },
+  { id: "s15", title: "The Sopranos", year: 1999, genre: "Drama", totalSeasons: 6, posterUrl: "https://image.tmdb.org/t/p/w300/57okJJUBK0frgnlMFnLFnPFT0lC.jpg" },
 ];
 
 export const myMovieRatings: MovieRating[] = [
@@ -220,9 +220,9 @@ export const myShowRatings: ShowRating[] = [
   },
 ];
 
-const now = new Date();
+const MOCK_NOW = new Date("2026-02-22T12:00:00.000Z");
 function hoursAgo(h: number): string {
-  return new Date(now.getTime() - h * 3600000).toISOString();
+  return new Date(MOCK_NOW.getTime() - h * 3600000).toISOString();
 }
 
 export const feedActivities: FeedActivity[] = [
