@@ -15,7 +15,9 @@ export function getRatingColorClass(rating: number): string {
 }
 
 export function timeAgo(dateString: string): string {
-  const now = new Date();
+  const now = typeof window === "undefined"
+    ? new Date("2026-02-22T12:00:00.000Z")
+    : new Date();
   const date = new Date(dateString);
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 

@@ -154,7 +154,7 @@ export default function FeedTab() {
                         {friend.handle}
                       </span>
                     </div>
-                    <span className="text-xs text-text-muted ml-auto shrink-0">
+                    <span className="text-xs text-text-muted ml-auto shrink-0" suppressHydrationWarning>
                       {timeAgo(activity.createdAt)}
                     </span>
                   </div>

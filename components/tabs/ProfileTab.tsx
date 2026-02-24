@@ -188,7 +188,7 @@ export default function ProfileTab() {
                     {activity.rating.toFixed(1)}
                   </span>
                 </p>
-                <p className="text-text-muted text-xs">
+                <p className="text-text-muted text-xs" suppressHydrationWarning>
                   {timeAgo(activity.createdAt)}
                 </p>
               </div>
