@@ -24,3 +24,10 @@ out/
 # OS specific files
 .DS_Store
 Thumbs.db
+
+# Claude worktrees
+.claude/
+
+# Excel lock/temp files
+~$*
+.~lock.*
