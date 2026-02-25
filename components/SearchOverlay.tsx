@@ -156,7 +156,7 @@ export default function SearchOverlay({ initialQuery = "", onClose }: SearchOver
 
   function handleTap(result: SearchResult) {
     if (result.source === "mylist") {
-      setActiveTab(result.type === "movie" ? "lists" : "lists");
+      setActiveTab("profile");
       onClose();
       return;
     }

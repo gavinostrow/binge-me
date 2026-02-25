@@ -313,7 +313,7 @@ export type ListContentType = "movies" | "shows" | "all" | "watchlist";
 
 // ─── Tab / View types ────────────────────────────────────────────────────────
 
-export type TabId = "feed" | "lists" | "add" | "groups" | "next" | "profile";
+export type TabId = "feed" | "add" | "groups" | "next" | "profile";
 export type ContentType = "movie" | "show";
 export type FeedView = "friends" | "community" | "new";
 export type GroupView = "list" | "chat" | "predictions" | "polls" | "members";

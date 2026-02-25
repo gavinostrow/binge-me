@@ -680,7 +680,7 @@ export default function AddTab() {
             </button>
           )}
           <button
-            onClick={() => setActiveTab("lists")}
+            onClick={() => setActiveTab("profile")}
             className="bg-bg-surface text-text-muted rounded-lg py-3 font-semibold w-full hover:bg-bg-hover active:scale-95 active:opacity-80 transition-all"
           >
             View My Lists

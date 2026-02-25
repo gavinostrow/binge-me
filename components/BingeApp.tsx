@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useApp } from "@/lib/AppContext";
 import BottomNav from "./BottomNav";
 import FeedTab from "./tabs/FeedTab";
-import MyListsTab from "./tabs/MyListsTab";
 import AddTab from "./tabs/AddTab";
 import WhatsNextTab from "./tabs/WhatsNextTab";
 import ProfileTab from "./tabs/ProfileTab";
@@ -30,7 +29,6 @@ export default function BingeApp() {
           {" "}
           {activeTab === "feed" && <FeedTab />}{" "}
           {activeTab === "add" && <AddTab />}{" "}
-          {activeTab === "lists" && <MyListsTab />}{" "}
           {activeTab === "groups" && <GroupsTab />}{" "}
           {activeTab === "next" && <WhatsNextTab />}{" "}
           {activeTab === "profile" && <ProfileTab />}{" "}
