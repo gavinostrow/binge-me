@@ -62,7 +62,7 @@ function GroupListCard({ group, onOpen }: { group: GroupClub; onOpen: () => void
               {group.clubType === "group-watch" ? "Group Watch" : "Friends Club"}
             </span>
           </div>
-          <span className="text-text-muted text-[10px] ml-2 shrink-0">
+          <span className="text-text-muted text-[10px] ml-2 shrink-0" suppressHydrationWarning>
             {group.lastActivity ? timeAgo(group.lastActivity) : ""}
           </span>
         </div>
@@ -169,7 +169,7 @@ function ChatBubble({ msg, groupId }: { msg: GroupMessage; groupId: string }) {
             ))}
           </div>
         )}
-        <span className="text-text-muted text-[9px] px-1">{timeAgo(msg.timestamp)}</span>
+        <span className="text-text-muted text-[9px] px-1" suppressHydrationWarning>{timeAgo(msg.timestamp)}</span>
       </div>
     </div>
   );
@@ -197,7 +197,7 @@ function PredictionCard({ pred, groupId }: { pred: Prediction; groupId: string }
       </div>
       <p className="text-text-primary text-sm leading-relaxed">{pred.text}</p>
       {pred.lockedAt && (
-        <p className="text-text-muted text-[10px] mt-2">Locked {timeAgo(pred.lockedAt)}</p>
+        <p className="text-text-muted text-[10px] mt-2" suppressHydrationWarning>Locked {timeAgo(pred.lockedAt)}</p>
       )}
     </div>
   );
@@ -221,7 +221,7 @@ function FavCharCard({ entry }: { entry: FavCharEntry }) {
         <UserAvatar userId={entry.userId} size="sm" />
         <div>
           <p className="text-text-primary text-xs font-semibold">{author?.displayName ?? author?.name}</p>
-          <p className="text-text-muted text-[10px]">{timeAgo(entry.timestamp)}</p>
+          <p className="text-text-muted text-[10px]" suppressHydrationWarning>{timeAgo(entry.timestamp)}</p>
         </div>
       </div>
       <p className="text-text-primary text-sm font-semibold">{entry.character}</p>

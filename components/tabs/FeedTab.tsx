@@ -501,7 +501,7 @@ function RecRequestCard({
             </button>
             <span className="text-text-muted text-xs">{friend.handle ?? friend.username ?? ""}</span>
           </div>
-          <p className="text-text-muted text-xs">is looking for a rec · {timeAgo(activity.timestamp ?? activity.createdAt ?? "")}</p>
+          <p className="text-text-muted text-xs" suppressHydrationWarning>is looking for a rec · {timeAgo(activity.timestamp ?? activity.createdAt ?? "")}</p>
         </div>
         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-accent-purple/60 text-accent-purple shrink-0">REC?</span>
       </div>
@@ -634,7 +634,7 @@ function RatingCard({
             </button>
             {" rated "}
             <span className="text-text-muted">{contentTypeLabel}</span>
-            <span className="ml-auto float-right">{timeAgo(activity.timestamp ?? activity.createdAt ?? "")}</span>
+            <span className="ml-auto float-right" suppressHydrationWarning>{timeAgo(activity.timestamp ?? activity.createdAt ?? "")}</span>
           </p>
         </div>
 

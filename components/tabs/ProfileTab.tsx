@@ -242,7 +242,7 @@ function MyWatchingStatus() {
                 {" "}
                 {myNowWatching.type === "movie" ? "Movie" : "Show"}{" "}
               </span>{" "}
-              <span className="text-text-muted text-[10px] font-body">
+              <span className="text-text-muted text-[10px] font-body" suppressHydrationWarning>
                 {timeAgo(myNowWatching.startedAt)}
               </span>{" "}
             </div>{" "}
@@ -1338,7 +1338,7 @@ function ActivityTimeline() {
                     {a.type === "watchlist_add" ? "saved" : "rated"}{" "}
                     <span className="text-accent">{title}</span>{" "}
                   </p>{" "}
-                  <p className="text-text-muted text-[10px] font-body">
+                  <p className="text-text-muted text-[10px] font-body" suppressHydrationWarning>
                     {timeAgo(a.timestamp ?? a.createdAt ?? "")}
                   </p>{" "}
                 </button>{" "}

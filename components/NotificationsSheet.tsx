@@ -132,7 +132,7 @@ export default function NotificationsSheet({ notifications, onClose }: Notificat
                           &ldquo;{notif.message}&rdquo;
                         </p>
                       )}
-                      <p className="text-xs text-text-muted mt-0.5">
+                      <p className="text-xs text-text-muted mt-0.5" suppressHydrationWarning>
                         {timeAgo(notif.timestamp ?? notif.createdAt ?? "")}
                       </p>
                     </div>

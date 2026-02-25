@@ -23,7 +23,7 @@ function WatchingStatusCard({ status }: { status: WatchStatus }) {
         <span className="text-[10px] font-body font-semibold uppercase tracking-widest text-text-muted">
           Watching Now
         </span>
-        <span className="ml-auto text-[10px] text-text-muted font-body">
+        <span className="ml-auto text-[10px] text-text-muted font-body" suppressHydrationWarning>
           {timeAgo(status.startedAt)}
         </span>
       </div>
