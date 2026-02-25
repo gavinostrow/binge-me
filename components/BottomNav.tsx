@@ -1,13 +1,14 @@
 "use client";
 
-import { TabId } from "@/lib/types";
 import { useApp } from "@/lib/AppContext";
+import { TabId } from "@/lib/types";
 
+// Order matches screenshot: Feed | Next | + Add | Groups/Clubs | Profile
 const tabs: { id: TabId; label: string; icon: string }[] = [
-  { id: "feed", label: "Feed", icon: "grid" },
-  { id: "lists", label: "My Lists", icon: "list" },
+  { id: "feed", label: "Feed", icon: "feed" },
+  { id: "next", label: "Next", icon: "next" },
   { id: "add", label: "Add", icon: "plus" },
-  { id: "next", label: "Next", icon: "shuffle" },
+  { id: "groups", label: "Clubs", icon: "clubs" },
   { id: "profile", label: "Profile", icon: "person" },
 ];
 
@@ -15,7 +16,7 @@ function TabIcon({ icon, active }: { icon: string; active: boolean }) {
   const color = active ? "#E8E4DC" : "#5E586E";
 
   switch (icon) {
-    case "grid":
+    case "feed":
       return (
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
           <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -24,27 +25,19 @@ function TabIcon({ icon, active }: { icon: string; active: boolean }) {
           <rect x="14" y="14" width="7" height="7" rx="1" />
         </svg>
       );
-    case "list":
+    case "next":
       return (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-          <line x1="8" y1="6" x2="21" y2="6" />
-          <line x1="8" y1="12" x2="21" y2="12" />
-          <line x1="8" y1="18" x2="21" y2="18" />
-          <line x1="3" y1="6" x2="3.01" y2="6" strokeLinecap="round" />
-          <line x1="3" y1="12" x2="3.01" y2="12" strokeLinecap="round" />
-          <line x1="3" y1="18" x2="3.01" y2="18" strokeLinecap="round" />
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round">
+          <polygon points="5 3 19 12 5 21 5 3" />
+          <line x1="19" y1="3" x2="19" y2="21" />
         </svg>
       );
     case "plus":
       return null;
-    case "shuffle":
+    case "clubs":
       return (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-          <polyline points="16 3 21 3 21 8" />
-          <line x1="4" y1="20" x2="21" y2="3" />
-          <polyline points="21 16 21 21 16 21" />
-          <line x1="15" y1="15" x2="21" y2="21" />
-          <line x1="4" y1="4" x2="9" y2="9" />
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
       );
     case "person":
@@ -60,8 +53,7 @@ function TabIcon({ icon, active }: { icon: string; active: boolean }) {
 }
 
 export default function BottomNav() {
-  const { activeTab, setActiveTab, watchlist, unreadCount } = useApp();
-  const watchlistCount = watchlist.length;
+  const { activeTab, setActiveTab, unreadCount } = useApp();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-bg-surface border-t border-bg-elevated z-50">
@@ -69,7 +61,6 @@ export default function BottomNav() {
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           const isAdd = tab.id === "add";
-          const isLists = tab.id === "lists";
           const isFeed = tab.id === "feed";
 
           if (isAdd) {
@@ -83,6 +74,7 @@ export default function BottomNav() {
                   <line x1="12" y1="5" x2="12" y2="19" />
                   <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
+                <span className="absolute -bottom-5 text-[10px] font-medium text-text-muted">Add</span>
               </button>
             );
           }
@@ -95,11 +87,6 @@ export default function BottomNav() {
             >
               <div className="relative">
                 <TabIcon icon={tab.icon} active={isActive} />
-                {isLists && watchlistCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent-purple rounded-full flex items-center justify-center text-[9px] font-bold text-white leading-none">
-                    {watchlistCount > 9 ? "9+" : watchlistCount}
-                  </span>
-                )}
                 {isFeed && unreadCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
                 )}
