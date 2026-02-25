@@ -27,6 +27,7 @@ import {
   initialWatchlist as mockWatchlist,
   initialNotifications,
 } from "./mockData";
+import { mockGroups } from "./mockGroups";
 
 interface AppContextType {
   theme: "dark" | "light";
@@ -123,7 +124,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [showRatings, setShowRatings] = useState<ShowRating[]>(initialShowRatings);
   const [feedActivities, setFeedActivities] = useState<FeedActivity[]>(initialFeedActivities);
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>(mockWatchlist);
-  const [groups, setGroups] = useState<GroupClub[]>([]);
+  const [groups, setGroups] = useState<GroupClub[]>(mockGroups);
   const [navigationStack, setNavigationStack] = useState<ScreenDescriptor[]>([]);
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [currentUserData, setCurrentUserData] = useState<User>(mockCurrentUser);

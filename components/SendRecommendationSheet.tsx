@@ -36,7 +36,8 @@ export default function SendRecommendationSheet({
         id: `rec_${Date.now()}_${friendId}`,
         type: "recommendation",
         fromUserId: "u1",
-        message: `You recommended ${item.title} to ${friend.displayName ?? friend.name}${note ? ` — "${note}"` : ""}`,
+        ...(itemType === "movie" ? { movie: item as Movie } : { show: item as Show }),
+        message: note || undefined,
         timestamp: new Date().toISOString(),
         seen: false,
       });
