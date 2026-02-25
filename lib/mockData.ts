@@ -1674,3 +1674,63 @@ export const newAndReturning: NewShowEntry[] = [
     buzz: "Thailand. New cast. Same savage wit.",
   },
 ];
+
+// ─── Friend Ratings (for taste comparison) ───────────────────────────────────
+
+export interface FriendRating {
+  title: string;
+  type: "movie" | "show";
+  year: number;
+  rating: number;
+}
+
+export const friendRatings: Record<string, FriendRating[]> = {
+  u2: [
+    { title: "Dune: Part Two", type: "movie", year: 2024, rating: 9.5 },
+    { title: "Hereditary", type: "movie", year: 2018, rating: 9.8 },
+    { title: "Oppenheimer", type: "movie", year: 2023, rating: 8.2 },
+    { title: "Parasite", type: "movie", year: 2019, rating: 9.4 },
+    { title: "Succession", type: "show", year: 2018, rating: 9.5 },
+    { title: "Moonlight", type: "movie", year: 2016, rating: 9.6 },
+    { title: "The Batman", type: "movie", year: 2022, rating: 6.5 },
+    { title: "Arrival", type: "movie", year: 2016, rating: 8.0 },
+    { title: "Fleabag", type: "show", year: 2016, rating: 9.3 },
+    { title: "Knives Out", type: "movie", year: 2019, rating: 7.8 },
+  ],
+  u3: [
+    { title: "The Batman", type: "movie", year: 2022, rating: 9.2 },
+    { title: "Dune: Part Two", type: "movie", year: 2024, rating: 9.0 },
+    { title: "Mad Max: Fury Road", type: "movie", year: 2015, rating: 9.5 },
+    { title: "Oppenheimer", type: "movie", year: 2023, rating: 8.4 },
+    { title: "Arcane", type: "show", year: 2021, rating: 9.7 },
+    { title: "Better Call Saul", type: "show", year: 2015, rating: 9.4 },
+    { title: "Parasite", type: "movie", year: 2019, rating: 7.8 },
+    { title: "Interstellar", type: "movie", year: 2014, rating: 9.8 },
+    { title: "Spider-Man: Across the Spider-Verse", type: "movie", year: 2023, rating: 9.4 },
+    { title: "Get Out", type: "movie", year: 2017, rating: 7.5 },
+  ],
+  u4: [
+    { title: "Everything Everywhere All at Once", type: "movie", year: 2022, rating: 9.9 },
+    { title: "Fleabag", type: "show", year: 2016, rating: 9.8 },
+    { title: "Parasite", type: "movie", year: 2019, rating: 9.6 },
+    { title: "Dune: Part Two", type: "movie", year: 2024, rating: 8.8 },
+    { title: "Interstellar", type: "movie", year: 2014, rating: 9.5 },
+    { title: "The Bear", type: "show", year: 2022, rating: 9.0 },
+    { title: "Oppenheimer", type: "movie", year: 2023, rating: 8.4 },
+    { title: "Arrival", type: "movie", year: 2016, rating: 9.2 },
+    { title: "The Batman", type: "movie", year: 2022, rating: 5.5 },
+    { title: "Knives Out", type: "movie", year: 2019, rating: 8.8 },
+  ],
+  u5: [
+    { title: "The Grand Budapest Hotel", type: "movie", year: 2014, rating: 9.8 },
+    { title: "Knives Out", type: "movie", year: 2019, rating: 9.2 },
+    { title: "Dune: Part Two", type: "movie", year: 2024, rating: 7.5 },
+    { title: "Oppenheimer", type: "movie", year: 2023, rating: 8.0 },
+    { title: "The Office", type: "show", year: 2005, rating: 9.5 },
+    { title: "Atlanta", type: "show", year: 2016, rating: 9.3 },
+    { title: "Parasite", type: "movie", year: 2019, rating: 8.4 },
+    { title: "Interstellar", type: "movie", year: 2014, rating: 7.8 },
+    { title: "Arrival", type: "movie", year: 2016, rating: 8.5 },
+    { title: "Spider-Man: Across the Spider-Verse", type: "movie", year: 2023, rating: 8.8 },
+  ],
+};

@@ -1,14 +1,22 @@
 // ─── Core Entities ────────────────────────────────────────────────────────────
 
+export interface MountRushmoreItem {
+  title: string;
+  type: "movie" | "show";
+  year?: number;
+}
+
 export interface User {
   id: string;
   name: string;
   displayName?: string;
   username: string;
+  handle?: string;
   bio?: string;
   favoriteGenres?: string[];
   avatarColor?: string;
   avatarUrl?: string;
+  mountRushmore?: MountRushmoreItem[];
 }
 
 export interface Movie {
@@ -305,7 +313,7 @@ export type ListContentType = "movies" | "shows" | "all" | "watchlist";
 
 // ─── Tab / View types ────────────────────────────────────────────────────────
 
-export type TabId = "feed" | "add" | "groups" | "next" | "profile";
+export type TabId = "feed" | "lists" | "add" | "groups" | "next" | "profile";
 export type ContentType = "movie" | "show";
 export type FeedView = "friends" | "community" | "new";
 export type GroupView = "list" | "chat" | "predictions" | "polls" | "members";

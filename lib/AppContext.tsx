@@ -80,6 +80,16 @@ interface AppContextType {
   clearNowWatching: () => void;
   pendingRecipientId: string | null;
   setPendingRecipientId: (id: string | null) => void;
+  unreadCount: number;
+  markNotificationsRead: () => void;
+  whatsNextSource: "taste" | "friends" | "community" | null;
+  setWhatsNextSource: (s: "taste" | "friends" | "community" | null) => void;
+  whatsNextContentType: "movie" | "show" | "both";
+  setWhatsNextContentType: (t: "movie" | "show" | "both") => void;
+  pendingAddItem: Movie | Show | null;
+  setPendingAddItem: (item: Movie | Show | null) => void;
+  deleteMovieRating: (id: string) => void;
+  deleteShowRating: (id: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -120,6 +130,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
   const [myNowWatching, setMyNowWatchingState] = useState<NowWatching | null>(null);
   const [pendingRecipientId, setPendingRecipientId] = useState<string | null>(null);
+  const [pendingAddItem, setPendingAddItem] = useState<Movie | Show | null>(null);
+  const [whatsNextSource, setWhatsNextSource] = useState<"taste" | "friends" | "community" | null>(null);
+  const [whatsNextContentType, setWhatsNextContentType] = useState<"movie" | "show" | "both">("both");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -338,6 +351,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const sendRecommendation = (notification: Notification) =>
     setNotifications((prev) => [notification, ...prev]);
 
+  const markNotificationsRead = () =>
+    setNotifications((prev) => prev.map((n) => ({ ...n, seen: true })));
+
   const markNotificationSeen = (id: string) =>
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, seen: true } : n)));
 
@@ -378,6 +394,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const setMyNowWatching = (status: NowWatching) => setMyNowWatchingState(status);
   const clearNowWatching = () => setMyNowWatchingState(null);
 
+  const deleteMovieRating = (id: string) =>
+    setMovieRatings((prev) => prev.filter((r) => r.id !== id));
+
+  const deleteShowRating = (id: string) =>
+    setShowRatings((prev) => prev.filter((r) => r.id !== id));
+
   const updateMovieRating = (ratingId: string, rating: number) =>
     setMovieRatings((prev) => prev.map((r) => (r.id === ratingId ? { ...r, rating } : r)));
 
@@ -385,6 +407,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setShowRatings((prev) =>
       prev.map((r) => (r.id === ratingId ? { ...r, overallRating: rating } : r))
     );
+
+  const unreadCount = notifications.filter((n) => !n.seen).length;
 
   const value: AppContextType = {
     theme, toggleTheme,
@@ -404,6 +428,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     updateMovieRating, updateShowRating,
     myNowWatching, setMyNowWatching, clearNowWatching,
     pendingRecipientId, setPendingRecipientId,
+    unreadCount, markNotificationsRead, pendingAddItem, setPendingAddItem,
+    whatsNextSource, setWhatsNextSource, whatsNextContentType, setWhatsNextContentType,
+    deleteMovieRating, deleteShowRating,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -1,172 +1,120 @@
 "use client";
+
+import { TabId } from "@/lib/types";
 import { useApp } from "@/lib/AppContext";
-import type { TabId } from "@/lib/types";
-const tabs: {
-  id: TabId;
-  label: string;
-  icon: (active: boolean) => React.ReactNode;
-}[] = [
-  {
-    id: "feed",
-    label: "Feed",
-    icon: (active) => (
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={active ? 2 : 1.6}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {" "}
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />{" "}
-        <polyline points="9 22 9 12 15 12 15 22" />{" "}
-      </svg>
-    ),
-  },
-  {
-    id: "next",
-    label: "Next",
-    icon: (active) => (
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={active ? 2 : 1.6}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {" "}
-        <polygon points="5 3 19 12 5 21 5 3" />{" "}
-        <line x1="19" y1="3" x2="19" y2="21" />{" "}
-      </svg>
-    ),
-  },
-  {
-    id: "add",
-    label: "Add",
-    icon: () => (
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="white"
-        strokeWidth={2.2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {" "}
-        <line x1="12" y1="5" x2="12" y2="19" />{" "}
-        <line x1="5" y1="12" x2="19" y2="12" />{" "}
-      </svg>
-    ),
-  },
-  {
-    id: "groups",
-    label: "Clubs",
-    icon: (active) => (
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={active ? 2 : 1.6}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {" "}
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />{" "}
-      </svg>
-    ),
-  },
-  {
-    id: "profile",
-    label: "Profile",
-    icon: (active) => (
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={active ? 2 : 1.6}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {" "}
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />{" "}
-        <circle cx="12" cy="7" r="4" />{" "}
-      </svg>
-    ),
-  },
+
+const tabs: { id: TabId; label: string; icon: string }[] = [
+  { id: "feed", label: "Feed", icon: "grid" },
+  { id: "lists", label: "My Lists", icon: "list" },
+  { id: "add", label: "Add", icon: "plus" },
+  { id: "next", label: "Next", icon: "shuffle" },
+  { id: "profile", label: "Profile", icon: "person" },
 ];
+
+function TabIcon({ icon, active }: { icon: string; active: boolean }) {
+  const color = active ? "#E8E4DC" : "#5E586E";
+
+  switch (icon) {
+    case "grid":
+      return (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+      );
+    case "list":
+      return (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <line x1="8" y1="6" x2="21" y2="6" />
+          <line x1="8" y1="12" x2="21" y2="12" />
+          <line x1="8" y1="18" x2="21" y2="18" />
+          <line x1="3" y1="6" x2="3.01" y2="6" strokeLinecap="round" />
+          <line x1="3" y1="12" x2="3.01" y2="12" strokeLinecap="round" />
+          <line x1="3" y1="18" x2="3.01" y2="18" strokeLinecap="round" />
+        </svg>
+      );
+    case "plus":
+      return null;
+    case "shuffle":
+      return (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <polyline points="16 3 21 3 21 8" />
+          <line x1="4" y1="20" x2="21" y2="3" />
+          <polyline points="21 16 21 21 16 21" />
+          <line x1="15" y1="15" x2="21" y2="21" />
+          <line x1="4" y1="4" x2="9" y2="9" />
+        </svg>
+      );
+    case "person":
+      return (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
+
 export default function BottomNav() {
-  const { activeTab, setActiveTab } = useApp();
+  const { activeTab, setActiveTab, watchlist, unreadCount } = useApp();
+  const watchlistCount = watchlist.length;
+
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-app border-t border-border z-50 bg-bg-primary">
-      {" "}
-      <div
-        className="flex items-center justify-around px-1"
-        style={{
-          paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
-          paddingTop: "0.5rem",
-        }}
-      >
-        {" "}
+    <nav className="fixed bottom-0 left-0 right-0 bg-bg-surface border-t border-bg-elevated z-50">
+      <div className="max-w-app mx-auto flex items-center justify-around h-16">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           const isAdd = tab.id === "add";
+          const isLists = tab.id === "lists";
+          const isFeed = tab.id === "feed";
+
           if (isAdd) {
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className="flex flex-col items-center gap-0.5 -mt-4"
-                aria-label="Add"
+                className="relative -mt-5 w-14 h-14 rounded-full bg-accent-purple flex items-center justify-center shadow-lg shadow-accent-purple/30 active:scale-95 transition-transform"
               >
-                {" "}
-                <div
-                  className="rounded-full flex items-center justify-center active:scale-95 transition-transform"
-                  style={{ width: 48, height: 48, backgroundColor: "#7C5CF6" }}
-                >
-                  {" "}
-                  {tab.icon(isActive)}{" "}
-                </div>{" "}
-                <span className="text-[9px] font-body font-semibold text-text-muted tracking-wide">
-                  Add
-                </span>{" "}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
               </button>
             );
           }
+
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className="flex flex-col items-center gap-0.5 py-1 px-2 transition-colors"
-              aria-label={tab.label}
+              className="relative flex flex-col items-center gap-1 py-2 px-3 transition-all active:scale-95 active:opacity-70"
             >
-              {" "}
-              <span style={{ color: isActive ? "#7C5CF6" : "#55556A" }}>
-                {" "}
-                {tab.icon(isActive)}{" "}
-              </span>{" "}
+              <div className="relative">
+                <TabIcon icon={tab.icon} active={isActive} />
+                {isLists && watchlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent-purple rounded-full flex items-center justify-center text-[9px] font-bold text-white leading-none">
+                    {watchlistCount > 9 ? "9+" : watchlistCount}
+                  </span>
+                )}
+                {isFeed && unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
+                )}
+              </div>
               <span
-                className="text-[9px] font-body font-semibold tracking-wide"
-                style={{ color: isActive ? "#7C5CF6" : "#55556A" }}
+                className={`text-[10px] font-medium ${
+                  isActive ? "text-text-primary" : "text-text-muted"
+                }`}
               >
-                {" "}
-                {tab.label}{" "}
-              </span>{" "}
+                {tab.label}
+              </span>
             </button>
           );
-        })}{" "}
-      </div>{" "}
+        })}
+      </div>
     </nav>
   );
 }

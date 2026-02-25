@@ -9,7 +9,15 @@ import PosterImage from "@/components/PosterImage";
 type Step = "choose" | "search" | "rate" | "rate-seasons" | "confirm";
 
 export default function AddTab() {
-  const { addMovieRating, addShowRating, setActiveTab } = useApp();
+  const {
+    addMovieRating,
+    addShowRating,
+    movieRatings,
+    showRatings,
+    setActiveTab,
+    pendingAddItem,
+    setPendingAddItem,
+  } = useApp();
 
   const [step, setStep] = useState<Step>("choose");
   const [contentType, setContentType] = useState<ContentType>("movie");
@@ -50,6 +58,24 @@ export default function AddTab() {
     };
   }, [searchQuery, contentType]);
 
+  // Handle pending add item from community deep link
+  useEffect(() => {
+    if (!pendingAddItem) return;
+    const isShow = "totalSeasons" in pendingAddItem;
+    setContentType(isShow ? "show" : "movie");
+    if (isShow) {
+      setSelectedShow(pendingAddItem as Show);
+    } else {
+      setSelectedMovie(pendingAddItem as Movie);
+    }
+    setRating(7.0);
+    setSeasonsWatched(1);
+    setRateSeasons(false);
+    setSeasonRatings([7.0]);
+    setStep("rate");
+    setPendingAddItem(null);
+  }, [pendingAddItem, setPendingAddItem]);
+
   const resetFlow = () => {
     setStep("choose");
     setSearchQuery("");
@@ -68,6 +94,14 @@ export default function AddTab() {
     setStep("search");
   };
 
+  // Check if a movie/show is already rated
+  const isAlreadyRated = (item: Movie | Show): boolean => {
+    if ("totalSeasons" in item) {
+      return showRatings.some((r) => r.show.id === item.id);
+    }
+    return movieRatings.some((r) => r.movie.id === item.id);
+  };
+
   const handleSelectMovie = (movie: Movie) => {
     setSelectedMovie(movie);
     setRating(7.0);
@@ -83,19 +117,12 @@ export default function AddTab() {
     setStep("rate");
   };
 
-  const handleSeasonsWatchedChange = (delta: number) => {
-    if (!selectedShow) return;
-    const newCount = Math.min(
-      Math.max(1, seasonsWatched + delta),
-      selectedShow.seasons ?? selectedShow.totalSeasons ?? 99
-    );
-    setSeasonsWatched(newCount);
+  const handleSeasonsWatchedSelect = (count: number) => {
+    setSeasonsWatched(count);
     setSeasonRatings((prev) => {
       const updated = [...prev];
-      while (updated.length < newCount) {
-        updated.push(7.0);
-      }
-      return updated.slice(0, newCount);
+      while (updated.length < count) updated.push(7.0);
+      return updated.slice(0, count);
     });
   };
 
@@ -148,6 +175,9 @@ export default function AddTab() {
 
   const filteredResults = searchResults;
 
+  const selected = contentType === "movie" ? selectedMovie : selectedShow;
+  const isDuplicate = selected ? isAlreadyRated(selected) : false;
+
   // Step: choose
   if (step === "choose") {
     return (
@@ -158,7 +188,7 @@ export default function AddTab() {
 
         <button
           onClick={() => handleSelectType("movie")}
-          className="bg-bg-surface rounded-xl p-6 w-full text-left flex items-center justify-between hover:bg-bg-hover transition-colors"
+          className="bg-bg-surface rounded-xl p-6 w-full text-left flex items-center justify-between hover:bg-bg-hover active:scale-95 active:opacity-80 transition-all"
         >
           <div>
             <h2 className="text-text-primary font-semibold text-lg">Movie</h2>
@@ -171,7 +201,7 @@ export default function AddTab() {
 
         <button
           onClick={() => handleSelectType("show")}
-          className="bg-bg-surface rounded-xl p-6 w-full text-left flex items-center justify-between hover:bg-bg-hover transition-colors"
+          className="bg-bg-surface rounded-xl p-6 w-full text-left flex items-center justify-between hover:bg-bg-hover active:scale-95 active:opacity-80 transition-all"
         >
           <div>
             <h2 className="text-text-primary font-semibold text-lg">
@@ -221,6 +251,7 @@ export default function AddTab() {
           placeholder={`Search ${contentType === "movie" ? "movies" : "TV shows"}...`}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          autoFocus
           className="bg-bg-elevated rounded-lg px-4 py-3 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-accent-purple w-full"
         />
 
@@ -228,8 +259,9 @@ export default function AddTab() {
           {isSearching && (
             <p className="text-text-muted text-sm text-center py-4">Searching...</p>
           )}
-          {!isSearching &&
-            filteredResults.map((item) => (
+          {!isSearching && filteredResults.map((item) => {
+            const alreadyRated = isAlreadyRated(item);
+            return (
               <button
                 key={item.id}
                 onClick={() =>
@@ -237,7 +269,7 @@ export default function AddTab() {
                     ? handleSelectMovie(item as Movie)
                     : handleSelectShow(item as Show)
                 }
-                className="bg-bg-surface rounded-lg p-3 text-left hover:bg-bg-hover transition-colors w-full flex items-center gap-3"
+                className="bg-bg-surface rounded-lg p-3 text-left hover:bg-bg-hover active:scale-[0.98] transition-all w-full flex items-center gap-3"
               >
                 <PosterImage
                   title={item.title}
@@ -245,15 +277,22 @@ export default function AddTab() {
                   posterPath={(item as Movie & Show).posterPath ?? undefined}
                   size="sm"
                 />
-                <div className="min-w-0">
-                  <div className="text-text-primary font-medium truncate">{item.title}</div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between">
+                    <div className="text-text-primary font-medium truncate">{item.title}</div>
+                    {alreadyRated && (
+                      <span className="text-xs text-accent-purple bg-accent-purple/10 px-2 py-0.5 rounded-full shrink-0 ml-2">
+                        Rated
+                      </span>
+                    )}
+                  </div>
                   <div className="text-text-secondary text-sm">
-                    {item.year}
-                    {item.genre ? ` · ${item.genre}` : ""}
+                    {item.year}{item.genre ? ` · ${item.genre}` : ""}
                   </div>
                 </div>
               </button>
-            ))}
+            );
+          })}
           {!isSearching && searchQuery.length >= 2 && filteredResults.length === 0 && (
             <p className="text-text-muted text-sm text-center py-4">
               No results found
@@ -266,7 +305,6 @@ export default function AddTab() {
 
   // Step: rate
   if (step === "rate") {
-    const selected = contentType === "movie" ? selectedMovie : selectedShow;
     if (!selected) return null;
 
     const ratingColor = getRatingColor(rating);
@@ -303,9 +341,16 @@ export default function AddTab() {
           </div>
         </div>
 
+        {/* Duplicate warning */}
+        {isDuplicate && (
+          <div className="bg-accent-purple/10 border border-accent-purple/30 rounded-lg p-3 text-sm text-accent-purple">
+            You&apos;ve already rated this. Adding again will create a second entry.
+          </div>
+        )}
+
         <div className="flex flex-col items-center gap-4">
           <div
-            className="text-5xl font-display font-bold"
+            className="text-5xl font-display font-bold transition-colors duration-200"
             style={{ color: ratingColor }}
           >
             {rating.toFixed(1)}
@@ -354,32 +399,32 @@ export default function AddTab() {
 
             {rateSeasons && (
               <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-text-secondary text-sm">
-                    How many seasons?
-                  </span>
-                  <div className="flex items-center gap-3">
+                <span className="text-text-secondary text-sm">
+                  How many seasons did you watch?
+                </span>
+                {/* Season chip selector */}
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                  {Array.from(
+                    { length: selectedShow.seasons ?? selectedShow.totalSeasons ?? 1 },
+                    (_, i) => i + 1
+                  ).map((n) => (
                     <button
-                      onClick={() => handleSeasonsWatchedChange(-1)}
-                      className="w-8 h-8 rounded-full bg-bg-elevated text-text-primary flex items-center justify-center hover:bg-bg-hover transition-colors"
+                      key={n}
+                      onClick={() => handleSeasonsWatchedSelect(n)}
+                      className={`shrink-0 w-10 h-10 rounded-full text-sm font-semibold transition-all active:scale-95 ${
+                        seasonsWatched === n
+                          ? "bg-accent-purple text-white"
+                          : "bg-bg-elevated text-text-secondary hover:bg-bg-hover"
+                      }`}
                     >
-                      -
+                      {n}
                     </button>
-                    <span className="text-text-primary font-semibold w-4 text-center">
-                      {seasonsWatched}
-                    </span>
-                    <button
-                      onClick={() => handleSeasonsWatchedChange(1)}
-                      className="w-8 h-8 rounded-full bg-bg-elevated text-text-primary flex items-center justify-center hover:bg-bg-hover transition-colors"
-                    >
-                      +
-                    </button>
-                  </div>
+                  ))}
                 </div>
 
                 <button
                   onClick={() => setStep("rate-seasons")}
-                  className="bg-accent-purple text-white rounded-lg py-3 font-semibold w-full hover:opacity-90 transition-opacity"
+                  className="bg-accent-purple text-white rounded-lg py-3 font-semibold w-full hover:opacity-90 active:scale-95 active:opacity-80 transition-all"
                 >
                   Next: Rate Seasons
                 </button>
@@ -390,7 +435,7 @@ export default function AddTab() {
 
         <button
           onClick={handleAdd}
-          className="bg-accent-purple text-white rounded-lg py-3 font-semibold w-full hover:opacity-90 transition-opacity"
+          className="bg-accent-purple text-white rounded-lg py-3 font-semibold w-full hover:opacity-90 active:scale-95 active:opacity-80 transition-all"
         >
           Add to My List
         </button>
@@ -440,7 +485,7 @@ export default function AddTab() {
                     Season {i + 1}
                   </span>
                   <span
-                    className="font-display font-bold"
+                    className="font-display font-bold transition-colors duration-200"
                     style={{ color }}
                   >
                     {seasonRating.toFixed(1)}
@@ -470,7 +515,7 @@ export default function AddTab() {
 
         <button
           onClick={handleAdd}
-          className="bg-accent-purple text-white rounded-lg py-3 font-semibold w-full hover:opacity-90 transition-opacity"
+          className="bg-accent-purple text-white rounded-lg py-3 font-semibold w-full hover:opacity-90 active:scale-95 active:opacity-80 transition-all"
         >
           Add to My List
         </button>
@@ -519,13 +564,13 @@ export default function AddTab() {
         <div className="flex flex-col gap-3 w-full">
           <button
             onClick={resetFlow}
-            className="bg-accent-purple text-white rounded-lg py-3 font-semibold w-full hover:opacity-90 transition-opacity"
+            className="bg-accent-purple text-white rounded-lg py-3 font-semibold w-full hover:opacity-90 active:scale-95 active:opacity-80 transition-all"
           >
             Add Another
           </button>
           <button
-            onClick={() => setActiveTab("feed")}
-            className="bg-bg-surface text-text-primary rounded-lg py-3 font-semibold w-full hover:bg-bg-hover transition-colors"
+            onClick={() => setActiveTab("lists")}
+            className="bg-bg-surface text-text-primary rounded-lg py-3 font-semibold w-full hover:bg-bg-hover active:scale-95 active:opacity-80 transition-all"
           >
             View My Lists
           </button>

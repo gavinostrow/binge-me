@@ -2,16 +2,18 @@
 
 import { useState } from "react";
 import { useApp } from "@/lib/AppContext";
-import { ContentType, FeedView, CommunityItem } from "@/lib/types";
+import { ContentType, FeedView, CommunityItem, User } from "@/lib/types";
 import {
   communityMovies,
   communityShows,
   communitySeasons,
   friends,
-  tasteMatchPercentages,
 } from "@/lib/mockData";
 import { timeAgo, getRatingColor } from "@/lib/utils";
 import RatingBadge from "@/components/RatingBadge";
+import FriendProfileSheet from "@/components/FriendProfileSheet";
+import NotificationsSheet from "@/components/NotificationsSheet";
+import SearchOverlay from "@/components/SearchOverlay";
 
 const reactionTypes = [
   { key: "fire", icon: "★", label: "Fire" },
@@ -23,7 +25,17 @@ const reactionTypes = [
 type ReactionType = (typeof reactionTypes)[number]["key"];
 
 export default function FeedTab() {
-  const { feedActivities, toggleReaction } = useApp();
+  const {
+    feedActivities,
+    toggleReaction,
+    watchlist,
+    addToWatchlist,
+    setActiveTab,
+    setPendingAddItem,
+    notifications,
+    unreadCount,
+    markNotificationsRead,
+  } = useApp();
 
   const [feedView, setFeedView] = useState<FeedView>("friends");
   const [contentFilter, setContentFilter] = useState<ContentType>("movie");
@@ -31,62 +43,150 @@ export default function FeedTab() {
     "movies" | "shows" | "seasons"
   >("movies");
   const [searchQuery, setSearchQuery] = useState("");
+  const [expandedCommunityId, setExpandedCommunityId] = useState<string | null>(null);
+  const [recentlyReacted, setRecentlyReacted] = useState<string | null>(null);
+  const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+
+  const query = searchQuery.toLowerCase().trim();
 
   const filteredActivities = feedActivities.filter((activity) => {
-    if (contentFilter === "movie") return activity.type === "movie_rating";
-    return activity.type === "show_rating";
+    const typeMatch =
+      contentFilter === "movie"
+        ? activity.type === "movie_rating"
+        : activity.type === "show_rating";
+    if (!typeMatch) return false;
+    if (!query) return true;
+    const title = activity.movie?.title ?? activity.show?.title ?? activity.title ?? "";
+    const name = activity.user?.displayName ?? activity.user?.name ?? "";
+    const handle = activity.user?.handle ?? activity.user?.username ?? "";
+    return (
+      title.toLowerCase().includes(query) ||
+      name.toLowerCase().includes(query) ||
+      handle.toLowerCase().includes(query)
+    );
   });
 
-  const communityData: CommunityItem[] =
+  const rawCommunityData: CommunityItem[] =
     communityTab === "movies"
       ? communityMovies
       : communityTab === "shows"
         ? communityShows
         : communitySeasons;
 
+  const communityData = query
+    ? rawCommunityData.filter((item) =>
+        (item.movie?.title ?? item.show?.title ?? "").toLowerCase().includes(query)
+      )
+    : rawCommunityData;
+
   const getFriend = (userId: string) => friends.find((f) => f.id === userId);
+  const getFriendByHandle = (handle: string) =>
+    friends.find((f) => f.handle === handle || f.username === handle.replace("@", ""));
 
   const getReactionCount = (
-    reactions: Record<string, string[]> | { userId: string; type: string }[],
+    reactions: Record<string, string[]> | { userId: string; type: string }[] | undefined,
     type: string
   ) => {
-    if (Array.isArray(reactions)) return reactions.filter((r: { userId: string; type: string }) => r.type === type).length;
+    if (!reactions) return 0;
+    if (Array.isArray(reactions)) return reactions.filter((r) => r.type === type).length;
     return (reactions[type] ?? []).length;
   };
 
   const hasUserReacted = (
-    reactions: Record<string, string[]> | { userId: string; type: string }[],
+    reactions: Record<string, string[]> | { userId: string; type: string }[] | undefined,
     type: string
   ) => {
-    if (Array.isArray(reactions)) return reactions.some((r: { userId: string; type: string }) => r.userId === "u1" && r.type === type);
+    if (!reactions) return false;
+    if (Array.isArray(reactions)) return reactions.some((r) => r.userId === "u1" && r.type === type);
     return (reactions[type] ?? []).includes("u1");
   };
+
+  const isOnWatchlist = (title: string) =>
+    watchlist.some((w) => w.title === title);
+
+  function handleCommunityWatchlist(item: CommunityItem) {
+    const title = item.movie?.title ?? item.show?.title ?? "";
+    const year = item.movie?.year ?? item.show?.year ?? 0;
+    const genre = item.movie?.genre ?? item.show?.genre ?? "";
+    const contentId = item.movie?.id ?? item.show?.id ?? "unknown";
+    const contentType: "movie" | "show" = item.movie ? "movie" : "show";
+    if (isOnWatchlist(title)) return;
+    addToWatchlist({
+      id: "wl-" + Date.now(),
+      userId: "u1",
+      contentId,
+      contentType,
+      title,
+      year,
+      genre: Array.isArray(genre) ? genre[0] : genre,
+      addedAt: new Date().toISOString(),
+    });
+  }
+
+  function handleCommunityRate(item: CommunityItem) {
+    const title = item.movie?.title ?? item.show?.title ?? "";
+    const year = item.movie?.year ?? item.show?.year ?? 0;
+    const genre = item.movie?.genre ?? item.show?.genre ?? "";
+    const id = item.movie?.id ?? item.show?.id ?? "unknown";
+    const isShow = !!item.show;
+    const pendingItem = isShow
+      ? { id, title, year, genre: Array.isArray(genre) ? genre[0] : genre, seasons: 1, totalSeasons: 1 }
+      : { id, title, year, genre: Array.isArray(genre) ? genre[0] : genre };
+    setPendingAddItem(pendingItem as unknown as Parameters<typeof setPendingAddItem>[0]);
+    setActiveTab("add");
+  }
+
+  function handleReaction(activityId: string, key: ReactionType) {
+    toggleReaction(activityId, key);
+    setRecentlyReacted(`${activityId}-${key}`);
+    setTimeout(() => setRecentlyReacted(null), 250);
+  }
 
   return (
     <div className="flex flex-col gap-4 pb-24">
       {/* Header */}
-      <div className="pt-4 px-1">
+      <div className="pt-4 px-1 flex items-center justify-between">
         <h1 className="text-2xl font-bold lowercase font-display text-text-primary">
           binge
         </h1>
+        <button
+          onClick={() => {
+            setShowNotifications(true);
+            markNotificationsRead();
+          }}
+          className="relative p-2 text-text-muted hover:text-text-secondary active:scale-90 transition-all"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          {unreadCount > 0 && (
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+          )}
+        </button>
       </div>
 
-      {/* Search bar */}
+      {/* Search bar — tapping opens global overlay */}
       <div className="relative">
-        <input
-          type="text"
-          placeholder="Search friends, movies, shows..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-bg-elevated text-text-primary placeholder-text-muted rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-accent-purple"
-        />
+        <div
+          onClick={() => setShowSearch(true)}
+          className="w-full bg-bg-elevated rounded-lg px-4 py-2.5 text-sm text-text-muted flex items-center gap-2 cursor-pointer"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          {searchQuery || "Search movies, shows, friends..."}
+        </div>
       </div>
 
       {/* Friends / Community toggle */}
       <div className="flex bg-bg-elevated rounded-lg p-1">
         <button
           onClick={() => setFeedView("friends")}
-          className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors ${
+          className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors active:scale-[0.98] ${
             feedView === "friends"
               ? "bg-bg-hover text-text-primary"
               : "text-text-muted"
@@ -96,7 +196,7 @@ export default function FeedTab() {
         </button>
         <button
           onClick={() => setFeedView("community")}
-          className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors ${
+          className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors active:scale-[0.98] ${
             feedView === "community"
               ? "bg-bg-hover text-text-primary"
               : "text-text-muted"
@@ -146,21 +246,25 @@ export default function FeedTab() {
                 >
                   {/* User row */}
                   <div className="flex items-center gap-2">
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
-                      style={{ backgroundColor: friend.avatarColor ?? "#7C5CF6" }}
+                    <button
+                      onClick={() => setSelectedFriend(friend)}
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0 active:opacity-70 transition-opacity"
+                      style={{ backgroundColor: friend.avatarColor ?? "#8B5CF6" }}
                     >
-                      {(friend.displayName ?? friend.name).charAt(0).toUpperCase()}
-                    </div>
-                    <div className="flex items-center gap-1.5 min-w-0">
+                      {(friend.displayName ?? friend.name ?? "?").charAt(0).toUpperCase()}
+                    </button>
+                    <button
+                      onClick={() => setSelectedFriend(friend)}
+                      className="flex items-center gap-1.5 min-w-0 active:opacity-70 transition-opacity"
+                    >
                       <span className="text-sm font-medium text-text-primary truncate">
                         {friend.displayName ?? friend.name}
                       </span>
                       <span className="text-xs text-text-muted truncate">
-                        @{(friend as { handle?: string }).handle ?? friend.username}
+                        {(friend.handle ?? friend.username ?? "")}
                       </span>
-                    </div>
-                    <span className="text-xs text-text-muted ml-auto shrink-0" suppressHydrationWarning>
+                    </button>
+                    <span className="text-xs text-text-muted ml-auto shrink-0">
                       {timeAgo(activity.timestamp ?? activity.createdAt ?? "")}
                     </span>
                   </div>
@@ -168,7 +272,7 @@ export default function FeedTab() {
                   {/* Title line */}
                   <div className="flex items-center gap-2">
                     <span className="font-display font-semibold text-text-primary">
-                      {activity.movie?.title ?? activity.show?.title ?? activity.title}
+                      {activity.title}
                       {activity.season != null && (
                         <span className="text-text-secondary">
                           {" "}
@@ -185,16 +289,19 @@ export default function FeedTab() {
 
                   {/* Tagged users */}
                   {activity.taggedUsers && activity.taggedUsers.length > 0 && (
-                    <div className="text-sm text-text-secondary">
-                      <span>with </span>
-                      {activity.taggedUsers.map((taggedId, idx) => {
-                        const taggedFriend = getFriend(taggedId);
+                    <div className="text-sm text-text-secondary flex flex-wrap gap-x-1">
+                      <span>with</span>
+                      {activity.taggedUsers.map((taggedHandle, idx) => {
+                        const taggedFriend = getFriendByHandle(taggedHandle);
                         return (
-                          <span key={taggedId}>
-                            <span className="text-accent-purple">
-                              {taggedFriend ? `@${(taggedFriend as { handle?: string }).handle ?? taggedFriend.username}` : taggedId}
-                            </span>
-                            {idx < activity.taggedUsers!.length - 1 && ", "}
+                          <span key={taggedHandle}>
+                            <button
+                              onClick={() => taggedFriend && setSelectedFriend(taggedFriend)}
+                              className={`${taggedFriend ? "text-accent-purple active:opacity-60" : "text-text-muted"} transition-opacity`}
+                            >
+                              {taggedHandle}
+                            </button>
+                            {idx < activity.taggedUsers!.length - 1 && ","}
                           </span>
                         );
                       })}
@@ -212,23 +319,28 @@ export default function FeedTab() {
                         activity.reactions,
                         reaction.key
                       );
+                      const justReacted =
+                        recentlyReacted === `${activity.id}-${reaction.key}`;
 
                       return (
                         <button
                           key={reaction.key}
                           onClick={() =>
-                            toggleReaction(
-                              activity.id,
-                              reaction.key
-                            )
+                            handleReaction(activity.id, reaction.key)
                           }
                           className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-colors ${
                             active
                               ? "bg-bg-hover text-accent-purple"
                               : "bg-bg-elevated text-text-muted"
-                          }`}
+                          } ${justReacted ? "animate-reaction-pop" : ""}`}
                         >
-                          <span>{reaction.icon}</span>
+                          <span
+                            style={
+                              active ? { color: "#8B5CF6" } : undefined
+                            }
+                          >
+                            {reaction.icon}
+                          </span>
                           <span>{count}</span>
                         </button>
                       );
@@ -240,7 +352,9 @@ export default function FeedTab() {
 
             {filteredActivities.length === 0 && (
               <div className="text-center text-text-muted text-sm py-8">
-                No activity yet. Start rating to see your friends&apos; feed!
+                {query
+                  ? `No results for "${searchQuery}"`
+                  : "No activity yet. Start rating to see your friends\u2019 feed!"}
               </div>
             )}
           </div>
@@ -252,7 +366,10 @@ export default function FeedTab() {
             {(["movies", "shows", "seasons"] as const).map((tab) => (
               <button
                 key={tab}
-                onClick={() => setCommunityTab(tab)}
+                onClick={() => {
+                  setCommunityTab(tab);
+                  setExpandedCommunityId(null);
+                }}
                 className={`pb-2 text-sm font-medium capitalize transition-colors ${
                   communityTab === tab
                     ? "text-text-primary border-b-2 border-accent-purple"
@@ -266,56 +383,131 @@ export default function FeedTab() {
 
           {/* Community ranked list */}
           <div className="flex flex-col gap-2">
-            {communityData.map((item, index) => (
-              <div
-                key={item.id}
-                className="bg-bg-surface rounded-lg p-3 flex items-center gap-3"
-              >
-                {/* Rank */}
-                <span className="text-text-muted font-display text-sm w-6 text-center shrink-0">
-                  {index + 1}
-                </span>
-
-                {/* Info */}
-                <div className="flex flex-col gap-1 min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-text-primary truncate">
-                      {item.movie?.title ?? item.show?.title}
-                      {item.season != null && (
-                        <span className="text-text-secondary">
-                          {" "}
-                          S{item.season}
-                        </span>
-                      )}
-                    </span>
-                    <span className="text-xs text-text-muted shrink-0">
-                      {item.movie?.year ?? item.show?.year}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs bg-bg-elevated text-text-secondary rounded px-2 py-0.5">
-                      {(item.movie?.genre ?? item.show?.genre ?? [])[0]}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Rating info */}
-                <div className="flex flex-col items-end gap-1 shrink-0">
-                  <span className="text-text-muted text-xs">
-                    {item.ratingCount} ratings
+            {communityData.map((item, index) => {
+              const itemTitle = item.movie?.title ?? item.show?.title ?? "";
+              const itemYear = item.movie?.year ?? item.show?.year ?? 0;
+              const rawGenre = item.movie?.genre ?? item.show?.genre ?? "";
+              const itemGenre = Array.isArray(rawGenre) ? rawGenre[0] ?? "" : rawGenre;
+              const itemId = item.movie?.id ?? item.show?.id ?? `item-${index}`;
+              const itemSeason = item.season;
+              return (
+              <div key={itemId}>
+                <div
+                  onClick={() =>
+                    setExpandedCommunityId(
+                      expandedCommunityId === itemId ? null : itemId
+                    )
+                  }
+                  className="bg-bg-surface rounded-lg p-3 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-all"
+                >
+                  {/* Rank */}
+                  <span className="text-text-muted font-display text-sm w-6 text-center shrink-0">
+                    {index + 1}
                   </span>
-                  <RatingBadge rating={item.averageRating} size="sm" />
+
+                  {/* Info */}
+                  <div className="flex flex-col gap-1 min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-text-primary truncate">
+                        {itemTitle}
+                        {itemSeason != null && (
+                          <span className="text-text-secondary">
+                            {" "}
+                            S{itemSeason}
+                          </span>
+                        )}
+                      </span>
+                      <span className="text-xs text-text-muted shrink-0">
+                        {itemYear}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs bg-bg-elevated text-text-secondary rounded px-2 py-0.5">
+                        {itemGenre}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Rating info */}
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span className="text-text-muted text-xs">
+                      {item.ratingCount.toLocaleString()} ratings
+                    </span>
+                    <RatingBadge rating={item.averageRating} size="sm" />
+                  </div>
                 </div>
+
+                {/* Expanded community row */}
+                {expandedCommunityId === itemId && (
+                  <div className="bg-bg-elevated rounded-b-lg px-4 py-3 flex flex-col gap-3 -mt-1 animate-fadeIn">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-text-secondary text-xs">Community avg</p>
+                        <p
+                          className="font-display font-bold text-lg"
+                          style={{ color: getRatingColor(item.averageRating) }}
+                        >
+                          {item.averageRating.toFixed(1)}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-text-secondary text-xs">Ratings</p>
+                        <p className="text-text-primary font-semibold">
+                          {item.ratingCount.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                    {communityTab !== "seasons" && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleCommunityRate(item)}
+                          className="flex-1 bg-accent-purple text-white text-sm font-semibold py-2 rounded-lg active:scale-95 transition-all"
+                        >
+                          Rate This
+                        </button>
+                        <button
+                          onClick={() => handleCommunityWatchlist(item)}
+                          className={`flex-1 text-sm font-semibold py-2 rounded-lg active:scale-95 transition-all border ${
+                            isOnWatchlist(itemTitle)
+                              ? "border-accent-purple text-accent-purple"
+                              : "border-bg-hover text-text-primary"
+                          }`}
+                        >
+                          {isOnWatchlist(itemTitle) ? "✓ Saved" : "+ Watchlist"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            ))}
+              );
+            })}
 
             {communityData.length === 0 && (
               <div className="text-center text-text-muted text-sm py-8">
-                No community data available yet.
+                {query
+                  ? `No results for "${searchQuery}"`
+                  : "No community data available yet."}
               </div>
             )}
           </div>
         </div>
+      )}
+
+      {/* Friend profile sheet */}
+      {selectedFriend && (
+        <FriendProfileSheet
+          friend={selectedFriend}
+          onClose={() => setSelectedFriend(null)}
+        />
+      )}
+
+      {/* Notifications sheet */}
+      {showNotifications && (
+        <NotificationsSheet
+          notifications={notifications}
+          onClose={() => setShowNotifications(false)}
+        />
       )}
     </div>
   );
