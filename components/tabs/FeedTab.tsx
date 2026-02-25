@@ -23,11 +23,12 @@ type FeedTab = "friends" | "community" | "new";
 type ContentFilter = "all" | "movies" | "shows";
 type CommunitySubTab = "movies" | "shows" | "seasons";
 
+// Keys must match the emoji strings used in mockData reactions
 const reactionTypes = [
-  { key: "fire", icon: "🔥" },
-  { key: "agree", icon: "✓" },
-  { key: "disagree", icon: "✗" },
-  { key: "mustwatch", icon: "◉" },
+  { key: "🔥", label: "fire" },
+  { key: "❤️", label: "love" },
+  { key: "😂", label: "lol" },
+  { key: "👏", label: "clap" },
 ] as const;
 type ReactionKey = (typeof reactionTypes)[number]["key"];
 
@@ -285,7 +286,7 @@ export default function FeedTab() {
                   activity={activity}
                   friend={friend}
                   onSelectFriend={setSelectedFriend}
-                  getFriendByHandle={getFriendByHandle}
+                  getFriend={getFriend}
                   getReactionCount={getReactionCount}
                   hasUserReacted={hasUserReacted}
                   handleReaction={handleReaction}
@@ -586,96 +587,170 @@ function RecRequestCard({
 
 // ─── Rating Card ──────────────────────────────────────────────────────────────
 function RatingCard({
-  activity, friend, onSelectFriend, getFriendByHandle, getReactionCount, hasUserReacted, handleReaction, recentlyReacted, pushScreen,
+  activity, friend, onSelectFriend, getFriend, getReactionCount, hasUserReacted, handleReaction, recentlyReacted, pushScreen,
 }: {
   activity: FeedActivity;
   friend: User;
   onSelectFriend: (f: User) => void;
-  getFriendByHandle: (h: string) => User | undefined;
+  getFriend: (id: string) => User | undefined;
   getReactionCount: (reactions: any, type: string) => number;
   hasUserReacted: (reactions: any, type: string) => boolean;
   handleReaction: (id: string, key: any) => void;
   recentlyReacted: string | null;
   pushScreen: (d: any) => void;
 }) {
+  const { addComment } = useApp();
+  const [showCommentInput, setShowCommentInput] = useState(false);
+  const [commentText, setCommentText] = useState("");
+
   const title = activity.title ?? activity.movie?.title ?? activity.show?.title ?? "";
   const contentTypeLabel = activity.movie ? "a movie" : "a show";
   const posterPath = activity.movie?.posterPath ?? activity.show?.posterPath;
   const year = activity.movie?.year ?? activity.show?.year;
 
+  function handleSendComment() {
+    if (!commentText.trim()) return;
+    addComment(activity.id, {
+      id: `c_${Date.now()}`,
+      userId: "u1",
+      user: { id: "u1", name: "Gavin Ostrow", displayName: "Gavin Ostrow", username: "gavin", handle: "@gavin", avatarColor: "#8B5CF6" },
+      text: commentText.trim(),
+      timestamp: new Date().toISOString(),
+    });
+    setCommentText("");
+    setShowCommentInput(false);
+  }
+
   return (
-    <div className="bg-bg-surface rounded-xl p-3.5 flex flex-col gap-2.5">
-      {/* Activity summary line */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => onSelectFriend(friend)}
-          className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
-          style={{ backgroundColor: friend.avatarColor ?? "#8B5CF6" }}
-        >
-          {(friend.displayName ?? friend.name ?? "?").charAt(0).toUpperCase()}
-        </button>
-        <p className="text-xs text-text-muted flex-1 min-w-0">
-          <button onClick={() => onSelectFriend(friend)} className="font-semibold text-text-secondary">
-            {friend.displayName ?? friend.name}
+    <div className="bg-bg-surface rounded-xl overflow-hidden">
+      <div className="p-3.5 flex flex-col gap-2.5">
+        {/* Activity summary line */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => onSelectFriend(friend)}
+            className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
+            style={{ backgroundColor: friend.avatarColor ?? "#8B5CF6" }}
+          >
+            {(friend.displayName ?? friend.name ?? "?").charAt(0).toUpperCase()}
           </button>
-          {" rated "}
-          <span className="text-text-muted">{contentTypeLabel}</span>
-          <span className="ml-auto float-right">{timeAgo(activity.timestamp ?? activity.createdAt ?? "")}</span>
-        </p>
-      </div>
-
-      {/* Main content row: poster + info */}
-      <div className="flex gap-3">
-        <button
-          onClick={() => {
-            if (activity.movie?.id) pushScreen({ screen: "movie-detail", movieId: activity.movie.id });
-            else if (activity.show?.id) pushScreen({ screen: "show-detail", showId: activity.show.id });
-          }}
-          className="shrink-0"
-        >
-          <PosterImage title={title} year={year} posterPath={posterPath} size="sm" />
-        </button>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <button
-              onClick={() => {
-                if (activity.movie?.id) pushScreen({ screen: "movie-detail", movieId: activity.movie.id });
-                else if (activity.show?.id) pushScreen({ screen: "show-detail", showId: activity.show.id });
-              }}
-              className="font-display font-bold text-text-primary text-left text-sm leading-tight"
-            >
-              {title}
-              {activity.season != null && <span className="text-text-secondary font-normal"> S{activity.season}</span>}
+          <p className="text-xs text-text-muted flex-1 min-w-0">
+            <button onClick={() => onSelectFriend(friend)} className="font-semibold text-text-secondary">
+              {friend.displayName ?? friend.name}
             </button>
-            {activity.rating != null && <RatingBadge rating={activity.rating} size="sm" />}
+            {" rated "}
+            <span className="text-text-muted">{contentTypeLabel}</span>
+            <span className="ml-auto float-right">{timeAgo(activity.timestamp ?? activity.createdAt ?? "")}</span>
+          </p>
+        </div>
+
+        {/* Main content row: poster + info */}
+        <div className="flex gap-3">
+          <button
+            onClick={() => {
+              if (activity.movie?.id) pushScreen({ screen: "movie-detail", movieId: activity.movie.id });
+              else if (activity.show?.id) pushScreen({ screen: "show-detail", showId: activity.show.id });
+            }}
+            className="shrink-0"
+          >
+            <PosterImage title={title} year={year} posterPath={posterPath} size="sm" />
+          </button>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <button
+                onClick={() => {
+                  if (activity.movie?.id) pushScreen({ screen: "movie-detail", movieId: activity.movie.id });
+                  else if (activity.show?.id) pushScreen({ screen: "show-detail", showId: activity.show.id });
+                }}
+                className="font-display font-bold text-text-primary text-left text-sm leading-tight"
+              >
+                {title}
+                {activity.season != null && <span className="text-text-secondary font-normal"> S{activity.season}</span>}
+              </button>
+              {activity.rating != null && <RatingBadge rating={activity.rating} size="sm" />}
+            </div>
+            {year && <p className="text-text-muted text-xs mt-0.5">{year}</p>}
+            {activity.review && (
+              <p className="text-text-secondary text-xs mt-1.5 leading-relaxed">&ldquo;{activity.review}&rdquo;</p>
+            )}
           </div>
-          {year && <p className="text-text-muted text-xs mt-0.5">{year}</p>}
-          {activity.review && (
-            <p className="text-text-secondary text-xs mt-1.5 leading-relaxed">&ldquo;{activity.review}&rdquo;</p>
-          )}
+        </div>
+
+        {/* Reactions */}
+        <div className="flex items-center gap-1.5">
+          {reactionTypes.map((reaction) => {
+            const count = getReactionCount(activity.reactions, reaction.key);
+            const active = hasUserReacted(activity.reactions, reaction.key);
+            return (
+              <button
+                key={reaction.key}
+                onClick={() => handleReaction(activity.id, reaction.key)}
+                className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-all active:scale-95 ${
+                  active ? "bg-accent-purple/15 text-accent-purple" : "bg-bg-elevated text-text-muted"
+                }`}
+              >
+                <span>{reaction.key}</span>
+                <span>{count}</span>
+              </button>
+            );
+          })}
+          <button
+            onClick={() => setShowCommentInput((v) => !v)}
+            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs bg-bg-elevated text-text-muted active:scale-95 transition-all ml-auto"
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>{activity.comments?.length ?? 0}</span>
+          </button>
         </div>
       </div>
 
-      {/* Reactions */}
-      <div className="flex items-center gap-1.5">
-        {reactionTypes.map((reaction) => {
-          const count = getReactionCount(activity.reactions, reaction.key);
-          const active = hasUserReacted(activity.reactions, reaction.key);
-          return (
-            <button
-              key={reaction.key}
-              onClick={() => handleReaction(activity.id, reaction.key)}
-              className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-all ${
-                active ? "bg-accent-purple/15 text-accent-purple" : "bg-bg-elevated text-text-muted"
-              }`}
-            >
-              <span>{reaction.icon}</span>
-              <span>{count}</span>
-            </button>
-          );
-        })}
-      </div>
+      {/* Comments thread */}
+      {activity.comments && activity.comments.length > 0 && (
+        <div className="border-t border-bg-elevated px-3.5 pt-2.5 pb-3 flex flex-col gap-2">
+          {activity.comments.map((comment) => {
+            const commenter = comment.user ?? (comment.userId ? getFriend(comment.userId) : null);
+            return (
+              <div key={comment.id} className="flex items-start gap-2">
+                <div
+                  className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white shrink-0 mt-0.5"
+                  style={{ backgroundColor: commenter?.avatarColor ?? "#8B5CF6" }}
+                >
+                  {(commenter?.displayName ?? commenter?.name ?? "?").charAt(0).toUpperCase()}
+                </div>
+                <p className="text-xs text-text-primary flex-1 min-w-0 leading-relaxed">
+                  <span className="font-semibold text-text-secondary">
+                    {commenter?.displayName ?? commenter?.name ?? "Someone"}{" "}
+                  </span>
+                  {comment.text}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Comment input */}
+      {showCommentInput && (
+        <div className="border-t border-bg-elevated px-3.5 py-2.5 flex items-center gap-2 animate-fadeIn">
+          <input
+            autoFocus
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") handleSendComment(); }}
+            placeholder="Add a comment..."
+            className="flex-1 bg-bg-elevated rounded-xl px-3 py-2 text-xs text-text-primary placeholder-text-muted outline-none"
+          />
+          <button
+            onClick={handleSendComment}
+            disabled={!commentText.trim()}
+            className="text-accent-purple text-xs font-semibold disabled:opacity-40 active:scale-95 transition-all"
+          >
+            Post
+          </button>
+        </div>
+      )}
     </div>
   );
 }

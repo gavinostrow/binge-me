@@ -25,30 +25,20 @@ interface RecResult {
 
 type VibeStep = "content-type" | "vibe" | "spinning" | "result";
 
-// 6 vibe questions
+// 3 vibe questions — skippable
 const VIBE_QUESTIONS = [
   {
     id: "mood",
-    question: "What's your mood right now?",
+    question: "What's your mood?",
     options: [
       { label: "Chill & easy", tags: ["Comedy", "Animation"] },
       { label: "Tense & gripping", tags: ["Thriller", "Crime"] },
       { label: "Big & epic", tags: ["Action", "Adventure"] },
-      { label: "Feel something", tags: ["Drama", "Romance"] },
+      { label: "Feel something deep", tags: ["Drama", "Romance"] },
     ],
   },
   {
-    id: "length",
-    question: "How much time do you have?",
-    options: [
-      { label: "90 mins or less", tags: ["short"] },
-      { label: "A full movie", tags: ["movie"] },
-      { label: "A few episodes", tags: ["show"] },
-      { label: "A full binge", tags: ["binge"] },
-    ],
-  },
-  {
-    id: "setting",
+    id: "vibe",
     question: "Pick a vibe:",
     options: [
       { label: "Dark and gritty", tags: ["Crime", "Horror", "Thriller"] },
@@ -58,33 +48,13 @@ const VIBE_QUESTIONS = [
     ],
   },
   {
-    id: "era",
-    question: "Old school or new?",
-    options: [
-      { label: "Classic (pre-2000)", tags: ["classic"] },
-      { label: "2000s–2015", tags: ["2000s"] },
-      { label: "Recent (2016+)", tags: ["recent"] },
-      { label: "Doesn't matter", tags: [] },
-    ],
-  },
-  {
     id: "social",
-    question: "Watching alone or with people?",
+    question: "Watching with anyone?",
     options: [
       { label: "Solo, late night", tags: ["Horror", "Thriller", "Drama"] },
       { label: "With friends", tags: ["Comedy", "Action", "Adventure"] },
       { label: "Date night", tags: ["Romance", "Drama", "Comedy"] },
-      { label: "Family friendly", tags: ["Animation", "Adventure", "Comedy"] },
-    ],
-  },
-  {
-    id: "ending",
-    question: "What kind of ending?",
-    options: [
-      { label: "Happy, I need it", tags: ["Comedy", "Romance", "Animation"] },
-      { label: "Doesn't matter", tags: [] },
-      { label: "Shocking twist", tags: ["Thriller", "Mystery", "Sci-Fi"] },
-      { label: "Thought-provoking", tags: ["Drama", "Sci-Fi", "Documentary"] },
+      { label: "Family", tags: ["Animation", "Adventure", "Comedy"] },
     ],
   },
 ];
@@ -323,10 +293,7 @@ export default function WhatsNextTab() {
         {/* Header */}
         <div className="px-4 pt-6 pb-4 flex items-center gap-3">
           <button
-            onClick={() => {
-              if (currentQuestion === 0) { resetFlow(); }
-              else { setCurrentQuestion((q) => q - 1); setSelectedTags((t) => t.slice(0, -(VIBE_QUESTIONS[currentQuestion - 1].options[0].tags.length))); }
-            }}
+            onClick={() => currentQuestion === 0 ? resetFlow() : setCurrentQuestion((q) => q - 1)}
             className="w-8 h-8 rounded-full bg-bg-surface flex items-center justify-center active:opacity-70 transition-opacity shrink-0"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -345,6 +312,12 @@ export default function WhatsNextTab() {
               />
             </div>
           </div>
+          <button
+            onClick={() => handleVibeAnswer([])}
+            className="text-text-muted text-xs font-medium active:opacity-60 transition-opacity shrink-0"
+          >
+            Skip
+          </button>
         </div>
 
         {/* Question */}
