@@ -83,6 +83,9 @@ interface AppContextType {
   setPendingRecipientId: (id: string | null) => void;
   unreadCount: number;
   markNotificationsRead: () => void;
+  showNotificationsSheet: boolean;
+  openNotifications: () => void;
+  closeNotifications: () => void;
   pendingAddItem: Movie | Show | null;
   setPendingAddItem: (item: Movie | Show | null) => void;
   whatsNextSource: "taste" | "friends" | "community" | null;
@@ -134,6 +137,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [pendingAddItem, setPendingAddItem] = useState<Movie | Show | null>(null);
   const [whatsNextSource, setWhatsNextSource] = useState<"taste" | "friends" | "community" | null>(null);
   const [whatsNextContentType, setWhatsNextContentType] = useState<"movie" | "show" | "both">("both");
+  const [showNotificationsSheet, setShowNotificationsSheet] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -411,6 +415,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const unreadCount = notifications.filter((n) => !n.seen).length;
 
+  const openNotifications = () => {
+    setShowNotificationsSheet(true);
+    setNotifications((prev) => prev.map((n) => ({ ...n, seen: true })));
+  };
+  const closeNotifications = () => setShowNotificationsSheet(false);
+
   const value: AppContextType = {
     theme, toggleTheme,
     activeTab, setActiveTab,
@@ -430,6 +440,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     myNowWatching, setMyNowWatching, clearNowWatching,
     pendingRecipientId, setPendingRecipientId,
     unreadCount, markNotificationsRead,
+    showNotificationsSheet, openNotifications, closeNotifications,
     pendingAddItem, setPendingAddItem,
     whatsNextSource, setWhatsNextSource,
     whatsNextContentType, setWhatsNextContentType,

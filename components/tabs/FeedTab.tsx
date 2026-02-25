@@ -16,7 +16,6 @@ import { timeAgo, getRatingColor } from "@/lib/utils";
 import RatingBadge from "@/components/RatingBadge";
 import PosterImage from "@/components/PosterImage";
 import FriendProfileSheet from "@/components/FriendProfileSheet";
-import NotificationsSheet from "@/components/NotificationsSheet";
 import SearchOverlay from "@/components/SearchOverlay";
 
 type FeedTab = "friends" | "community" | "new";
@@ -43,7 +42,7 @@ export default function FeedTab() {
     setPendingAddItem,
     notifications,
     unreadCount,
-    markNotificationsRead,
+    openNotifications,
     pushScreen,
   } = useApp();
 
@@ -53,7 +52,6 @@ export default function FeedTab() {
   const [expandedCommunityId, setExpandedCommunityId] = useState<string | null>(null);
   const [recentlyReacted, setRecentlyReacted] = useState<string | null>(null);
   const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [recQuery, setRecQuery] = useState("");
   const [showRecInput, setShowRecInput] = useState(false);
@@ -157,10 +155,7 @@ export default function FeedTab() {
       <div className="pt-4 px-4 flex items-center justify-between mb-3">
         <h1 className="text-2xl font-bold lowercase font-display text-text-primary">binge</h1>
         <button
-          onClick={() => {
-            setShowNotifications(true);
-            markNotificationsRead();
-          }}
+          onClick={openNotifications}
           className="relative p-2 -mr-1 text-text-muted active:scale-90 transition-all"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -451,7 +446,6 @@ export default function FeedTab() {
       )}
 
       {selectedFriend && <FriendProfileSheet friend={selectedFriend} onClose={() => setSelectedFriend(null)} />}
-      {showNotifications && <NotificationsSheet notifications={notifications} onClose={() => setShowNotifications(false)} />}
       {showSearch && <SearchOverlay onClose={() => setShowSearch(false)} />}
     </div>
   );
