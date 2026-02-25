@@ -19,6 +19,32 @@ html, body {
   overflow-x: hidden;
 }
 
+/* ── Light mode overrides ── */
+html.light,
+html.light body {
+  background-color: #F5F4F0;
+  color: #1A1825;
+}
+
+html.light .bg-bg-primary { background-color: #F5F4F0 !important; }
+html.light .bg-bg-surface { background-color: #FFFFFF !important; }
+html.light .bg-bg-elevated { background-color: #EEECF0 !important; }
+html.light .bg-bg-hover { background-color: #E4E2EA !important; }
+
+html.light .text-text-primary { color: #1A1825 !important; }
+html.light .text-text-secondary { color: #4A4560 !important; }
+html.light .text-text-muted { color: #8884A0 !important; }
+
+html.light .border-bg-elevated { border-color: #DEDCE8 !important; }
+html.light .border-bg-hover { border-color: #D0CEDC !important; }
+
+html.light input[type="range"] { background: #DEDCE8; }
+html.light input,
+html.light textarea { background-color: #EEECF0 !important; color: #1A1825 !important; }
+html.light ::placeholder { color: #8884A0 !important; }
+
+html.light .border-t { border-color: #DEDCE8 !important; }
+
 ::-webkit-scrollbar {
   width: 0;
   height: 0;
