@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useApp } from "@/lib/AppContext";
 import { ContentType, Movie, Show } from "@/lib/types";
-import { searchableMovies, searchableShows } from "@/lib/mockData";
 import { getRatingColor } from "@/lib/utils";
+import PosterImage from "@/components/PosterImage";
 
 type Step = "choose" | "search" | "rate" | "rate-seasons" | "confirm";
 
@@ -20,6 +20,35 @@ export default function AddTab() {
   const [rateSeasons, setRateSeasons] = useState(false);
   const [seasonsWatched, setSeasonsWatched] = useState(1);
   const [seasonRatings, setSeasonRatings] = useState<number[]>([7.0]);
+  const [searchResults, setSearchResults] = useState<(Movie | Show)[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (searchQuery.length < 2) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+    setIsSearching(true);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/tmdb/search?query=${encodeURIComponent(searchQuery)}&type=${contentType}`
+        );
+        const data = await res.json();
+        setSearchResults(data.results ?? []);
+      } catch {
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 350);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [searchQuery, contentType]);
 
   const resetFlow = () => {
     setStep("choose");
@@ -30,6 +59,7 @@ export default function AddTab() {
     setRateSeasons(false);
     setSeasonsWatched(1);
     setSeasonRatings([7.0]);
+    setSearchResults([]);
   };
 
   const handleSelectType = (type: ContentType) => {
@@ -116,16 +146,7 @@ export default function AddTab() {
     }
   };
 
-  const filteredResults =
-    searchQuery.length >= 2
-      ? contentType === "movie"
-        ? searchableMovies.filter((m) =>
-            m.title.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-        : searchableShows.filter((s) =>
-            s.title.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-      : [];
+  const filteredResults = searchResults;
 
   // Step: choose
   if (step === "choose") {
@@ -204,23 +225,36 @@ export default function AddTab() {
         />
 
         <div className="flex flex-col gap-2">
-          {filteredResults.map((item) => (
-            <button
-              key={item.id}
-              onClick={() =>
-                contentType === "movie"
-                  ? handleSelectMovie(item as Movie)
-                  : handleSelectShow(item as Show)
-              }
-              className="bg-bg-surface rounded-lg p-3 text-left hover:bg-bg-hover transition-colors w-full"
-            >
-              <div className="text-text-primary font-medium">{item.title}</div>
-              <div className="text-text-secondary text-sm">
-                {item.year} &middot; {item.genre}
-              </div>
-            </button>
-          ))}
-          {searchQuery.length >= 2 && filteredResults.length === 0 && (
+          {isSearching && (
+            <p className="text-text-muted text-sm text-center py-4">Searching...</p>
+          )}
+          {!isSearching &&
+            filteredResults.map((item) => (
+              <button
+                key={item.id}
+                onClick={() =>
+                  contentType === "movie"
+                    ? handleSelectMovie(item as Movie)
+                    : handleSelectShow(item as Show)
+                }
+                className="bg-bg-surface rounded-lg p-3 text-left hover:bg-bg-hover transition-colors w-full flex items-center gap-3"
+              >
+                <PosterImage
+                  title={item.title}
+                  year={item.year ?? undefined}
+                  posterPath={(item as Movie & Show).posterPath ?? undefined}
+                  size="sm"
+                />
+                <div className="min-w-0">
+                  <div className="text-text-primary font-medium truncate">{item.title}</div>
+                  <div className="text-text-secondary text-sm">
+                    {item.year}
+                    {item.genre ? ` · ${item.genre}` : ""}
+                  </div>
+                </div>
+              </button>
+            ))}
+          {!isSearching && searchQuery.length >= 2 && filteredResults.length === 0 && (
             <p className="text-text-muted text-sm text-center py-4">
               No results found
             </p>
