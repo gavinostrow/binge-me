@@ -5,6 +5,7 @@ import { useApp } from "@/lib/AppContext";
 import { ContentType, Movie, Show } from "@/lib/types";
 import { getRatingColor } from "@/lib/utils";
 import PosterImage from "@/components/PosterImage";
+import SendRecommendationSheet from "@/components/SendRecommendationSheet";
 
 type Step = "choose" | "search" | "rate" | "rate-seasons" | "confirm";
 
@@ -529,6 +530,7 @@ export default function AddTab() {
       contentType === "movie"
         ? selectedMovie?.title
         : selectedShow?.title;
+    const [showSendRec, setShowSendRec] = useState(false);
 
     return (
       <div className="flex flex-col items-center justify-center gap-6 p-4 py-12">
@@ -568,13 +570,33 @@ export default function AddTab() {
           >
             Add Another
           </button>
+          {(selectedMovie || selectedShow) && (
+            <button
+              onClick={() => setShowSendRec(true)}
+              className="bg-bg-surface text-text-primary rounded-lg py-3 font-semibold w-full hover:bg-bg-hover active:scale-95 active:opacity-80 transition-all flex items-center justify-center gap-2"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+              Send to a Friend
+            </button>
+          )}
           <button
             onClick={() => setActiveTab("lists")}
-            className="bg-bg-surface text-text-primary rounded-lg py-3 font-semibold w-full hover:bg-bg-hover active:scale-95 active:opacity-80 transition-all"
+            className="bg-bg-surface text-text-muted rounded-lg py-3 font-semibold w-full hover:bg-bg-hover active:scale-95 active:opacity-80 transition-all"
           >
             View My Lists
           </button>
         </div>
+
+        {showSendRec && (selectedMovie || selectedShow) && (
+          <SendRecommendationSheet
+            item={(selectedMovie ?? selectedShow)!}
+            itemType={contentType}
+            onClose={() => setShowSendRec(false)}
+          />
+        )}
       </div>
     );
   }
