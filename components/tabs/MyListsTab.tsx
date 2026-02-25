@@ -14,11 +14,11 @@ export default function MyListsTab() {
   const [expandedShowId, setExpandedShowId] = useState<string | null>(null);
 
   const filteredMovies = movieRatings
-    .filter((mr) => selectedGenre === "All" || mr.movie.genre === selectedGenre)
+    .filter((mr) => selectedGenre === "All" || mr.movie.genre.includes(selectedGenre))
     .sort((a, b) => b.rating - a.rating);
 
   const filteredShows = showRatings
-    .filter((sr) => selectedGenre === "All" || sr.show.genre === selectedGenre)
+    .filter((sr) => selectedGenre === "All" || sr.show.genre.includes(selectedGenre))
     .sort((a, b) => b.overallRating - a.overallRating);
 
   return (
@@ -91,9 +91,9 @@ export default function MyListsTab() {
                 <span className="text-text-muted font-display text-base w-6 shrink-0 text-center">
                   {index + 1}
                 </span>
-                {mr.movie.posterUrl ? (
+                {mr.movie.posterPath ? (
                   <img
-                    src={mr.movie.posterUrl}
+                    src={mr.movie.posterPath}
                     alt={mr.movie.title}
                     className="w-10 h-14 rounded object-cover shrink-0"
                   />
@@ -130,9 +130,9 @@ export default function MyListsTab() {
                 <span className="text-text-muted font-display text-base w-6 shrink-0 text-center">
                   {index + 1}
                 </span>
-                {sr.show.posterUrl ? (
+                {sr.show.posterPath ? (
                   <img
-                    src={sr.show.posterUrl}
+                    src={sr.show.posterPath}
                     alt={sr.show.title}
                     className="w-10 h-14 rounded object-cover shrink-0"
                   />
@@ -145,7 +145,7 @@ export default function MyListsTab() {
                     {sr.show.year} &middot; {sr.show.genre}
                   </p>
                   <p className="text-text-muted text-sm">
-                    {sr.show.totalSeasons} seasons
+                    {sr.show.seasons ?? sr.show.totalSeasons} seasons
                   </p>
                 </div>
                 <div className="shrink-0">

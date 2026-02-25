@@ -1,148 +1,412 @@
 "use client";
-
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
-import {
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import type {
   TabId,
+  User,
+  Movie,
+  Show,
   MovieRating,
   ShowRating,
   FeedActivity,
   WatchlistItem,
-  Reaction,
+  GroupClub,
+  GroupMessage,
+  Prediction,
+  ContentType,
+  Comment,
+  Notification,
+  GroupPoll,
+  NowWatching,
 } from "./types";
+import type { ScreenDescriptor } from "./navigation";
 import {
+  currentUser as mockCurrentUser,
   myMovieRatings as initialMovieRatings,
   myShowRatings as initialShowRatings,
-  feedActivities as initialFeed,
+  feedActivities as initialFeedActivities,
+  initialWatchlist as mockWatchlist,
+  initialNotifications,
 } from "./mockData";
 
-interface AppState {
+interface AppContextType {
+  theme: "dark" | "light";
+  toggleTheme: () => void;
   activeTab: TabId;
   setActiveTab: (tab: TabId) => void;
   movieRatings: MovieRating[];
-  showRatings: ShowRating[];
-  feedActivities: FeedActivity[];
-  watchlist: WatchlistItem[];
   addMovieRating: (rating: MovieRating) => void;
+  getMyMovieRating: (movieId: string) => MovieRating | undefined;
+  showRatings: ShowRating[];
   addShowRating: (rating: ShowRating) => void;
+  getMyShowRating: (showId: string) => ShowRating | undefined;
+  feedActivities: FeedActivity[];
+  addFeedActivity: (activity: FeedActivity) => void;
+  toggleReaction: (activityId: string, emoji: string) => void;
+  watchlist: WatchlistItem[];
   addToWatchlist: (item: WatchlistItem) => void;
-  removeFromWatchlist: (id: string) => void;
-  toggleReaction: (activityId: string, userId: string, type: Reaction["type"]) => void;
+  removeFromWatchlist: (itemId: string) => void;
+  isInWatchlist: (contentType: ContentType, contentId: string) => boolean;
+  groups: GroupClub[];
+  sendGroupMessage: (groupId: string, message: GroupMessage) => void;
+  toggleGroupReaction: (groupId: string, messageId: string, emoji: string, userId: string) => void;
+  addPrediction: (groupId: string, prediction: Prediction) => void;
+  lockPrediction: (groupId: string, predictionId: string) => void;
+  revealPrediction: (groupId: string, predictionId: string, result: string) => void;
+  votePrediction: (groupId: string, predictionId: string, vote: "right" | "wrong") => void;
+  createGroup: (group: GroupClub) => void;
+  navigationStack: ScreenDescriptor[];
+  pushScreen: (descriptor: ScreenDescriptor) => void;
+  popScreen: () => void;
+  clearStack: () => void;
+  authUser: User | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (name: string, username: string, email: string, password: string) => Promise<void>;
+  logout: () => void;
+  updateProfile: (updates: Partial<User>) => void;
+  currentUserData: User;
+  notifications: Notification[];
+  addComment: (activityId: string, comment: Comment) => void;
+  sendRecommendation: (notification: Notification) => void;
+  markNotificationSeen: (id: string) => void;
+  sendGroupPoll: (groupId: string, poll: GroupPoll) => void;
+  voteGroupPoll: (groupId: string, pollId: string, optionId: string, userId: string) => void;
+  toggleMovieFavorite: (ratingId: string) => void;
+  toggleShowFavorite: (ratingId: string) => void;
+  updateMovieRating: (ratingId: string, rating: number) => void;
+  updateShowRating: (ratingId: string, rating: number) => void;
+  myNowWatching: NowWatching | null;
+  setMyNowWatching: (status: NowWatching) => void;
+  clearNowWatching: () => void;
+  pendingRecipientId: string | null;
+  setPendingRecipientId: (id: string | null) => void;
 }
 
-const AppContext = createContext<AppState | undefined>(undefined);
+const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === "dark" ? "light" : "dark";
+      if (typeof document !== "undefined") {
+        document.documentElement.classList.toggle("light", next === "light");
+        localStorage.setItem("binge_theme", next);
+      }
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("binge_theme") as "dark" | "light" | null;
+      if (saved === "light") {
+        setTheme("light");
+        document.documentElement.classList.add("light");
+      }
+    }
+  }, []);
+
   const [activeTab, setActiveTab] = useState<TabId>("feed");
   const [movieRatings, setMovieRatings] = useState<MovieRating[]>(initialMovieRatings);
   const [showRatings, setShowRatings] = useState<ShowRating[]>(initialShowRatings);
-  const [feedActivities, setFeedActivities] = useState<FeedActivity[]>(initialFeed);
-  const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
+  const [feedActivities, setFeedActivities] = useState<FeedActivity[]>(initialFeedActivities);
+  const [watchlist, setWatchlist] = useState<WatchlistItem[]>(mockWatchlist);
+  const [groups, setGroups] = useState<GroupClub[]>([]);
+  const [navigationStack, setNavigationStack] = useState<ScreenDescriptor[]>([]);
+  const [authUser, setAuthUser] = useState<User | null>(null);
+  const [currentUserData, setCurrentUserData] = useState<User>(mockCurrentUser);
+  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+  const [myNowWatching, setMyNowWatchingState] = useState<NowWatching | null>(null);
+  const [pendingRecipientId, setPendingRecipientId] = useState<string | null>(null);
 
-  const addMovieRating = useCallback((rating: MovieRating) => {
-    setMovieRatings((prev) => [rating, ...prev]);
-    const activity: FeedActivity = {
-      id: `fa-${Date.now()}`,
-      userId: rating.userId,
-      user: {
-        id: rating.userId,
-        username: "alexchen",
-        displayName: "Alex Chen",
-        handle: "@alexchen",
-        bio: "",
-        avatarColor: "#8B5CF6",
-        mountRushmore: [],
-        createdAt: "",
-      },
-      type: "movie_rating",
-      title: rating.movie.title,
-      year: rating.movie.year,
-      rating: rating.rating,
-      taggedUsers: [],
-      reactions: [],
-      createdAt: new Date().toISOString(),
-    };
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("binge_user");
+      if (saved) {
+        try {
+          const user = JSON.parse(saved);
+          setAuthUser(user);
+          setCurrentUserData(user);
+        } catch {
+          console.error("Failed to parse saved user");
+        }
+      }
+    }
+  }, []);
+
+  const addMovieRating = (rating: MovieRating) => {
+    setMovieRatings((prev) => {
+      const existing = prev.findIndex((r) => r.movie.id === rating.movie.id);
+      if (existing >= 0) {
+        const updated = [...prev];
+        updated[existing] = rating;
+        return updated;
+      }
+      return [...prev, rating];
+    });
+  };
+
+  const getMyMovieRating = (movieId: string) => movieRatings.find((r) => r.movie.id === movieId);
+
+  const addShowRating = (rating: ShowRating) => {
+    setShowRatings((prev) => {
+      const existing = prev.findIndex((r) => r.show.id === rating.show.id);
+      if (existing >= 0) {
+        const updated = [...prev];
+        updated[existing] = rating;
+        return updated;
+      }
+      return [...prev, rating];
+    });
+  };
+
+  const getMyShowRating = (showId: string) => showRatings.find((r) => r.show.id === showId);
+
+  const addFeedActivity = (activity: FeedActivity) => {
     setFeedActivities((prev) => [activity, ...prev]);
-  }, []);
+  };
 
-  const addShowRating = useCallback((rating: ShowRating) => {
-    setShowRatings((prev) => [rating, ...prev]);
-    const activity: FeedActivity = {
-      id: `fa-${Date.now()}`,
-      userId: rating.userId,
-      user: {
-        id: rating.userId,
-        username: "alexchen",
-        displayName: "Alex Chen",
-        handle: "@alexchen",
-        bio: "",
-        avatarColor: "#8B5CF6",
-        mountRushmore: [],
-        createdAt: "",
-      },
-      type: "show_rating",
-      title: rating.show.title,
-      year: rating.show.year,
-      rating: rating.overallRating,
-      taggedUsers: [],
-      reactions: [],
-      createdAt: new Date().toISOString(),
-    };
-    setFeedActivities((prev) => [activity, ...prev]);
-  }, []);
+  const toggleReaction = (activityId: string, emoji: string) => {
+    setFeedActivities((prev) =>
+      prev.map((activity) => {
+        if (activity.id !== activityId) return activity;
+        const reactions = { ...activity.reactions };
+        if (!reactions[emoji]) reactions[emoji] = [];
+        const idx = reactions[emoji].indexOf("u1");
+        if (idx >= 0) {
+          reactions[emoji] = reactions[emoji].filter((id) => id !== "u1");
+        } else {
+          reactions[emoji] = [...reactions[emoji], "u1"];
+        }
+        return { ...activity, reactions };
+      })
+    );
+  };
 
-  const addToWatchlist = useCallback((item: WatchlistItem) => {
-    setWatchlist((prev) => [item, ...prev]);
-  }, []);
+  const addToWatchlist = (item: WatchlistItem) => setWatchlist((prev) => [...prev, item]);
+  const removeFromWatchlist = (itemId: string) =>
+    setWatchlist((prev) => prev.filter((w) => w.id !== itemId));
 
-  const removeFromWatchlist = useCallback((id: string) => {
-    setWatchlist((prev) => prev.filter((item) => item.id !== id));
-  }, []);
+  const isInWatchlist = (contentType: ContentType, contentId: string) =>
+    watchlist.some((w) => {
+      if (w.contentType !== contentType) return false;
+      if (contentType === "movie") return w.movie?.id === contentId;
+      return w.show?.id === contentId;
+    });
 
-  const toggleReaction = useCallback(
-    (activityId: string, userId: string, type: Reaction["type"]) => {
-      setFeedActivities((prev) =>
-        prev.map((activity) => {
-          if (activity.id !== activityId) return activity;
-          const existing = activity.reactions.find(
-            (r) => r.userId === userId && r.type === type
-          );
-          if (existing) {
-            return {
-              ...activity,
-              reactions: activity.reactions.filter(
-                (r) => !(r.userId === userId && r.type === type)
+  const sendGroupMessage = (groupId: string, message: GroupMessage) => {
+    setGroups((prev) =>
+      prev.map((g) =>
+        g.id !== groupId ? g : { ...g, messages: [...(g.messages || []), message] }
+      )
+    );
+  };
+
+  const toggleGroupReaction = (
+    groupId: string,
+    messageId: string,
+    emoji: string,
+    userId: string
+  ) => {
+    setGroups((prev) =>
+      prev.map((g) => {
+        if (g.id !== groupId) return g;
+        return {
+          ...g,
+          messages: (g.messages || []).map((m) => {
+            if (m.id !== messageId) return m;
+            const reactions = { ...m.reactions };
+            if (!reactions[emoji]) reactions[emoji] = [];
+            const idx = reactions[emoji].indexOf(userId);
+            if (idx >= 0) {
+              reactions[emoji] = reactions[emoji].filter((id) => id !== userId);
+            } else {
+              reactions[emoji] = [...reactions[emoji], userId];
+            }
+            return { ...m, reactions };
+          }),
+        };
+      })
+    );
+  };
+
+  const addPrediction = (groupId: string, prediction: Prediction) =>
+    setGroups((prev) =>
+      prev.map((g) =>
+        g.id !== groupId ? g : { ...g, predictions: [...(g.predictions || []), prediction] }
+      )
+    );
+
+  const lockPrediction = (groupId: string, predictionId: string) =>
+    setGroups((prev) =>
+      prev.map((g) =>
+        g.id !== groupId
+          ? g
+          : {
+              ...g,
+              predictions: (g.predictions || []).map((p) =>
+                p.id !== predictionId
+                  ? p
+                  : { ...p, locked: true, lockedAt: new Date().toISOString() }
               ),
-            };
-          }
-          return {
-            ...activity,
-            reactions: [...activity.reactions, { userId, type }],
-          };
-        })
-      );
-    },
-    []
-  );
+            }
+      )
+    );
 
-  return (
-    <AppContext.Provider
-      value={{
-        activeTab,
-        setActiveTab,
-        movieRatings,
-        showRatings,
-        feedActivities,
-        watchlist,
-        addMovieRating,
-        addShowRating,
-        addToWatchlist,
-        removeFromWatchlist,
-        toggleReaction,
-      }}
-    >
-      {children}
-    </AppContext.Provider>
-  );
+  const revealPrediction = (groupId: string, predictionId: string, result: string) =>
+    setGroups((prev) =>
+      prev.map((g) =>
+        g.id !== groupId
+          ? g
+          : {
+              ...g,
+              predictions: (g.predictions || []).map((p) =>
+                p.id !== predictionId ? p : { ...p, revealed: true, result }
+              ),
+            }
+      )
+    );
+
+  const votePrediction = (groupId: string, predictionId: string, vote: "right" | "wrong") =>
+    setGroups((prev) =>
+      prev.map((g) => {
+        if (g.id !== groupId) return g;
+        return {
+          ...g,
+          predictions: (g.predictions || []).map((p) => {
+            if (p.id !== predictionId) return p;
+            return { ...p, votes: { ...p.votes, u1: vote } };
+          }),
+        };
+      })
+    );
+
+  const createGroup = (group: GroupClub) => setGroups((prev) => [...prev, group]);
+
+  const pushScreen = (descriptor: ScreenDescriptor) =>
+    setNavigationStack((prev) => [...prev, descriptor]);
+
+  const popScreen = () =>
+    setNavigationStack((prev) => (prev.length > 0 ? prev.slice(0, -1) : prev));
+
+  const clearStack = () => setNavigationStack([]);
+
+  const login = async (_email: string, _password: string) => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("binge_user");
+      if (saved) {
+        const user = JSON.parse(saved);
+        setAuthUser(user);
+        setCurrentUserData(user);
+      }
+    }
+  };
+
+  const signup = async (name: string, username: string, _email: string, _password: string) => {
+    const newUser: User = { id: `u_${Date.now()}`, name, username, bio: "", favoriteGenres: [] };
+    if (typeof window !== "undefined") localStorage.setItem("binge_user", JSON.stringify(newUser));
+    setAuthUser(newUser);
+    setCurrentUserData(newUser);
+  };
+
+  const logout = () => {
+    if (typeof window !== "undefined") localStorage.removeItem("binge_user");
+    setAuthUser(null);
+    setCurrentUserData(mockCurrentUser);
+  };
+
+  const updateProfile = (updates: Partial<User>) => {
+    const updated = { ...currentUserData, ...updates };
+    setCurrentUserData(updated);
+    if (authUser) {
+      const newAuthUser = { ...authUser, ...updates };
+      setAuthUser(newAuthUser);
+      if (typeof window !== "undefined")
+        localStorage.setItem("binge_user", JSON.stringify(newAuthUser));
+    }
+  };
+
+  const addComment = (activityId: string, comment: Comment) =>
+    setFeedActivities((prev) =>
+      prev.map((a) =>
+        a.id === activityId ? { ...a, comments: [...(a.comments ?? []), comment] } : a
+      )
+    );
+
+  const sendRecommendation = (notification: Notification) =>
+    setNotifications((prev) => [notification, ...prev]);
+
+  const markNotificationSeen = (id: string) =>
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, seen: true } : n)));
+
+  const sendGroupPoll = (groupId: string, poll: GroupPoll) =>
+    setGroups((prev) =>
+      prev.map((g) => (g.id === groupId ? { ...g, polls: [...(g.polls ?? []), poll] } : g))
+    );
+
+  const voteGroupPoll = (groupId: string, pollId: string, optionId: string, userId: string) =>
+    setGroups((prev) =>
+      prev.map((g) => {
+        if (g.id !== groupId) return g;
+        const polls = (g.polls ?? []).map((p) => {
+          if (p.id !== pollId) return p;
+          const options = p.options.map((o) => ({
+            ...o,
+            votes:
+              o.id === optionId
+                ? [...o.votes.filter((v) => v !== userId), userId]
+                : o.votes.filter((v) => v !== userId),
+          }));
+          return { ...p, options };
+        });
+        return { ...g, polls };
+      })
+    );
+
+  const toggleMovieFavorite = (ratingId: string) =>
+    setMovieRatings((prev) =>
+      prev.map((r) => (r.id === ratingId ? { ...r, isFavorite: !r.isFavorite } : r))
+    );
+
+  const toggleShowFavorite = (ratingId: string) =>
+    setShowRatings((prev) =>
+      prev.map((r) => (r.id === ratingId ? { ...r, isFavorite: !r.isFavorite } : r))
+    );
+
+  const setMyNowWatching = (status: NowWatching) => setMyNowWatchingState(status);
+  const clearNowWatching = () => setMyNowWatchingState(null);
+
+  const updateMovieRating = (ratingId: string, rating: number) =>
+    setMovieRatings((prev) => prev.map((r) => (r.id === ratingId ? { ...r, rating } : r)));
+
+  const updateShowRating = (ratingId: string, rating: number) =>
+    setShowRatings((prev) =>
+      prev.map((r) => (r.id === ratingId ? { ...r, overallRating: rating } : r))
+    );
+
+  const value: AppContextType = {
+    theme, toggleTheme,
+    activeTab, setActiveTab,
+    movieRatings, addMovieRating, getMyMovieRating,
+    showRatings, addShowRating, getMyShowRating,
+    feedActivities, addFeedActivity, toggleReaction,
+    watchlist, addToWatchlist, removeFromWatchlist, isInWatchlist,
+    groups, sendGroupMessage, toggleGroupReaction, addPrediction,
+    lockPrediction, revealPrediction, votePrediction, createGroup,
+    navigationStack, pushScreen, popScreen, clearStack,
+    authUser, isAuthenticated: authUser !== null,
+    login, signup, logout, updateProfile, currentUserData,
+    notifications, addComment, sendRecommendation, markNotificationSeen,
+    sendGroupPoll, voteGroupPoll,
+    toggleMovieFavorite, toggleShowFavorite,
+    updateMovieRating, updateShowRating,
+    myNowWatching, setMyNowWatching, clearNowWatching,
+    pendingRecipientId, setPendingRecipientId,
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 
 export function useApp() {

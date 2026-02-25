@@ -47,14 +47,20 @@ export default function FeedTab() {
   const getFriend = (userId: string) => friends.find((f) => f.id === userId);
 
   const getReactionCount = (
-    reactions: { userId: string; type: string }[],
+    reactions: Record<string, string[]> | { userId: string; type: string }[],
     type: string
-  ) => reactions.filter((r) => r.type === type).length;
+  ) => {
+    if (Array.isArray(reactions)) return reactions.filter((r: { userId: string; type: string }) => r.type === type).length;
+    return (reactions[type] ?? []).length;
+  };
 
   const hasUserReacted = (
-    reactions: { userId: string; type: string }[],
+    reactions: Record<string, string[]> | { userId: string; type: string }[],
     type: string
-  ) => reactions.some((r) => r.userId === "u1" && r.type === type);
+  ) => {
+    if (Array.isArray(reactions)) return reactions.some((r: { userId: string; type: string }) => r.userId === "u1" && r.type === type);
+    return (reactions[type] ?? []).includes("u1");
+  };
 
   return (
     <div className="flex flex-col gap-4 pb-24">
@@ -130,7 +136,7 @@ export default function FeedTab() {
           {/* Feed cards */}
           <div className="flex flex-col gap-3">
             {filteredActivities.map((activity) => {
-              const friend = getFriend(activity.userId);
+              const friend = activity.user ?? (activity.userId ? getFriend(activity.userId) : null);
               if (!friend) return null;
 
               return (
@@ -142,27 +148,27 @@ export default function FeedTab() {
                   <div className="flex items-center gap-2">
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
-                      style={{ backgroundColor: friend.avatarColor }}
+                      style={{ backgroundColor: friend.avatarColor ?? "#7C5CF6" }}
                     >
-                      {friend.displayName.charAt(0).toUpperCase()}
+                      {(friend.displayName ?? friend.name).charAt(0).toUpperCase()}
                     </div>
                     <div className="flex items-center gap-1.5 min-w-0">
                       <span className="text-sm font-medium text-text-primary truncate">
-                        {friend.displayName}
+                        {friend.displayName ?? friend.name}
                       </span>
                       <span className="text-xs text-text-muted truncate">
-                        {friend.handle}
+                        @{(friend as { handle?: string }).handle ?? friend.username}
                       </span>
                     </div>
-                    <span className="text-xs text-text-muted ml-auto shrink-0">
-                      {timeAgo(activity.createdAt)}
+                    <span className="text-xs text-text-muted ml-auto shrink-0" suppressHydrationWarning>
+                      {timeAgo(activity.timestamp ?? activity.createdAt ?? "")}
                     </span>
                   </div>
 
                   {/* Title line */}
                   <div className="flex items-center gap-2">
                     <span className="font-display font-semibold text-text-primary">
-                      {activity.title}
+                      {activity.movie?.title ?? activity.show?.title ?? activity.title}
                       {activity.season != null && (
                         <span className="text-text-secondary">
                           {" "}
@@ -174,7 +180,7 @@ export default function FeedTab() {
 
                   {/* Rating */}
                   <div>
-                    <RatingBadge rating={activity.rating} />
+                    {activity.rating != null && <RatingBadge rating={activity.rating} />}
                   </div>
 
                   {/* Tagged users */}
@@ -186,7 +192,7 @@ export default function FeedTab() {
                         return (
                           <span key={taggedId}>
                             <span className="text-accent-purple">
-                              {taggedFriend?.handle ?? taggedId}
+                              {taggedFriend ? `@${(taggedFriend as { handle?: string }).handle ?? taggedFriend.username}` : taggedId}
                             </span>
                             {idx < activity.taggedUsers!.length - 1 && ", "}
                           </span>
@@ -213,8 +219,7 @@ export default function FeedTab() {
                           onClick={() =>
                             toggleReaction(
                               activity.id,
-                              "u1",
-                              reaction.key as ReactionType
+                              reaction.key
                             )
                           }
                           className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-colors ${
@@ -275,8 +280,8 @@ export default function FeedTab() {
                 <div className="flex flex-col gap-1 min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-text-primary truncate">
-                      {item.title}
-                      {("season" in item && item.season != null) && (
+                      {item.movie?.title ?? item.show?.title}
+                      {item.season != null && (
                         <span className="text-text-secondary">
                           {" "}
                           S{item.season}
@@ -284,12 +289,12 @@ export default function FeedTab() {
                       )}
                     </span>
                     <span className="text-xs text-text-muted shrink-0">
-                      {item.year}
+                      {item.movie?.year ?? item.show?.year}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs bg-bg-elevated text-text-secondary rounded px-2 py-0.5">
-                      {item.genre}
+                      {(item.movie?.genre ?? item.show?.genre ?? [])[0]}
                     </span>
                   </div>
                 </div>
@@ -297,7 +302,7 @@ export default function FeedTab() {
                 {/* Rating info */}
                 <div className="flex flex-col items-end gap-1 shrink-0">
                   <span className="text-text-muted text-xs">
-                    {item.totalRatings} ratings
+                    {item.ratingCount} ratings
                   </span>
                   <RatingBadge rating={item.averageRating} size="sm" />
                 </div>

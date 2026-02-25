@@ -57,7 +57,7 @@ export default function AddTab() {
     if (!selectedShow) return;
     const newCount = Math.min(
       Math.max(1, seasonsWatched + delta),
-      selectedShow.totalSeasons
+      selectedShow.seasons ?? selectedShow.totalSeasons ?? 99
     );
     setSeasonsWatched(newCount);
     setSeasonRatings((prev) => {
@@ -93,7 +93,7 @@ export default function AddTab() {
     if (!selectedShow) return;
     const seasonRatingsArray = rateSeasons
       ? seasonRatings.slice(0, seasonsWatched).map((r, i) => ({
-          seasonNumber: i + 1,
+          season: i + 1,
           rating: r,
         }))
       : [];
@@ -490,7 +490,7 @@ export default function AddTab() {
             Add Another
           </button>
           <button
-            onClick={() => setActiveTab("lists")}
+            onClick={() => setActiveTab("feed")}
             className="bg-bg-surface text-text-primary rounded-lg py-3 font-semibold w-full hover:bg-bg-hover transition-colors"
           >
             View My Lists

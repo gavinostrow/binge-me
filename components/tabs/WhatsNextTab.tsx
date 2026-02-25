@@ -17,7 +17,7 @@ import RatingBadge from "@/components/RatingBadge";
 interface RecommendationResult {
   title: string;
   year: number;
-  genre: string;
+  genre: string | string[];
   reason: string;
   rating?: number;
 }
@@ -39,14 +39,14 @@ export default function WhatsNextTab() {
     const genreScores: Record<string, { total: number; count: number }> = {};
     if (contentType === "movie") {
       for (const r of movieRatings) {
-        const genre = r.movie.genre || "Unknown";
+        const genre = (Array.isArray(r.movie.genre) ? r.movie.genre[0] : r.movie.genre) || "Unknown";
         if (!genreScores[genre]) genreScores[genre] = { total: 0, count: 0 };
         genreScores[genre].total += r.rating;
         genreScores[genre].count += 1;
       }
     } else {
       for (const r of showRatings) {
-        const genre = r.show.genre || "Unknown";
+        const genre = (Array.isArray(r.show.genre) ? r.show.genre[0] : r.show.genre) || "Unknown";
         if (!genreScores[genre]) genreScores[genre] = { total: 0, count: 0 };
         genreScores[genre].total += r.overallRating;
         genreScores[genre].count += 1;
@@ -65,12 +65,12 @@ export default function WhatsNextTab() {
       const unrated = pool.filter((item) => !ratedTitles.has(item.title));
       const genrePrefs = getGenrePreferences();
       const sorted = [...unrated].sort((a, b) => {
-        const aScore = genrePrefs[a.genre] || 0;
-        const bScore = genrePrefs[b.genre] || 0;
+        const aScore = genrePrefs[(Array.isArray(a.genre) ? a.genre[0] : a.genre) as string] || 0;
+        const bScore = genrePrefs[(Array.isArray(b.genre) ? b.genre[0] : b.genre) as string] || 0;
         return bScore - aScore;
       });
       return sorted.map((item) => {
-        const topGenre = item.genre;
+        const topGenre = (Array.isArray(item.genre) ? item.genre[0] : item.genre) as string;
         const matchScore = genrePrefs[topGenre];
         const reason = matchScore
           ? `Matches your ${topGenre} taste (avg rating: ${matchScore.toFixed(1)})`
@@ -86,16 +86,19 @@ export default function WhatsNextTab() {
 
     if (source === "friends") {
       const communityPool = contentType === "movie" ? communityMovies : communityShows;
-      const unrated = communityPool.filter((item) => !ratedTitles.has(item.title));
+      const unrated = communityPool.filter((item) => {
+        const t = item.movie?.title ?? item.show?.title ?? "";
+        return !ratedTitles.has(t);
+      });
       return unrated.map((item) => {
         const friend = friends[Math.floor(Math.random() * friends.length)];
         const matchPct = tasteMatchPercentages[friend.id] || 75;
         const friendRating = (7 + Math.random() * 3).toFixed(1);
         return {
-          title: item.title,
-          year: item.year,
-          genre: item.genre,
-          reason: `${friend.displayName} rated ${friendRating} — ${matchPct}% taste match`,
+          title: item.movie?.title ?? item.show?.title ?? "",
+          year: item.movie?.year ?? item.show?.year ?? 0,
+          genre: item.movie?.genre ?? item.show?.genre ?? [],
+          reason: `${friend.displayName ?? friend.name} rated ${friendRating} — ${matchPct}% taste match`,
           rating: item.averageRating,
         };
       });
@@ -103,12 +106,15 @@ export default function WhatsNextTab() {
 
     // community
     const communityPool = contentType === "movie" ? communityMovies : communityShows;
-    const unrated = communityPool.filter((item) => !ratedTitles.has(item.title));
+    const unrated = communityPool.filter((item) => {
+      const t = item.movie?.title ?? item.show?.title ?? "";
+      return !ratedTitles.has(t);
+    });
     return unrated.map((item) => ({
-      title: item.title,
-      year: item.year,
-      genre: item.genre,
-      reason: `${item.averageRating.toFixed(1)} avg from ${item.totalRatings.toLocaleString()} ratings`,
+      title: item.movie?.title ?? item.show?.title ?? "",
+      year: item.movie?.year ?? item.show?.year ?? 0,
+      genre: item.movie?.genre ?? item.show?.genre ?? [],
+      reason: `${item.averageRating.toFixed(1)} avg from ${item.ratingCount.toLocaleString()} ratings`,
       rating: item.averageRating,
     }));
   }
