@@ -1,20 +1,43 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import Tab1 from './Tabs/Tab1';
-import Tab2 from './Tabs/Tab2';
-import Tab3 from './Tabs/Tab3';
-
-const BingeApp = () => {
-    return (
-        <Router>
-            <Switch>
-                <Route path='/tab1' component={Tab1} />
-                <Route path='/tab2' component={Tab2} />
-                <Route path='/tab3' component={Tab3} />
-                <Route path='/' exact component={Tab1} /> {/* Default route */}
-            </Switch>
-        </Router>
-    );
-};
-
-export default BingeApp;
+"use client";
+import { useEffect, useState } from "react";
+import { useApp } from "@/lib/AppContext";
+import BottomNav from "./BottomNav";
+import FeedTab from "./tabs/FeedTab";
+import AddTab from "./tabs/AddTab";
+import WhatsNextTab from "./tabs/WhatsNextTab";
+import ProfileTab from "./tabs/ProfileTab";
+import GroupsTab from "./tabs/GroupsTab";
+import ScreenRenderer from "./ScreenRenderer";
+import Onboarding from "./Onboarding";
+export default function BingeApp() {
+  const { activeTab } = useApp();
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      !localStorage.getItem("binge_onboarded")
+    ) {
+      setShowOnboarding(true);
+    }
+  }, []);
+  return (
+    <div className="min-h-screen bg-bg-primary max-w-app mx-auto relative overflow-x-hidden">
+      {" "}
+      <main className="pb-20">
+        {" "}
+        <div className="animate-fadeIn" key={activeTab}>
+          {" "}
+          {activeTab === "feed" && <FeedTab />}{" "}
+          {activeTab === "add" && <AddTab />}{" "}
+          {activeTab === "groups" && <GroupsTab />}{" "}
+          {activeTab === "next" && <WhatsNextTab />}{" "}
+          {activeTab === "profile" && <ProfileTab />}{" "}
+        </div>{" "}
+      </main>{" "}
+      <BottomNav /> <ScreenRenderer />{" "}
+      {showOnboarding && (
+        <Onboarding onDone={() => setShowOnboarding(false)} />
+      )}{" "}
+    </div>
+  );
+}

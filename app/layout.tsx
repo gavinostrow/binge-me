@@ -1,20 +1,27 @@
-import React from 'react';
+import type { Metadata } from "next";
+import "@/styles/globals.css";
 
-// Import fonts
-import '../styles/fonts.css';
-
-// Metadata
-export const metadata = {
-  title: 'Binge Me',
-  description: 'Your ultimate binge-watching guide',
+export const metadata: Metadata = {
+  title: "binge",
+  description: "Social movie and TV show rankings",
 };
 
-const RootLayout = ({ children }) => {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1"
+        />
+      </head>
+      <body className="bg-bg-primary text-text-primary font-body">
+        {children}
+      </body>
     </html>
   );
-};
-
-export default RootLayout;
+}

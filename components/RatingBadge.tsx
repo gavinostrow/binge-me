@@ -1,34 +1,26 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+"use client";
 
-const RatingBadge = ({ rating }) => {
-    let color;
+import { getRatingColor } from "@/lib/utils";
 
-    if (rating >= 4.5) {
-        color = 'green'; // Excellent
-    } else if (rating >= 3.5) {
-        color = 'yellowgreen'; // Good
-    } else if (rating >= 2.5) {
-        color = 'orange'; // Average
-    } else {
-        color = 'red'; // Poor
-    }
+interface RatingBadgeProps {
+  rating: number;
+  size?: "sm" | "md" | "lg";
+}
 
-    return (
-        <div style={{
-            backgroundColor: color,
-            color: 'white',
-            padding: '10px 15px',
-            borderRadius: '5px',
-            display: 'inline-block'
-        }}>
-            {rating} / 5
-        </div>
-    );
-};
+export default function RatingBadge({ rating, size = "md" }: RatingBadgeProps) {
+  const color = getRatingColor(rating);
+  const sizeClasses = {
+    sm: "text-xs px-1.5 py-0.5 min-w-[32px]",
+    md: "text-sm px-2 py-1 min-w-[40px]",
+    lg: "text-lg px-3 py-1.5 min-w-[52px] font-bold",
+  };
 
-RatingBadge.propTypes = {
-    rating: PropTypes.number.isRequired,
-};
-
-export default RatingBadge;
+  return (
+    <span
+      className={`inline-flex items-center justify-center rounded-md font-display font-bold ${sizeClasses[size]}`}
+      style={{ backgroundColor: color }}
+    >
+      <span className="text-white">{rating.toFixed(1)}</span>
+    </span>
+  );
+}
