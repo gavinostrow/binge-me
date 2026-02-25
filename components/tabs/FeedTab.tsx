@@ -594,13 +594,14 @@ function RatingCard({
   pushScreen: (d: any) => void;
 }) {
   const { addComment } = useApp();
-  const [showCommentInput, setShowCommentInput] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [focused, setFocused] = useState(false);
 
   const title = activity.title ?? activity.movie?.title ?? activity.show?.title ?? "";
   const contentTypeLabel = activity.movie ? "a movie" : "a show";
   const posterPath = activity.movie?.posterPath ?? activity.show?.posterPath;
   const year = activity.movie?.year ?? activity.show?.year;
+  const comments = activity.comments ?? [];
 
   function handleSendComment() {
     if (!commentText.trim()) return;
@@ -612,7 +613,7 @@ function RatingCard({
       timestamp: new Date().toISOString(),
     });
     setCommentText("");
-    setShowCommentInput(false);
+    setFocused(false);
   }
 
   return (
@@ -688,22 +689,13 @@ function RatingCard({
               </button>
             );
           })}
-          <button
-            onClick={() => setShowCommentInput((v) => !v)}
-            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs bg-bg-elevated text-text-muted active:scale-95 transition-all ml-auto"
-          >
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-            <span>{activity.comments?.length ?? 0}</span>
-          </button>
         </div>
       </div>
 
-      {/* Comments thread */}
-      {activity.comments && activity.comments.length > 0 && (
-        <div className="border-t border-bg-elevated px-3.5 pt-2.5 pb-3 flex flex-col gap-2">
-          {activity.comments.map((comment) => {
+      {/* Comments — always visible */}
+      {comments.length > 0 && (
+        <div className="border-t border-bg-elevated px-3.5 pt-2.5 pb-2 flex flex-col gap-2">
+          {comments.map((comment) => {
             const commenter = comment.user ?? (comment.userId ? getFriend(comment.userId) : null);
             return (
               <div key={comment.id} className="flex items-start gap-2">
@@ -725,26 +717,28 @@ function RatingCard({
         </div>
       )}
 
-      {/* Comment input */}
-      {showCommentInput && (
-        <div className="border-t border-bg-elevated px-3.5 py-2.5 flex items-center gap-2 animate-fadeIn">
-          <input
-            autoFocus
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") handleSendComment(); }}
-            placeholder="Add a comment..."
-            className="flex-1 bg-bg-elevated rounded-xl px-3 py-2 text-xs text-text-primary placeholder-text-muted outline-none"
-          />
+      {/* Comment input — always at bottom */}
+      <div className="border-t border-bg-elevated px-3.5 py-2 flex items-center gap-2">
+        <div className="w-5 h-5 rounded-full bg-accent-purple flex items-center justify-center text-[9px] font-bold text-white shrink-0">G</div>
+        <input
+          value={commentText}
+          onChange={(e) => setCommentText(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => { if (!commentText.trim()) setFocused(false); }}
+          onKeyDown={(e) => { if (e.key === "Enter") handleSendComment(); }}
+          placeholder="Add a comment..."
+          className="flex-1 bg-transparent text-xs text-text-primary placeholder-text-muted outline-none"
+        />
+        {(focused || commentText.trim()) && (
           <button
             onClick={handleSendComment}
             disabled={!commentText.trim()}
-            className="text-accent-purple text-xs font-semibold disabled:opacity-40 active:scale-95 transition-all"
+            className="text-accent-purple text-xs font-semibold disabled:opacity-40 active:scale-95 transition-all shrink-0"
           >
             Post
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
