@@ -7,7 +7,7 @@ import { getRatingColor } from "@/lib/utils";
 import PosterImage from "@/components/PosterImage";
 import SendRecommendationSheet from "@/components/SendRecommendationSheet";
 
-type Step = "choose" | "search" | "rate" | "rate-seasons" | "confirm";
+type Step = "choose" | "search" | "rate" | "rate-seasons" | "confirm" | "send-rec";
 
 export default function AddTab() {
   const {
@@ -214,6 +214,103 @@ export default function AddTab() {
           </div>
           <span className="text-text-muted text-xl">&rarr;</span>
         </button>
+
+        <button
+          onClick={() => setStep("send-rec")}
+          className="bg-bg-surface rounded-xl p-6 w-full text-left flex items-center justify-between hover:bg-bg-hover active:scale-95 active:opacity-80 transition-all"
+        >
+          <div>
+            <h2 className="text-text-primary font-semibold text-lg">Send a Recommendation</h2>
+            <p className="text-text-secondary text-sm">
+              Tell a friend what to watch next
+            </p>
+          </div>
+          <span className="text-text-muted text-xl">&rarr;</span>
+        </button>
+      </div>
+    );
+  }
+
+  // Step: send-rec
+  if (step === "send-rec") {
+    return (
+      <div className="flex flex-col gap-4 p-4">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setStep("choose")}
+            className="text-text-secondary hover:text-text-primary transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5" />
+              <path d="M12 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h1 className="font-display font-bold text-xl text-text-primary">Send a Rec</h1>
+        </div>
+        <p className="text-text-muted text-sm">Search for something to recommend to a friend.</p>
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => { setContentType("movie"); setSearchQuery(""); setSearchResults([]); }}
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${contentType === "movie" ? "bg-accent-purple text-white" : "bg-bg-surface text-text-muted"}`}
+          >Movies</button>
+          <button
+            onClick={() => { setContentType("show"); setSearchQuery(""); setSearchResults([]); }}
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${contentType === "show" ? "bg-accent-purple text-white" : "bg-bg-surface text-text-muted"}`}
+          >Shows</button>
+        </div>
+
+        <input
+          type="text"
+          placeholder={`Search ${contentType === "movie" ? "movies" : "TV shows"}...`}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          autoFocus
+          className="bg-bg-elevated rounded-lg px-4 py-3 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-accent-purple w-full"
+        />
+
+        <div className="flex flex-col gap-2">
+          {isSearching && (
+            <p className="text-text-muted text-sm text-center py-4">Searching...</p>
+          )}
+          {!isSearching && filteredResults.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                if (contentType === "movie") {
+                  setSelectedMovie(item as Movie);
+                  setSelectedShow(null);
+                } else {
+                  setSelectedShow(item as Show);
+                  setSelectedMovie(null);
+                }
+              }}
+              className={`bg-bg-surface rounded-lg p-3 text-left active:scale-[0.98] transition-all w-full flex items-center gap-3 ${
+                (selectedMovie?.id === item.id || selectedShow?.id === item.id) ? "ring-2 ring-accent-purple" : ""
+              }`}
+            >
+              <div className="min-w-0 flex-1">
+                <div className="text-text-primary font-medium truncate">{item.title}</div>
+                <div className="text-text-secondary text-sm">
+                  {item.year}{item.genre ? ` · ${Array.isArray(item.genre) ? item.genre[0] : item.genre}` : ""}
+                </div>
+              </div>
+            </button>
+          ))}
+          {!isSearching && searchQuery.length >= 2 && filteredResults.length === 0 && (
+            <p className="text-text-muted text-sm text-center py-4">No results found</p>
+          )}
+        </div>
+
+        {(selectedMovie || selectedShow) && (
+          <>
+            <SendRecommendationSheet
+              item={(selectedMovie ?? selectedShow)!}
+              itemType={contentType}
+              onClose={() => { setSelectedMovie(null); setSelectedShow(null); setStep("choose"); }}
+            />
+          </>
+        )}
       </div>
     );
   }
