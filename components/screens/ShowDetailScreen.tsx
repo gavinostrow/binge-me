@@ -11,6 +11,7 @@ import {
 import { getInitial } from "@/lib/utils";
 import PosterImage from "@/components/PosterImage";
 import RatingBadge from "@/components/RatingBadge";
+import SendRecommendationSheet from "@/components/SendRecommendationSheet";
 import { useState } from "react";
 
 const FRIEND_COLORS = ["#7C5CF6", "#EC4899", "#F59E0B", "#10B981", "#3B82F6"];
@@ -34,6 +35,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
     currentUserData,
   } = useApp();
   const [scrolled, setScrolled] = useState(false);
+  const [showSendRec, setShowSendRec] = useState(false);
 
   const show = shows.find((s) => s.id === showId);
   if (!show) return <div className="p-4">Show not found</div>;
@@ -550,7 +552,27 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
         >
           {inWatchlist ? "✓ In Watchlist" : "Add to Watchlist"}
         </button>
+
+        {/* Send Recommendation */}
+        <button
+          onClick={() => setShowSendRec(true)}
+          className="w-full py-3 rounded-2xl font-body font-semibold transition-all active:scale-[0.98] bg-bg-card text-text-secondary border border-border flex items-center justify-center gap-2"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
+          Send to a Friend
+        </button>
       </div>
+
+      {showSendRec && (
+        <SendRecommendationSheet
+          item={show}
+          itemType="show"
+          onClose={() => setShowSendRec(false)}
+        />
+      )}
     </div>
   );
 }

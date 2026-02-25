@@ -35,6 +35,7 @@ export default function FeedTab() {
     notifications,
     unreadCount,
     markNotificationsRead,
+    pushScreen,
   } = useApp();
 
   const [feedView, setFeedView] = useState<FeedView>("friends");
@@ -271,7 +272,16 @@ export default function FeedTab() {
 
                   {/* Title line */}
                   <div className="flex items-center gap-2">
-                    <span className="font-display font-semibold text-text-primary">
+                    <button
+                      onClick={() => {
+                        if (activity.movie?.id) {
+                          pushScreen({ screen: "movie-detail", movieId: activity.movie.id });
+                        } else if (activity.show?.id) {
+                          pushScreen({ screen: "show-detail", showId: activity.show.id });
+                        }
+                      }}
+                      className="font-display font-semibold text-text-primary text-left active:opacity-70 transition-opacity"
+                    >
                       {activity.title}
                       {activity.season != null && (
                         <span className="text-text-secondary">
@@ -279,7 +289,7 @@ export default function FeedTab() {
                           S{activity.season}
                         </span>
                       )}
-                    </span>
+                    </button>
                   </div>
 
                   {/* Rating */}
@@ -477,6 +487,18 @@ export default function FeedTab() {
                         </button>
                       </div>
                     )}
+                    <button
+                      onClick={() => {
+                        if (item.movie?.id) {
+                          pushScreen({ screen: "movie-detail", movieId: item.movie.id });
+                        } else if (item.show?.id) {
+                          pushScreen({ screen: "show-detail", showId: item.show.id });
+                        }
+                      }}
+                      className="text-accent-purple text-xs font-semibold text-center py-1 active:opacity-60 transition-opacity"
+                    >
+                      View Details →
+                    </button>
                   </div>
                 )}
               </div>
