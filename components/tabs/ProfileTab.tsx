@@ -111,22 +111,51 @@ export default function ProfileTab() {
         </p>
       </div>
 
-      {/* Mount Rushmore */}
+      {/* Favorites Board */}
       <div className="bg-bg-surface rounded-xl p-4 mt-4">
         <div className="w-8 h-0.5 bg-accent-gold rounded mb-3"></div>
         <h3 className="text-accent-gold text-xs font-display font-bold tracking-widest uppercase">
-          MOUNT RUSHMORE
+          FAVORITES
         </h3>
         <div className="grid grid-cols-2 gap-3 mt-3">
-          {currentUser.mountRushmore.map((item, index) => (
-            <div key={index} className="bg-bg-elevated rounded-lg p-3">
-              <span className="text-text-muted text-xs">{index + 1}</span>
-              <p className="font-medium text-sm">{item.title}</p>
-              <span className="text-xs text-text-muted">
-                {item.type === "movie" ? "Movie" : "Show"}
-              </span>
+          {currentUser.favoriteMovie && (
+            <div className="bg-bg-elevated rounded-lg overflow-hidden">
+              {currentUser.favoriteMovie.posterUrl ? (
+                <img
+                  src={currentUser.favoriteMovie.posterUrl}
+                  alt={currentUser.favoriteMovie.title}
+                  className="w-full h-36 object-cover"
+                />
+              ) : (
+                <div className="w-full h-36 bg-bg-hover flex items-center justify-center">
+                  <span className="text-text-muted text-2xl">🎬</span>
+                </div>
+              )}
+              <div className="p-2.5">
+                <p className="font-medium text-sm truncate">{currentUser.favoriteMovie.title}</p>
+                <span className="text-xs text-text-muted">Fav Movie</span>
+              </div>
             </div>
-          ))}
+          )}
+          {currentUser.favoriteShow && (
+            <div className="bg-bg-elevated rounded-lg overflow-hidden">
+              {currentUser.favoriteShow.posterUrl ? (
+                <img
+                  src={currentUser.favoriteShow.posterUrl}
+                  alt={currentUser.favoriteShow.title}
+                  className="w-full h-36 object-cover"
+                />
+              ) : (
+                <div className="w-full h-36 bg-bg-hover flex items-center justify-center">
+                  <span className="text-text-muted text-2xl">📺</span>
+                </div>
+              )}
+              <div className="p-2.5">
+                <p className="font-medium text-sm truncate">{currentUser.favoriteShow.title}</p>
+                <span className="text-xs text-text-muted">Fav Show</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

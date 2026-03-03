@@ -5,13 +5,15 @@ export interface User {
   handle: string;
   bio: string;
   avatarColor: string;
-  mountRushmore: MountRushmoreItem[];
+  favoriteMovie: FavoriteItem | null;
+  favoriteShow: FavoriteItem | null;
   createdAt: string;
 }
 
-export interface MountRushmoreItem {
+export interface FavoriteItem {
   title: string;
-  type: "movie" | "show";
+  year: number;
+  posterUrl?: string;
 }
 
 export interface Movie {
@@ -96,26 +98,7 @@ export interface CommunityItem {
   season?: number;
 }
 
-export interface Club {
-  id: string;
-  name: string;
-  description: string;
-  type: "private" | "public";
-  iconColor: string;
-  members: ClubMember[];
-  topPick?: { title: string; rating: number };
-  createdBy: string;
-  createdAt: string;
-}
-
-export interface ClubMember {
-  userId: string;
-  user: User;
-  role: "owner" | "member";
-  joinedAt: string;
-}
-
-export type TabId = "feed" | "clubs" | "add" | "next" | "profile";
+export type TabId = "feed" | "myLists" | "add" | "next" | "profile";
 export type ContentType = "movie" | "show";
 export type FeedView = "friends" | "community";
 export type RecommendationSource = "taste" | "friends" | "community";

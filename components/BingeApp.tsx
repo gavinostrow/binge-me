@@ -3,7 +3,7 @@
 import { useApp } from "@/lib/AppContext";
 import BottomNav from "./BottomNav";
 import FeedTab from "./tabs/FeedTab";
-import ClubsTab from "./tabs/ClubsTab";
+import MyListsTab from "./tabs/MyListsTab";
 import AddTab from "./tabs/AddTab";
 import WhatsNextTab from "./tabs/WhatsNextTab";
 import ProfileTab from "./tabs/ProfileTab";
@@ -16,7 +16,7 @@ export default function BingeApp() {
       <main className="pb-20">
         <div className="animate-fadeIn" key={activeTab}>
           {activeTab === "feed" && <FeedTab />}
-          {activeTab === "clubs" && <ClubsTab />}
+          {activeTab === "myLists" && <MyListsTab />}
           {activeTab === "add" && <AddTab />}
           {activeTab === "next" && <WhatsNextTab />}
           {activeTab === "profile" && <ProfileTab />}
