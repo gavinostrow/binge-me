@@ -33,8 +33,17 @@ export default function FeedTab() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredActivities = feedActivities.filter((activity) => {
-    if (contentFilter === "movie") return activity.type === "movie_rating";
-    return activity.type === "show_rating";
+    if (contentFilter === "movie" && activity.type !== "movie_rating") return false;
+    if (contentFilter === "show" && activity.type !== "show_rating") return false;
+    if (searchQuery.length >= 2) {
+      const q = searchQuery.toLowerCase();
+      return (
+        activity.title.toLowerCase().includes(q) ||
+        activity.user.displayName.toLowerCase().includes(q) ||
+        activity.user.handle.toLowerCase().includes(q)
+      );
+    }
+    return true;
   });
 
   const communityData: CommunityItem[] =
@@ -57,7 +66,7 @@ export default function FeedTab() {
   ) => reactions.some((r) => r.userId === "u1" && r.type === type);
 
   return (
-    <div className="flex flex-col gap-4 pb-24">
+    <div className="flex flex-col gap-4 pb-24 px-4">
       {/* Header */}
       <div className="pt-4 px-1">
         <h1 className="text-2xl font-bold lowercase font-display text-text-primary">
