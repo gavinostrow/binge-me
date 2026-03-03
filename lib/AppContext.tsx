@@ -8,11 +8,14 @@ import {
   FeedActivity,
   WatchlistItem,
   Reaction,
+  Club,
 } from "./types";
 import {
   myMovieRatings as initialMovieRatings,
   myShowRatings as initialShowRatings,
   feedActivities as initialFeed,
+  myClubs as initialMyClubs,
+  discoverClubs as initialDiscoverClubs,
 } from "./mockData";
 
 interface AppState {
@@ -22,11 +25,15 @@ interface AppState {
   showRatings: ShowRating[];
   feedActivities: FeedActivity[];
   watchlist: WatchlistItem[];
+  myClubs: Club[];
+  discoverClubs: Club[];
   addMovieRating: (rating: MovieRating) => void;
   addShowRating: (rating: ShowRating) => void;
   addToWatchlist: (item: WatchlistItem) => void;
   removeFromWatchlist: (id: string) => void;
   toggleReaction: (activityId: string, userId: string, type: Reaction["type"]) => void;
+  joinClub: (clubId: string) => void;
+  leaveClub: (clubId: string) => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -37,6 +44,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [showRatings, setShowRatings] = useState<ShowRating[]>(initialShowRatings);
   const [feedActivities, setFeedActivities] = useState<FeedActivity[]>(initialFeed);
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
+  const [myClubs, setMyClubs] = useState<Club[]>(initialMyClubs);
+  const [discoverClubs, setDiscoverClubs] = useState<Club[]>(initialDiscoverClubs);
 
   const addMovieRating = useCallback((rating: MovieRating) => {
     setMovieRatings((prev) => [rating, ...prev]);
@@ -124,6 +133,44 @@ export function AppProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const joinClub = useCallback((clubId: string) => {
+    setDiscoverClubs((prev) => {
+      const club = prev.find((c) => c.id === clubId);
+      if (!club) return prev;
+      const currentUserMember = {
+        userId: "u1",
+        user: {
+          id: "u1",
+          username: "alexchen",
+          displayName: "Alex Chen",
+          handle: "@alexchen",
+          bio: "",
+          avatarColor: "#8B5CF6",
+          mountRushmore: [],
+          createdAt: "",
+        },
+        role: "member" as const,
+        joinedAt: new Date().toISOString(),
+      };
+      const updatedClub = { ...club, members: [...club.members, currentUserMember] };
+      setMyClubs((myPrev) => [...myPrev, updatedClub]);
+      return prev.filter((c) => c.id !== clubId);
+    });
+  }, []);
+
+  const leaveClub = useCallback((clubId: string) => {
+    setMyClubs((prev) => {
+      const club = prev.find((c) => c.id === clubId);
+      if (!club) return prev;
+      const updatedClub = {
+        ...club,
+        members: club.members.filter((m) => m.userId !== "u1"),
+      };
+      setDiscoverClubs((discPrev) => [...discPrev, updatedClub]);
+      return prev.filter((c) => c.id !== clubId);
+    });
+  }, []);
+
   return (
     <AppContext.Provider
       value={{
@@ -133,11 +180,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
         showRatings,
         feedActivities,
         watchlist,
+        myClubs,
+        discoverClubs,
         addMovieRating,
         addShowRating,
         addToWatchlist,
         removeFromWatchlist,
         toggleReaction,
+        joinClub,
+        leaveClub,
       }}
     >
       {children}

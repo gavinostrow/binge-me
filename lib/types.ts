@@ -96,7 +96,26 @@ export interface CommunityItem {
   season?: number;
 }
 
-export type TabId = "feed" | "lists" | "add" | "next" | "profile";
+export interface Club {
+  id: string;
+  name: string;
+  description: string;
+  type: "private" | "public";
+  iconColor: string;
+  members: ClubMember[];
+  topPick?: { title: string; rating: number };
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface ClubMember {
+  userId: string;
+  user: User;
+  role: "owner" | "member";
+  joinedAt: string;
+}
+
+export type TabId = "feed" | "clubs" | "add" | "next" | "profile";
 export type ContentType = "movie" | "show";
 export type FeedView = "friends" | "community";
 export type RecommendationSource = "taste" | "friends" | "community";

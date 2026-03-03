@@ -7,6 +7,7 @@ import {
   FeedActivity,
   WatchlistItem,
   CommunityItem,
+  Club,
 } from "./types";
 
 export const currentUser: User = {
@@ -372,3 +373,98 @@ export const tasteMatchPercentages: Record<string, number> = {
   u4: 91,
   u5: 65,
 };
+
+export const myClubs: Club[] = [
+  {
+    id: "club1",
+    name: "Friday Night Crew",
+    description: "Our weekly movie night picks and rankings",
+    type: "private",
+    iconColor: "#8B5CF6",
+    members: [
+      { userId: "u1", user: currentUser, role: "owner", joinedAt: "2024-09-01T10:00:00Z" },
+      { userId: "u2", user: friends[0], role: "member", joinedAt: "2024-09-01T12:00:00Z" },
+      { userId: "u3", user: friends[1], role: "member", joinedAt: "2024-09-02T10:00:00Z" },
+      { userId: "u4", user: friends[2], role: "member", joinedAt: "2024-09-05T10:00:00Z" },
+    ],
+    topPick: { title: "Dune: Part Two", rating: 9.3 },
+    createdBy: "u1",
+    createdAt: "2024-09-01T10:00:00Z",
+  },
+  {
+    id: "club2",
+    name: "Prestige TV Addicts",
+    description: "For people who can't stop talking about peak television",
+    type: "private",
+    iconColor: "#EC4899",
+    members: [
+      { userId: "u1", user: currentUser, role: "member", joinedAt: "2024-10-01T10:00:00Z" },
+      { userId: "u2", user: friends[0], role: "owner", joinedAt: "2024-09-20T10:00:00Z" },
+      { userId: "u5", user: friends[3], role: "member", joinedAt: "2024-10-05T10:00:00Z" },
+    ],
+    topPick: { title: "Succession", rating: 9.4 },
+    createdBy: "u2",
+    createdAt: "2024-09-20T10:00:00Z",
+  },
+];
+
+export const discoverClubs: Club[] = [
+  {
+    id: "club3",
+    name: "Horror Heads",
+    description: "Jump scares, slow burns, and everything in between",
+    type: "public",
+    iconColor: "#EF4444",
+    members: [
+      { userId: "u2", user: friends[0], role: "owner", joinedAt: "2024-08-01T10:00:00Z" },
+      { userId: "u4", user: friends[2], role: "member", joinedAt: "2024-08-05T10:00:00Z" },
+    ],
+    topPick: { title: "Hereditary", rating: 9.1 },
+    createdBy: "u2",
+    createdAt: "2024-08-01T10:00:00Z",
+  },
+  {
+    id: "club4",
+    name: "Sci-Fi Society",
+    description: "From Blade Runner to Dune — we rate them all",
+    type: "public",
+    iconColor: "#06B6D4",
+    members: [
+      { userId: "u3", user: friends[1], role: "owner", joinedAt: "2024-07-15T10:00:00Z" },
+      { userId: "u5", user: friends[3], role: "member", joinedAt: "2024-07-20T10:00:00Z" },
+      { userId: "u4", user: friends[2], role: "member", joinedAt: "2024-08-01T10:00:00Z" },
+    ],
+    topPick: { title: "Interstellar", rating: 9.5 },
+    createdBy: "u3",
+    createdAt: "2024-07-15T10:00:00Z",
+  },
+  {
+    id: "club5",
+    name: "90s Nostalgia",
+    description: "Tarantino, Fincher, the Coens — relive the golden era",
+    type: "public",
+    iconColor: "#D4A843",
+    members: [
+      { userId: "u5", user: friends[3], role: "owner", joinedAt: "2024-11-01T10:00:00Z" },
+    ],
+    topPick: { title: "Pulp Fiction", rating: 9.2 },
+    createdBy: "u5",
+    createdAt: "2024-11-01T10:00:00Z",
+  },
+  {
+    id: "club6",
+    name: "A24 Stans",
+    description: "Everything A24 — from Moonlight to Everything Everywhere",
+    type: "public",
+    iconColor: "#84CC16",
+    members: [
+      { userId: "u4", user: friends[2], role: "owner", joinedAt: "2024-10-15T10:00:00Z" },
+      { userId: "u2", user: friends[0], role: "member", joinedAt: "2024-10-20T10:00:00Z" },
+      { userId: "u3", user: friends[1], role: "member", joinedAt: "2024-11-01T10:00:00Z" },
+      { userId: "u5", user: friends[3], role: "member", joinedAt: "2024-11-05T10:00:00Z" },
+    ],
+    topPick: { title: "Everything Everywhere All at Once", rating: 9.3 },
+    createdBy: "u4",
+    createdAt: "2024-10-15T10:00:00Z",
+  },
+];

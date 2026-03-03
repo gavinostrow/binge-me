@@ -490,10 +490,10 @@ export default function AddTab() {
             Add Another
           </button>
           <button
-            onClick={() => setActiveTab("lists")}
+            onClick={() => setActiveTab("profile")}
             className="bg-bg-surface text-text-primary rounded-lg py-3 font-semibold w-full hover:bg-bg-hover transition-colors"
           >
-            View My Lists
+            View My Rankings
           </button>
         </div>
       </div>
