@@ -14,7 +14,7 @@ export type NextSeason =
   | { kind: "unknown" }; // returning series, no news yet
 
 export interface TitleExtras {
-  next?: NextSeason; // shows only
+  next?: NextSeason;
   providers: Provider[];
   similarTmdbIds?: number[];
   source: "sample" | "tmdb";
@@ -40,38 +40,12 @@ export const sampleShowExtras: Record<string, Omit<TitleExtras, "source">> = {
   s15: { next: { kind: "date", season: 5, date: "2026-10-24" }, providers: [p.apple] }, // Slow Horses
 };
 
-export const sampleMovieExtras: Record<string, Omit<TitleExtras, "source">> = {
-  m1: { providers: [p.netflix] },
-  m2: { providers: [p.max] },
-  m3: { providers: [p.paramount] },
-  m4: { providers: [p.max, p.hulu] },
-  m5: { providers: [p.peacock] },
-  m6: { providers: [p.prime] },
-  m7: { providers: [p.max] },
-  m8: { providers: [p.max] },
-  m9: { providers: [p.peacock] },
-  m10: { providers: [p.netflix] },
-  m11: { providers: [p.prime] },
-  m12: { providers: [p.netflix] },
-  m13: { providers: [p.paramount] },
-  m14: { providers: [p.hulu, p.disney] },
-  m15: { providers: [p.max] },
-  m16: { providers: [p.netflix] },
-  m17: { providers: [p.netflix] },
-  m18: { providers: [p.max] },
-  m19: { providers: [p.hulu] },
-  m20: { providers: [p.netflix] },
-};
-
-export function sampleExtras(type: "movie" | "show", id: string, show?: Show): TitleExtras {
-  const base = type === "show" ? sampleShowExtras[id] : sampleMovieExtras[id];
+export function sampleExtras(id: string, show?: Show): TitleExtras {
+  const base = sampleShowExtras[id];
   if (base) return { ...base, source: "sample" };
-  if (type === "show" && show) {
-    const next: NextSeason =
-      show.status === "ended" ? { kind: "ended" } : show.status === "cancelled" ? { kind: "canceled" } : { kind: "unknown" };
-    return { next, providers: [], source: "sample" };
-  }
-  return { providers: [], source: "sample" };
+  const next: NextSeason =
+    show?.status === "ended" ? { kind: "ended" } : show?.status === "cancelled" ? { kind: "canceled" } : { kind: "unknown" };
+  return { next, providers: [], source: "sample" };
 }
 
 // ─── Display helpers ─────────────────────────────────────────────────────────

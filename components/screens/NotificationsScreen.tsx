@@ -10,7 +10,7 @@ import UserAvatar from "@/components/social/UserAvatar";
 
 function describe(n: Notification): { lead?: string; text: string } {
   const who = n.fromUser?.name.split(" ")[0];
-  const title = n.show?.title ?? n.movie?.title;
+  const title = n.show?.title;
   switch (n.type) {
     case "rec_request":
       return { lead: who, text: "is looking for a new show to watch. Send a pick?" };
@@ -57,8 +57,6 @@ export default function NotificationsScreen() {
       pushScreen({ screen: "my-request" });
     } else if (n.show) {
       pushScreen({ screen: "show-detail", showId: n.show.id });
-    } else if (n.movie) {
-      pushScreen({ screen: "movie-detail", movieId: n.movie.id });
     } else if (n.fromUserId) {
       pushScreen({ screen: "profile", userId: n.fromUserId });
     }
@@ -71,7 +69,7 @@ export default function NotificationsScreen() {
         {sorted.length === 0 && <p className="text-text-secondary text-sm text-center py-16">You&apos;re all caught up.</p>}
         {sorted.map((n) => {
           const d = describe(n);
-          const title = n.show ?? n.movie;
+          const title = n.show;
           return (
             <button
               key={n.id}

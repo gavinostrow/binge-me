@@ -3,7 +3,7 @@ import "@/styles/globals.css";
 
 export const metadata: Metadata = {
   title: "binge",
-  description: "Social movie and TV show rankings",
+  description: "Rank TV shows with friends",
 };
 
 export default function RootLayout({

@@ -1,7 +1,7 @@
 // Client helpers for live TMDB data (through /api/tmdb). Every function returns
 // null when TMDB isn't configured, so the app quietly keeps using sample data.
-import type { Movie, Show } from "./types";
-import { findByTmdb, registerMovie, registerShow } from "./catalog";
+import type { Show } from "./types";
+import { findByTmdb, registerShow } from "./catalog";
 import { providerFromTmdb } from "./providers";
 import type { NextSeason, TitleExtras } from "./showExtras";
 
@@ -57,24 +57,8 @@ function genresOf(item: TmdbItem): string[] {
   return Array.from(new Set(ids.map((id) => GENRES[id]).filter(Boolean)));
 }
 
-export function mapMovie(item: TmdbItem): Movie {
-  const existing = findByTmdb("movie", item.id) as Movie | undefined;
-  const movie: Movie = {
-    ...(existing ?? {}),
-    id: existing?.id ?? `tmdb-movie-${item.id}`,
-    tmdbId: item.id,
-    title: item.title ?? existing?.title ?? "Untitled",
-    year: Number((item.release_date ?? "").slice(0, 4)) || existing?.year || 0,
-    genre: existing?.genre ?? genresOf(item),
-    posterPath: item.poster_path ?? existing?.posterPath,
-    description: item.overview || existing?.description,
-  };
-  registerMovie(movie);
-  return movie;
-}
-
 export function mapShow(item: TmdbItem & { number_of_seasons?: number; status?: string; networks?: { name: string }[] }): Show {
-  const existing = findByTmdb("show", item.id) as Show | undefined;
+  const existing = findByTmdb(item.id);
   const status: Show["status"] =
     item.status === "Ended" ? "ended" : item.status === "Canceled" ? "cancelled" : item.status ? "ongoing" : existing?.status;
   const show: Show = {
@@ -96,16 +80,10 @@ export function mapShow(item: TmdbItem & { number_of_seasons?: number; status?: 
 
 // ─── Search ──────────────────────────────────────────────────────────────────
 
-export async function searchTitles(query: string): Promise<{ movies: Movie[]; shows: Show[] } | null> {
-  const data = await tmdb<{ results: TmdbItem[] }>("search/multi", { query, include_adult: "false" });
+export async function searchShows(query: string): Promise<Show[] | null> {
+  const data = await tmdb<{ results: TmdbItem[] }>("search/tv", { query, include_adult: "false" });
   if (!data) return null;
-  const movies: Movie[] = [];
-  const shows: Show[] = [];
-  for (const r of data.results) {
-    if (r.media_type === "movie") movies.push(mapMovie(r));
-    if (r.media_type === "tv") shows.push(mapShow(r));
-  }
-  return { movies, shows };
+  return data.results.map(mapShow);
 }
 
 // ─── Details: next season, providers, similar ────────────────────────────────
@@ -152,18 +130,6 @@ export async function fetchShowExtras(tmdbId: number, region = "US"): Promise<(T
     next: nextSeasonFromTmdb(d),
     providers: flat.map((f) => providerFromTmdb(f.provider_id, f.provider_name)),
     similar: (d.recommendations?.results ?? []).slice(0, 10).map(mapShow),
-    source: "tmdb",
-  };
-}
-
-export async function fetchMovieExtras(tmdbId: number, region = "US"): Promise<(TitleExtras & { similar: Movie[] }) | null> {
-  const d = await tmdb<TvDetails>(`movie/${tmdbId}`, { append_to_response: "watch/providers,recommendations" });
-  if (!d) return null;
-  mapMovie(d);
-  const flat = d["watch/providers"]?.results?.[region]?.flatrate ?? [];
-  return {
-    providers: flat.map((f) => providerFromTmdb(f.provider_id, f.provider_name)),
-    similar: (d.recommendations?.results ?? []).slice(0, 10).map(mapMovie),
     source: "tmdb",
   };
 }

@@ -40,10 +40,10 @@ create table if not exists public.follows (
   check (follower_id <> following_id)
 );
 
--- ─── Titles (cached from TMDB) ───────────────────────────────────────────────
+-- ─── Shows (cached from TMDB) ───────────────────────────────────────────────
 create table if not exists public.titles (
-  id text primary key,                      -- 'movie:27205' or 'show:1396'
-  type text not null check (type in ('movie', 'show')),
+  id text primary key,                      -- 'show:1396' (TMDB TV id)
+  type text not null default 'show' check (type = 'show'),
   tmdb_id int not null,
   title text not null,
   year int,
@@ -108,7 +108,6 @@ create table if not exists public.streaming_services (
 create table if not exists public.rec_requests (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
-  kind text not null default 'show' check (kind in ('show', 'movie', 'any')),
   note text,
   created_at timestamptz not null default now(),
   expires_at timestamptz not null default now() + interval '48 hours'

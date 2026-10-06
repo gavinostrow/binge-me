@@ -2,11 +2,11 @@
 import { useMemo, useState } from "react";
 import { useApp } from "@/lib/AppContext";
 import { useSocial } from "@/lib/SocialContext";
-import { allMovies, allShows, getMovie, getShow } from "@/lib/catalog";
-import { friendStatus, type Kind } from "@/lib/social";
+import { allShows, getShow } from "@/lib/catalog";
+import { friendStatus } from "@/lib/social";
 import { knownExtras } from "@/lib/useTitleExtras";
 import { mergeById, useLiveSearch } from "@/lib/useLiveSearch";
-import type { Movie, Show } from "@/lib/types";
+import type { Show } from "@/lib/types";
 import PosterImage from "@/components/PosterImage";
 import RatingBadge from "@/components/RatingBadge";
 import ScreenHeader from "@/components/social/ScreenHeader";
@@ -14,14 +14,13 @@ import UserAvatar from "@/components/social/UserAvatar";
 import { ProviderLogos } from "@/components/social/ProviderChips";
 
 interface Candidate {
-  type: Kind;
-  item: Movie | Show;
+  item: Show;
   myRating?: number;
 }
 
 /** Answer a friend's "looking for something to watch" — with already-watched titles flagged. */
 export default function RecRequestScreen({ requestId }: { requestId: string }) {
-  const { movieRatings, showRatings, popScreen } = useApp();
+  const { showRatings, popScreen } = useApp();
   const { recRequests, getUser, sendRecToRequest, showToast, myServices } = useSocial();
   const req = recRequests.find((r) => r.id === requestId);
   const [query, setQuery] = useState("");
@@ -29,26 +28,18 @@ export default function RecRequestScreen({ requestId }: { requestId: string }) {
   const [note, setNote] = useState("");
   const live = useLiveSearch(query);
 
-  const kinds: Kind[] = !req ? [] : req.kind === "any" ? ["show", "movie"] : [req.kind];
-
   const candidates: Candidate[] = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const mine: Candidate[] = [
-      ...(kinds.includes("show") ? showRatings.map((r) => ({ type: "show" as const, item: r.show, myRating: r.overallRating })) : []),
-      ...(kinds.includes("movie") ? movieRatings.map((r) => ({ type: "movie" as const, item: r.movie, myRating: r.rating })) : []),
-    ].sort((a, b) => (b.myRating ?? 0) - (a.myRating ?? 0));
+    const mine: Candidate[] = showRatings
+      .map((r) => ({ item: r.show, myRating: r.overallRating }))
+      .sort((a, b) => (b.myRating ?? 0) - (a.myRating ?? 0));
     if (!q) return mine;
-    const rated = new Map(mine.map((c) => [`${c.type}:${c.item.id}`, c.myRating]));
-    const pool: Candidate[] = [
-      ...(kinds.includes("show") ? mergeById(allShows().filter((s) => s.title.toLowerCase().includes(q)), live.shows) : []).map(
-        (item) => ({ type: "show" as const, item, myRating: rated.get(`show:${item.id}`) }),
-      ),
-      ...(kinds.includes("movie") ? mergeById(allMovies().filter((m) => m.title.toLowerCase().includes(q)), live.movies) : []).map(
-        (item) => ({ type: "movie" as const, item, myRating: rated.get(`movie:${item.id}`) }),
-      ),
-    ];
-    return pool;
-  }, [query, kinds.join(), showRatings, movieRatings, live.shows, live.movies]); // eslint-disable-line react-hooks/exhaustive-deps
+    const rated = new Map(mine.map((c) => [c.item.id, c.myRating]));
+    return mergeById(allShows().filter((s) => s.title.toLowerCase().includes(q)), live.shows).map((item) => ({
+      item,
+      myRating: rated.get(item.id),
+    }));
+  }, [query, showRatings, live.shows]);
 
   if (!req) {
     return (
@@ -65,7 +56,7 @@ export default function RecRequestScreen({ requestId }: { requestId: string }) {
 
   const send = () => {
     if (!selected) return;
-    sendRecToRequest(req.id, selected.type, selected.item.id, note);
+    sendRecToRequest(req.id, selected.item.id, note);
     showToast(`Sent ${selected.item.title} to ${firstName}`);
     popScreen();
   };
@@ -79,7 +70,7 @@ export default function RecRequestScreen({ requestId }: { requestId: string }) {
             <UserAvatar user={asker} size="md" />
             <div>
               <p className="text-text-primary text-sm font-body">
-                <span className="font-semibold">{firstName}</span> is looking for a new {req.kind === "any" ? "thing" : req.kind} to watch
+                <span className="font-semibold">{firstName}</span> is looking for a new show to watch
               </p>
               {req.note && <p className="text-text-secondary text-sm italic mt-0.5">&ldquo;{req.note}&rdquo;</p>}
             </div>
@@ -90,7 +81,7 @@ export default function RecRequestScreen({ requestId }: { requestId: string }) {
           <div className="bg-bg-card border border-border rounded-2xl p-3">
             <p className="text-text-muted text-[10px] font-body uppercase tracking-wider mb-2">Already suggested</p>
             {others.map((r) => {
-              const it = r.type === "movie" ? getMovie(r.itemId) : getShow(r.itemId);
+              const it = getShow(r.itemId);
               const u = getUser(r.fromUserId);
               return it && u ? (
                 <p key={r.id} className="text-text-secondary text-xs font-body py-0.5">
@@ -104,7 +95,7 @@ export default function RecRequestScreen({ requestId }: { requestId: string }) {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={`Search any ${req.kind === "movie" ? "movie" : req.kind === "show" ? "show" : "title"}…`}
+          placeholder="Search any show…"
           className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder-text-muted outline-none focus:border-accent font-body"
         />
 
@@ -114,14 +105,14 @@ export default function RecRequestScreen({ requestId }: { requestId: string }) {
 
         <div className="space-y-2">
           {candidates.map((c) => {
-            const status = friendStatus(req.userId, c.type, c.item.id);
+            const status = friendStatus(req.userId, c.item.id);
             const watched = status.watched != null;
-            const picked = selected?.item.id === c.item.id && selected.type === c.type;
-            const providers = knownExtras(c.type, c.item).providers;
+            const picked = selected?.item.id === c.item.id;
+            const providers = knownExtras(c.item).providers;
             const onMine = providers.some((p) => myServices.includes(p.key));
             return (
               <button
-                key={`${c.type}:${c.item.id}`}
+                key={c.item.id}
                 disabled={watched}
                 onClick={() => setSelected(picked ? null : c)}
                 className={`w-full rounded-2xl p-2.5 flex items-center gap-3 text-left border transition-colors ${

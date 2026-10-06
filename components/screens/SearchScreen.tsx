@@ -4,40 +4,27 @@ import { useApp } from "@/lib/AppContext";
 import PosterImage from "@/components/PosterImage";
 import RatingBadge from "@/components/RatingBadge";
 import {
-  movies,
   shows,
   friends,
-  friendsMovieRatings,
   friendsShowRatings,
-  communityMovies,
   communityShows,
 } from "@/lib/mockData";
-import type { Movie, Show, User } from "@/lib/types";
+import type { Show, User } from "@/lib/types";
 import { mergeById, useLiveSearch } from "@/lib/useLiveSearch";
 import { useSocial } from "@/lib/SocialContext";
 import { getInitial } from "@/lib/utils";
 
-type SearchTab = "all" | "movies" | "shows" | "friends";
+type SearchTab = "all" | "shows" | "friends";
 
 const FRIEND_COLORS = ["#7C5CF6", "#EC4899", "#F59E0B", "#10B981", "#3B82F6"];
 function friendColor(userId: string) {
   return FRIEND_COLORS[parseInt(userId.replace(/\D/g, "")) % FRIEND_COLORS.length];
 }
 
-function getFriendAvgMovie(movieId: string): number | null {
-  const ratings = friendsMovieRatings[movieId];
-  if (!ratings || ratings.length === 0) return null;
-  return ratings.reduce((s, r) => s + r.rating, 0) / ratings.length;
-}
-
 function getFriendAvgShow(showId: string): number | null {
   const ratings = friendsShowRatings[showId];
   if (!ratings || ratings.length === 0) return null;
   return ratings.reduce((s, r) => s + r.rating, 0) / ratings.length;
-}
-
-function getCommunityMovie(movieId: string) {
-  return communityMovies.find((c) => c.movie?.id === movieId);
 }
 
 function getCommunityShow(showId: string) {
@@ -119,44 +106,6 @@ function FriendRow({ user, onPress }: { user: User; onPress: () => void }) {
   );
 }
 
-function MovieRow({ movie, onPress }: { movie: Movie; onPress: () => void }) {
-  const friendAvg = getFriendAvgMovie(movie.id);
-  const community = getCommunityMovie(movie.id);
-  return (
-    <button
-      onClick={onPress}
-      className="flex items-center gap-3 py-3 border-b border-border last:border-0 w-full text-left active:opacity-80 transition-opacity"
-    >
-      <PosterImage
-        title={movie.title}
-        year={movie.year}
-        posterPath={movie.posterPath}
-        size="sm"
-        className="w-10 h-14 rounded-lg flex-shrink-0"
-      />
-      <div className="flex-1 min-w-0">
-        <p className="font-display font-semibold text-text-primary text-sm truncate">{movie.title}</p>
-        <p className="text-text-muted text-xs mt-0.5">{movie.year} · {movie.genre[0]}</p>
-        <div className="flex items-center gap-3 mt-1.5">
-          {friendAvg !== null && (
-            <span className="text-[10px] font-body font-semibold" style={{ color: "#7C5CF6" }}>
-              Friends {friendAvg.toFixed(1)}
-            </span>
-          )}
-          {community && (
-            <span className="text-[10px] font-body font-semibold" style={{ color: "#D4A843" }}>
-              Binge {community.averageRating.toFixed(1)}
-            </span>
-          )}
-        </div>
-      </div>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgb(var(--text-muted))" strokeWidth={2} strokeLinecap="round">
-        <polyline points="9 18 15 12 9 6" />
-      </svg>
-    </button>
-  );
-}
-
 function ShowRow({ show, onPress }: { show: Show; onPress: () => void }) {
   const friendAvg = getFriendAvgShow(show.id);
   const community = getCommunityShow(show.id);
@@ -214,18 +163,6 @@ export default function SearchScreen({ initialQuery }: { initialQuery?: string }
     [q]
   );
 
-  const matchedMovies = useMemo(
-    () =>
-      movies.filter(
-        (m) =>
-          m.title.toLowerCase().includes(q) ||
-          m.genre.some((g) => g.toLowerCase().includes(q)) ||
-          m.director?.toLowerCase().includes(q) ||
-          m.cast?.some((a) => a.toLowerCase().includes(q))
-      ),
-    [q]
-  );
-
   const matchedShows = useMemo(
     () =>
       shows.filter(
@@ -252,20 +189,17 @@ export default function SearchScreen({ initialQuery }: { initialQuery?: string }
   const showEmpty = !q;
   const tabs: { id: SearchTab; label: string }[] = [
     { id: "all", label: "All" },
-    { id: "movies", label: "Movies" },
     { id: "shows", label: "Shows" },
     { id: "friends", label: "Friends" },
   ];
 
   const showFriends = tab === "all" || tab === "friends";
-  const showMovies = tab === "all" || tab === "movies";
   const showShows = tab === "all" || tab === "shows";
 
   const displayFriends = showEmpty ? friends : matchedPeople;
-  const displayMovies = showEmpty ? movies.slice(0, 10) : mergeById(matchedMovies, live.movies);
   const displayShows = showEmpty ? shows.slice(0, 10) : mergeById(matchedShows, live.shows);
   const hasResults =
-    displayFriends.length > 0 || displayMovies.length > 0 || displayShows.length > 0;
+    displayFriends.length > 0 || displayShows.length > 0;
 
   return (
     <div className="flex flex-col h-full overflow-y-auto scrollbar-hide bg-bg-primary">
@@ -299,7 +233,7 @@ export default function SearchScreen({ initialQuery }: { initialQuery?: string }
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Movies, shows, actors, friends..."
+              placeholder="Shows, actors, friends..."
               className="w-full bg-bg-card border border-border rounded-xl pl-9 pr-9 py-2.5 text-text-primary placeholder-text-muted font-body text-sm focus:outline-none focus:border-accent transition-colors"
             />
             {query && (
@@ -347,7 +281,7 @@ export default function SearchScreen({ initialQuery }: { initialQuery?: string }
             <p className="font-body text-sm">No results for &ldquo;{query}&rdquo;</p>
           </div>
         )}
-        {(showMovies || showShows) && hasResults && <RatingLegend />}
+        {showShows && hasResults && <RatingLegend />}
         {showFriends && displayFriends.length > 0 && (
           <Section title="Friends">
             {displayFriends.map((f) => (
@@ -355,17 +289,6 @@ export default function SearchScreen({ initialQuery }: { initialQuery?: string }
                 key={f.id}
                 user={f}
                 onPress={() => pushScreen({ screen: "profile", userId: f.id })}
-              />
-            ))}
-          </Section>
-        )}
-        {showMovies && displayMovies.length > 0 && (
-          <Section title="Movies">
-            {displayMovies.map((m) => (
-              <MovieRow
-                key={m.id}
-                movie={m}
-                onPress={() => pushScreen({ screen: "movie-detail", movieId: m.id })}
               />
             ))}
           </Section>

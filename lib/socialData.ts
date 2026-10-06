@@ -9,7 +9,7 @@ const hoursFromNow = (h: number) => new Date(now + h * 3600000).toISOString();
 
 export interface UserRating {
   userId: string;
-  type: "movie" | "show";
+  type: "show";
   id: string;
   rating: number;
   review?: string;
@@ -23,27 +23,19 @@ export const friendRatingLog: UserRating[] = [
   { userId: "u2", type: "show", id: "s11", rating: 8.8 },
   { userId: "u2", type: "show", id: "s6", rating: 8.1 },
   { userId: "u2", type: "show", id: "s14", rating: 8.3 },
-  { userId: "u2", type: "movie", id: "m14", rating: 7.2 },
-  { userId: "u2", type: "movie", id: "m19", rating: 9.6 },
   // Marcus
   { userId: "u3", type: "show", id: "s10", rating: 9.6 },
   { userId: "u3", type: "show", id: "s13", rating: 7.4 },
   { userId: "u3", type: "show", id: "s15", rating: 9.0 },
   { userId: "u3", type: "show", id: "s4", rating: 8.9 },
-  { userId: "u3", type: "movie", id: "m8", rating: 9.5 },
-  { userId: "u3", type: "movie", id: "m18", rating: 8.4 },
   // Sofia
   { userId: "u4", type: "show", id: "s11", rating: 9.2, review: "Every season is a vacation I'd never take." },
   { userId: "u4", type: "show", id: "s9", rating: 9.0 },
   { userId: "u4", type: "show", id: "s3", rating: 9.1 },
-  { userId: "u4", type: "movie", id: "m17", rating: 9.3 },
-  { userId: "u4", type: "movie", id: "m16", rating: 9.0 },
   // Jake
   { userId: "u5", type: "show", id: "s5", rating: 8.6 },
   { userId: "u5", type: "show", id: "s14", rating: 8.9 },
   { userId: "u5", type: "show", id: "s7", rating: 9.7 },
-  { userId: "u5", type: "movie", id: "m15", rating: 9.0 },
-  { userId: "u5", type: "movie", id: "m9", rating: 9.0 },
   // Michael
   { userId: "u6", type: "show", id: "s1", rating: 9.7, review: "Walter White is the GOAT. Not close." },
   { userId: "u6", type: "show", id: "s10", rating: 9.4 },
@@ -51,18 +43,15 @@ export const friendRatingLog: UserRating[] = [
   { userId: "u6", type: "show", id: "s8", rating: 8.5 },
   { userId: "u6", type: "show", id: "s9", rating: 9.1, review: "Funniest show ever made, and somehow also the weirdest." },
   { userId: "u6", type: "show", id: "s3", rating: 9.0 },
-  { userId: "u6", type: "movie", id: "m13", rating: 9.8 },
-  { userId: "u6", type: "movie", id: "m11", rating: 8.2 },
-  { userId: "u6", type: "movie", id: "m2", rating: 9.3 },
 ];
 
 /** Friends' watchlists, as item keys ("show:s4"). */
 export const friendWatchlists: Record<string, string[]> = {
-  u2: ["show:s12", "movie:m5"],
-  u3: ["show:s9", "movie:m19"],
+  u2: ["show:s12"],
+  u3: ["show:s9"],
   u4: ["show:s4", "show:s15"],
-  u5: ["show:s11", "movie:m6"],
-  u6: ["show:s4", "show:s15", "movie:m4"],
+  u5: ["show:s11"],
+  u6: ["show:s4", "show:s15"],
 };
 
 export interface CurrentlyWatchingEntry {
@@ -92,7 +81,7 @@ export const suggestedUsers: User[] = [
 export interface RecReply {
   id: string;
   fromUserId: string;
-  type: "movie" | "show";
+  type: "show";
   itemId: string;
   note?: string;
   createdAt: string;
@@ -101,7 +90,7 @@ export interface RecReply {
 export interface RecRequest {
   id: string;
   userId: string;
-  kind: "show" | "movie" | "any";
+  kind: "show";
   note?: string;
   createdAt: string;
   expiresAt: string;

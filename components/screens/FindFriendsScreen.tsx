@@ -25,7 +25,7 @@ export default function FindFriendsScreen() {
     typeof window !== "undefined" ? `${window.location.origin}/?invite=${encodeURIComponent(currentUserData.username)}` : "";
 
   const invite = async () => {
-    const text = `I'm on Binge — rate shows and movies with me. Add me: @${currentUserData.username}`;
+    const text = `I'm on Binge — rate TV shows with me. Add me: @${currentUserData.username}`;
     try {
       if (navigator.share) {
         await navigator.share({ title: "Join me on Binge", text, url: inviteUrl });

@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { useApp } from "@/lib/AppContext";
-import { ContentType, FeedView, CommunityItem } from "@/lib/types";
+import { FeedView, CommunityItem } from "@/lib/types";
 import {
-  communityMovies,
   communityShows,
   communitySeasons,
   friends,
@@ -46,23 +45,12 @@ export default function FeedTab() {
   };
 
   const [feedView, setFeedView] = useState<FeedView>("friends");
-  const [contentFilter, setContentFilter] = useState<ContentType>("movie");
-  const [communityTab, setCommunityTab] = useState<
-    "movies" | "shows" | "seasons"
-  >("movies");
+  const [communityTab, setCommunityTab] = useState<"shows" | "seasons">("shows");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredActivities = feedActivities.filter((activity) => {
-    if (contentFilter === "movie") return activity.type === "movie_rating";
-    return activity.type === "show_rating";
-  });
+  const filteredActivities = feedActivities.filter((activity) => activity.type === "show_rating");
 
-  const communityData: CommunityItem[] =
-    communityTab === "movies"
-      ? communityMovies
-      : communityTab === "shows"
-        ? communityShows
-        : communitySeasons;
+  const communityData: CommunityItem[] = communityTab === "shows" ? communityShows : communitySeasons;
 
   const getFriend = (userId: string) => friends.find((f) => f.id === userId);
 
@@ -124,7 +112,7 @@ export default function FeedTab() {
       <div className="relative">
         <input
           type="text"
-          placeholder="Search friends, movies, shows..."
+          placeholder="Search friends and shows..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full bg-bg-elevated text-text-primary placeholder-text-muted rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-accent-purple"
@@ -158,30 +146,6 @@ export default function FeedTab() {
       {/* Content area */}
       {feedView === "friends" ? (
         <div className="flex flex-col gap-4 animate-fadeIn">
-          {/* Movie / Show sub-tabs */}
-          <div className="flex gap-6 border-b border-bg-elevated">
-            <button
-              onClick={() => setContentFilter("movie")}
-              className={`pb-2 text-sm font-medium transition-colors ${
-                contentFilter === "movie"
-                  ? "text-text-primary border-b-2 border-accent-purple"
-                  : "text-text-muted"
-              }`}
-            >
-              Movies
-            </button>
-            <button
-              onClick={() => setContentFilter("show")}
-              className={`pb-2 text-sm font-medium transition-colors ${
-                contentFilter === "show"
-                  ? "text-text-primary border-b-2 border-accent-purple"
-                  : "text-text-muted"
-              }`}
-            >
-              Shows
-            </button>
-          </div>
-
           {/* Friends looking for something to watch */}
           {openFriendRequests.map((req) => {
             const u = getUser(req.userId);
@@ -196,7 +160,7 @@ export default function FeedTab() {
                 <UserAvatar user={u} size="md" />
                 <div className="flex-1 min-w-0">
                   <p className="text-text-primary text-sm font-body leading-snug">
-                    <span className="font-semibold">{u.name.split(" ")[0]}</span> is looking for a new {req.kind === "any" ? "thing" : req.kind} to watch
+                    <span className="font-semibold">{u.name.split(" ")[0]}</span> is looking for a new show to watch
                   </p>
                   {req.note && <p className="text-text-muted text-xs truncate">&ldquo;{req.note}&rdquo;</p>}
                 </div>
@@ -242,7 +206,7 @@ export default function FeedTab() {
                   {/* Title line */}
                   <div className="flex items-center gap-2">
                     <span className="font-display font-semibold text-text-primary">
-                      {activity.movie?.title ?? activity.show?.title ?? activity.title}
+                      {activity.show?.title ?? activity.title}
                       {activity.season != null && (
                         <span className="text-text-secondary">
                           {" "}
@@ -330,9 +294,9 @@ export default function FeedTab() {
         </div>
       ) : (
         <div className="flex flex-col gap-4 animate-fadeIn">
-          {/* Movies / Shows / Seasons sub-tabs */}
+          {/* Shows / Seasons sub-tabs */}
           <div className="flex gap-6 border-b border-bg-elevated">
-            {(["movies", "shows", "seasons"] as const).map((tab) => (
+            {(["shows", "seasons"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setCommunityTab(tab)}
@@ -363,7 +327,7 @@ export default function FeedTab() {
                 <div className="flex flex-col gap-1 min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-text-primary truncate">
-                      {item.movie?.title ?? item.show?.title}
+                      {item.show?.title}
                       {item.season != null && (
                         <span className="text-text-secondary">
                           {" "}
@@ -372,12 +336,12 @@ export default function FeedTab() {
                       )}
                     </span>
                     <span className="text-xs text-text-muted shrink-0">
-                      {item.movie?.year ?? item.show?.year}
+                      {item.show?.year}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs bg-bg-elevated text-text-secondary rounded px-2 py-0.5">
-                      {(item.movie?.genre ?? item.show?.genre ?? [])[0]}
+                      {(item.show?.genre ?? [])[0]}
                     </span>
                   </div>
                 </div>

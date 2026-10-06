@@ -7,7 +7,7 @@ import RatingBadge from "@/components/RatingBadge";
 import PosterImage from "@/components/PosterImage";
 import { genres } from "@/lib/mockData";
 import { timeAgo, getRatingColor, getInitial } from "@/lib/utils";
-import type { MovieRating, ShowRating, ListContentType } from "@/lib/types";
+import type { ShowRating, ListContentType } from "@/lib/types";
 // ─── Member Level ─────────────────────────────────────────────────────────────
 function getMemberLevel(total: number): { label: string; color: string; next: number | null } {
   if (total >= 100) return { label: "Platinum", color: "#E5E4E2", next: null };
@@ -144,23 +144,16 @@ const XIcon = () => (
   </svg>
 );
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-function calcStats(movieRatings: MovieRating[], showRatings: ShowRating[]) {
-  const allRatings = [
-    ...movieRatings.map((r) => r.rating),
-    ...showRatings.map((r) => r.overallRating),
-  ];
-  const avg = allRatings.length > 0 ? allRatings.reduce((a, b) => a + b, 0) / allRatings.length : 0;
-  const totalRuntime = movieRatings.reduce((sum, r) => sum + (r.movie.runtime ?? 100), 0);
-  const hours = Math.floor(totalRuntime / 60);
-  return { totalMovies: movieRatings.length, totalShows: showRatings.length, avg, hours };
+// Rough hours: ~8 episodes a season (or the show's season count), ~50 minutes an episode.
+function calcStats(showRatings: ShowRating[]) {
+  const all = showRatings.map((r) => r.overallRating);
+  const avg = all.length > 0 ? all.reduce((a, b) => a + b, 0) / all.length : 0;
+  const seasons = showRatings.reduce((n, r) => n + Math.max(1, r.seasonRatings.length || r.show.seasons || 1), 0);
+  const hours = Math.round((seasons * 8 * 50) / 60);
+  return { totalShows: showRatings.length, seasons, avg, hours };
 }
-function calcGenreBreakdown(movieRatings: MovieRating[], showRatings: ShowRating[]) {
+function calcGenreBreakdown(showRatings: ShowRating[]) {
   const counts: Record<string, number> = {};
-  movieRatings.forEach((r) =>
-    r.movie.genre.forEach((g) => {
-      counts[g] = (counts[g] ?? 0) + 1;
-    }),
-  );
   showRatings.forEach((r) =>
     r.show.genre.forEach((g) => {
       counts[g] = (counts[g] ?? 0) + 1;
@@ -176,9 +169,9 @@ function friendColor(userId: string) {
   return FRIEND_COLORS[parseInt(userId.replace(/\D/g, "")) % FRIEND_COLORS.length];
 }
 function UserHeader() {
-  const { currentUserData, pushScreen, isAuthenticated, movieRatings, showRatings, updateProfile } =
+  const { currentUserData, pushScreen, isAuthenticated, showRatings, updateProfile } =
     useApp();
-  const total = movieRatings.length + showRatings.length;
+  const total = showRatings.length;
   const level = getMemberLevel(total);
   const colors = ["#7C5CF6", "#8B5CF6"];
   const [copied, setCopied] = useState(false);
@@ -358,8 +351,8 @@ function UserHeader() {
 }
 function StatsGrid({ stats }: { stats: ReturnType<typeof calcStats> }) {
   const items = [
-    { label: "Movies", value: stats.totalMovies, icon: <FilmIcon /> },
     { label: "Shows", value: stats.totalShows, icon: <TvIcon /> },
+    { label: "Seasons", value: stats.seasons, icon: <FilmIcon /> },
     { label: "Avg Rating", value: stats.avg.toFixed(1), icon: <StarIcon /> },
     { label: "Hours", value: `${stats.hours}h`, icon: <ClockIcon /> },
   ];
@@ -382,17 +375,10 @@ function StatsGrid({ stats }: { stats: ReturnType<typeof calcStats> }) {
     </div>
   );
 }
-function FavoritesSection({
-  movieRatings,
-  showRatings,
-}: {
-  movieRatings: MovieRating[];
-  showRatings: ShowRating[];
-}) {
-  const { toggleMovieFavorite, toggleShowFavorite, pushScreen } = useApp();
-  const favMovies = movieRatings.filter((r) => r.isFavorite);
+function FavoritesSection({ showRatings }: { showRatings: ShowRating[] }) {
+  const { toggleShowFavorite, pushScreen } = useApp();
   const favShows = showRatings.filter((r) => r.isFavorite);
-  const hasFavorites = favMovies.length > 0 || favShows.length > 0;
+  const hasFavorites = favShows.length > 0;
   return (
     <div className="bg-bg-card rounded-2xl p-4 border border-border">
       {" "}
@@ -405,46 +391,11 @@ function FavoritesSection({
       {!hasFavorites ? (
         <p className="text-text-muted text-sm font-body text-center py-3">
           {" "}
-          Heart titles in your lists to add them here{" "}
+          Heart shows in your list to add them here{" "}
         </p>
       ) : (
         <div className="flex flex-col gap-2">
           {" "}
-          {favMovies.map((r) => (
-            <div key={r.id} className="flex items-center gap-3">
-              {" "}
-              <button
-                onClick={() => pushScreen({ screen: "movie-detail", movieId: r.movie.id })}
-                className="flex items-center gap-3 flex-1 text-left active:opacity-80"
-              >
-                {" "}
-                <PosterImage
-                  title={r.movie.title}
-                  year={r.movie.year}
-                  posterPath={r.movie.posterPath}
-                  size="sm"
-                  className="w-9 h-12 rounded-lg flex-shrink-0"
-                />{" "}
-                <div className="flex-1 min-w-0">
-                  {" "}
-                  <p className="font-display font-semibold text-text-primary text-xs truncate">
-                    {r.movie.title}
-                  </p>{" "}
-                  <p className="text-text-muted text-[10px] font-body">
-                    {r.movie.year} · Movie
-                  </p>{" "}
-                </div>{" "}
-                <RatingBadge rating={r.rating} size="sm" />{" "}
-              </button>{" "}
-              <button
-                onClick={() => toggleMovieFavorite(r.id)}
-                className="text-accent flex-shrink-0 hover:scale-110 transition-transform"
-              >
-                {" "}
-                <HeartIcon filled />{" "}
-              </button>{" "}
-            </div>
-          ))}{" "}
           {favShows.map((r) => (
             <div key={r.id} className="flex items-center gap-3">
               {" "}
@@ -465,7 +416,7 @@ function FavoritesSection({
                   <p className="font-display font-semibold text-text-primary text-xs truncate">
                     {r.show.title}
                   </p>{" "}
-                  <p className="text-text-muted text-[10px] font-body">{r.show.year} · Show</p>{" "}
+                  <p className="text-text-muted text-[10px] font-body">{r.show.year}</p>{" "}
                 </div>{" "}
                 <RatingBadge rating={r.overallRating} size="sm" />{" "}
               </button>{" "}
@@ -570,90 +521,7 @@ function InlineReRatePanel({
     </div>
   );
 }
-// ─── Movie / Show Row ─────────────────────────────────────────────────────────
-function MovieRow({
-  rating,
-  rank,
-  onPress,
-  onFavorite,
-}: {
-  rating: MovieRating;
-  rank: number;
-  onPress: () => void;
-  onFavorite: () => void;
-}) {
-  const { updateMovieRating } = useApp();
-  const [editing, setEditing] = useState(false);
-  return (
-    <div className="border-b border-border last:border-0">
-      {" "}
-      <div className="flex items-center gap-2 py-3 w-full min-w-0">
-        {" "}
-        <button
-          onClick={onPress}
-          className="flex items-center gap-2 flex-1 min-w-0 text-left active:opacity-80 transition-opacity"
-        >
-          {" "}
-          <span
-            className="font-display font-bold w-5 text-center flex-shrink-0 text-xs"
-            style={{ color: rank <= 3 ? "#F5A623" : "rgb(var(--text-muted))" }}
-          >
-            {" "}
-            {rank}{" "}
-          </span>{" "}
-          <PosterImage
-            title={rating.movie.title}
-            year={rating.movie.year}
-            posterPath={rating.movie.posterPath}
-            size="sm"
-            className="w-9 h-12 rounded-lg flex-shrink-0"
-          />{" "}
-          <div className="flex-1 min-w-0">
-            {" "}
-            <p className="font-display font-semibold text-text-primary text-sm truncate">
-              {rating.movie.title}
-            </p>{" "}
-            <div className="flex items-center gap-1.5 mt-0.5">
-              {" "}
-              <span className="text-text-muted text-xs">{rating.movie.year}</span>{" "}
-              <span className="text-text-muted text-xs">·</span>{" "}
-              <span className="text-text-muted text-xs">{rating.movie.genre[0]}</span>{" "}
-            </div>{" "}
-            {rating.review && (
-              <p className="text-text-secondary text-xs mt-1 italic truncate">"{rating.review}"</p>
-            )}{" "}
-          </div>{" "}
-          <RatingBadge rating={rating.rating} size="sm" />{" "}
-        </button>{" "}
-        {/* Edit + Favorite */}{" "}
-        <button
-          onClick={() => setEditing((v) => !v)}
-          className={`flex-shrink-0 p-1 rounded-lg transition-colors ${editing ? "text-accent" : "text-text-muted/40 hover:text-text-muted"}`}
-        >
-          {" "}
-          <PencilIcon />{" "}
-        </button>{" "}
-        <button
-          onClick={onFavorite}
-          className={`flex-shrink-0 p-1 rounded-lg transition-colors ${rating.isFavorite ? "text-accent" : "text-text-muted/30 hover:text-text-muted"}`}
-        >
-          {" "}
-          <HeartIcon filled={rating.isFavorite} />{" "}
-        </button>{" "}
-      </div>{" "}
-      {editing && (
-        <InlineReRatePanel
-          currentRating={rating.rating}
-          onSave={(r) => {
-            updateMovieRating(rating.id, r);
-            setEditing(false);
-          }}
-          onCancel={() => setEditing(false)}
-        />
-      )}{" "}
-    </div>
-  );
-}
+// ─── Show Row ─────────────────────────────────────────────────────────────────
 function ShowRow({
   rating,
   rank,
@@ -778,13 +646,11 @@ function ShowRow({
 // ─── Watchlist Row ────────────────────────────────────────────────────────────
 function WatchlistRow({ item }: { item: ReturnType<typeof useApp>["watchlist"][number] }) {
   const { removeFromWatchlist, pushScreen } = useApp();
-  const title = item.movie?.title ?? item.show?.title ?? "";
-  const year = item.movie?.year ?? item.show?.year ?? 0;
-  const posterPath = item.movie?.posterPath ?? item.show?.posterPath;
-  const isMovie = item.contentType === "movie";
+  const title = item.show?.title ?? item.title ?? "";
+  const year = item.show?.year ?? item.year ?? 0;
+  const posterPath = item.show?.posterPath;
   const handlePress = () => {
-    if (item.movie) pushScreen({ screen: "movie-detail", movieId: item.movie.id });
-    else if (item.show) pushScreen({ screen: "show-detail", showId: item.show.id });
+    if (item.show) pushScreen({ screen: "show-detail", showId: item.show.id });
   };
   return (
     <div className="flex items-center gap-3 py-3 border-b border-border last:border-0 w-full min-w-0">
@@ -809,17 +675,6 @@ function WatchlistRow({ item }: { item: ReturnType<typeof useApp>["watchlist"][n
           <div className="flex items-center gap-1.5 mt-0.5">
             {" "}
             <span className="text-text-muted text-xs">{year}</span>{" "}
-            <span className="text-text-muted text-xs">·</span>{" "}
-            <span
-              className="text-[10px] font-body font-semibold px-1.5 py-0.5 rounded-md"
-              style={{
-                backgroundColor: isMovie ? "#7C5CF620" : "#F056A820",
-                color: isMovie ? "#7C5CF6" : "#F056A8",
-              }}
-            >
-              {" "}
-              {isMovie ? "Movie" : "Show"}{" "}
-            </span>{" "}
           </div>{" "}
           {item.recommendedBy && (
             <p className="text-text-muted text-[10px] font-body mt-0.5">
@@ -842,24 +697,10 @@ function WatchlistRow({ item }: { item: ReturnType<typeof useApp>["watchlist"][n
 }
 // ─── Lists Section ────────────────────────────────────────────────────────────
 function MyListsSection() {
-  const {
-    movieRatings,
-    showRatings,
-    watchlist,
-    pushScreen,
-    toggleMovieFavorite,
-    toggleShowFavorite,
-  } = useApp();
-  const [contentType, setContentType] = useState<ListContentType>("movies");
+  const { showRatings, watchlist, pushScreen, toggleShowFavorite } = useApp();
+  const [contentType, setContentType] = useState<ListContentType>("shows");
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<"rating" | "recent">("rating");
-  const filteredMovies = movieRatings
-    .filter((r) => !selectedGenre || r.movie.genre.includes(selectedGenre))
-    .sort((a, b) =>
-      sortBy === "rating"
-        ? b.rating - a.rating
-        : new Date(b.dateWatched ?? b.createdAt ?? 0).getTime() - new Date(a.dateWatched ?? a.createdAt ?? 0).getTime(),
-    );
   const filteredShows = showRatings
     .filter((r) => !selectedGenre || r.show.genre.includes(selectedGenre))
     .sort((a, b) =>
@@ -868,7 +709,6 @@ function MyListsSection() {
         : new Date(b.dateWatched ?? b.createdAt ?? 0).getTime() - new Date(a.dateWatched ?? a.createdAt ?? 0).getTime(),
     );
   const tabs: { id: ListContentType; label: string }[] = [
-    { id: "movies", label: `Movies (${movieRatings.length})` },
     { id: "shows", label: `Shows (${showRatings.length})` },
     { id: "watchlist", label: `Saved (${watchlist.length})` },
   ];
@@ -903,7 +743,7 @@ function MyListsSection() {
           </button>
         )}{" "}
       </div>{" "}
-      {/* Content type toggle — 3 tabs */}{" "}
+      {/* Ranked shows / saved */}{" "}
       <div className="flex bg-bg-elevated mx-4 rounded-xl p-1 gap-1 mb-3">
         {" "}
         {tabs.map((t) => (
@@ -917,7 +757,7 @@ function MyListsSection() {
           </button>
         ))}{" "}
       </div>{" "}
-      {/* Genre filter — only for movies/shows */}{" "}
+      {/* Genre filter */}{" "}
       {contentType !== "watchlist" && (
         <div className="px-4 mb-3">
           {" "}
@@ -927,27 +767,7 @@ function MyListsSection() {
       {/* List content */}{" "}
       <div className="px-4 pb-4">
         {" "}
-        {contentType === "movies" ? (
-          filteredMovies.length === 0 ? (
-            <div className="py-10 text-center text-text-muted">
-              {" "}
-              <div className="flex justify-center mb-2 opacity-40">
-                <FilmIcon />
-              </div>{" "}
-              <p className="font-body text-sm">No movies yet. Add some!</p>{" "}
-            </div>
-          ) : (
-            filteredMovies.map((r, i) => (
-              <MovieRow
-                key={r.id}
-                rating={r}
-                rank={i + 1}
-                onPress={() => pushScreen({ screen: "movie-detail", movieId: r.movie.id })}
-                onFavorite={() => toggleMovieFavorite(r.id)}
-              />
-            ))
-          )
-        ) : contentType === "shows" ? (
+        {contentType === "shows" ? (
           filteredShows.length === 0 ? (
             <div className="py-10 text-center text-text-muted">
               {" "}
@@ -974,7 +794,7 @@ function MyListsSection() {
               <BookmarkIcon />
             </div>{" "}
             <p className="font-body text-sm">Nothing saved yet.</p>{" "}
-            <p className="text-xs mt-1">Add titles from What's Next.</p>{" "}
+            <p className="text-xs mt-1">Add shows from What's Next.</p>{" "}
           </div>
         ) : (
           watchlist.map((item) => <WatchlistRow key={item.id} item={item} />)
@@ -1021,17 +841,8 @@ function GenreBreakdown({ breakdown }: { breakdown: [string, number][] }) {
     </div>
   );
 }
-function RatingDistribution({
-  movieRatings,
-  showRatings,
-}: {
-  movieRatings: MovieRating[];
-  showRatings: ShowRating[];
-}) {
-  const allRatings = [
-    ...movieRatings.map((r) => r.rating),
-    ...showRatings.map((r) => r.overallRating),
-  ];
+function RatingDistribution({ showRatings }: { showRatings: ShowRating[] }) {
+  const allRatings = showRatings.map((r) => r.overallRating);
   const buckets = [
     { label: "9–10", min: 9, max: 10.1 },
     { label: "7–8.9", min: 7, max: 9 },
@@ -1095,7 +906,7 @@ function ActivityTimeline() {
         <div className="flex flex-col gap-3">
           {" "}
           {myActivities.map((a) => {
-            const title = a.movie?.title ?? a.show?.title ?? "";
+            const title = a.show?.title ?? "";
             return (
               <div key={a.id} className="flex items-center gap-3">
                 {" "}
@@ -1112,8 +923,7 @@ function ActivityTimeline() {
                 </div>{" "}
                 <button
                   onClick={() => {
-                    if (a.movie) pushScreen({ screen: "movie-detail", movieId: a.movie.id });
-                    else if (a.show) pushScreen({ screen: "show-detail", showId: a.show.id });
+                    if (a.show) pushScreen({ screen: "show-detail", showId: a.show.id });
                   }}
                   className="flex-1 min-w-0 text-left hover:opacity-80 transition-opacity"
                 >
@@ -1139,11 +949,11 @@ function ActivityTimeline() {
 }
 // ─── Main ProfileTab ──────────────────────────────────────────────────────────
 export default function ProfileTab() {
-  const { movieRatings, showRatings, pushScreen } = useApp();
-  const stats = useMemo(() => calcStats(movieRatings, showRatings), [movieRatings, showRatings]);
+  const { showRatings, pushScreen } = useApp();
+  const stats = useMemo(() => calcStats(showRatings), [showRatings]);
   const genreBreakdown = useMemo(
-    () => calcGenreBreakdown(movieRatings, showRatings),
-    [movieRatings, showRatings],
+    () => calcGenreBreakdown(showRatings),
+    [showRatings],
   );
   return (
     <div className="min-h-screen bg-bg-primary">
@@ -1186,10 +996,10 @@ export default function ProfileTab() {
         <CurrentlyWatchingSection />
         <WrappedEntry />
         <StatsGrid stats={stats} />{" "}
-        <FavoritesSection movieRatings={movieRatings} showRatings={showRatings} />{" "}
+        <FavoritesSection showRatings={showRatings} />{" "}
         <MyListsSection />{" "}
         {genreBreakdown.length > 0 && <GenreBreakdown breakdown={genreBreakdown} />}{" "}
-        <RatingDistribution movieRatings={movieRatings} showRatings={showRatings} />{" "}
+        <RatingDistribution showRatings={showRatings} />{" "}
         <ActivityTimeline />{" "}
       </div>{" "}
     </div>

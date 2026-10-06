@@ -1,9 +1,9 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useApp } from "@/lib/AppContext";
 import { useSocial } from "@/lib/SocialContext";
 import { ratingsByUser, tasteMatch } from "@/lib/social";
-import { getMovie, getShow } from "@/lib/catalog";
+import { getShow } from "@/lib/catalog";
 import { knownExtras } from "@/lib/useTitleExtras";
 import PosterImage from "@/components/PosterImage";
 import RatingBadge from "@/components/RatingBadge";
@@ -14,7 +14,6 @@ import { ProviderLogos } from "@/components/social/ProviderChips";
 export default function ProfileDetailScreen({ userId }: { userId: string }) {
   const { pushScreen, currentUserData } = useApp();
   const { getUser, myRows, watchingFor, isFollowing, follow, unfollow, showToast, recRequests } = useSocial();
-  const [tab, setTab] = useState<"show" | "movie">("show");
 
   const isSelf = userId === currentUserData.id || userId === "u1";
   const user = getUser(userId);
@@ -26,7 +25,7 @@ export default function ProfileDetailScreen({ userId }: { userId: string }) {
   const match = isSelf ? null : tasteMatch(myRows, userId);
   const following = isFollowing(userId);
   const openRequest = recRequests.find((r) => r.userId === userId && new Date(r.expiresAt).getTime() > Date.now());
-  const list = rows.filter((r) => r.type === tab).sort((a, b) => b.rating - a.rating);
+  const list = [...rows].sort((a, b) => b.rating - a.rating);
   const avg = rows.length ? (rows.reduce((s, r) => s + r.rating, 0) / rows.length).toFixed(1) : "—";
 
   return (
@@ -130,7 +129,7 @@ export default function ProfileDetailScreen({ userId }: { userId: string }) {
                     <p className="flex-1 min-w-0 text-text-primary text-sm font-display font-semibold truncate">
                       {show.title} <span className="text-text-secondary font-body font-normal">· Season {w.season}</span>
                     </p>
-                    <ProviderLogos providers={knownExtras("show", show).providers} max={1} size="sm" />
+                    <ProviderLogos providers={knownExtras(show).providers} max={1} size="sm" />
                   </button>
                 );
               })}
@@ -140,8 +139,8 @@ export default function ProfileDetailScreen({ userId }: { userId: string }) {
 
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: "Shows", value: rows.filter((r) => r.type === "show").length },
-            { label: "Movies", value: rows.filter((r) => r.type === "movie").length },
+            { label: "Shows", value: rows.length },
+            { label: "Seasons", value: rows.reduce((n, r) => n + Math.max(1, r.seasons?.length ?? 1), 0) },
             { label: "Avg", value: avg },
           ].map((s) => (
             <div key={s.label} className="bg-bg-card border border-border rounded-xl p-3 text-center">
@@ -152,29 +151,19 @@ export default function ProfileDetailScreen({ userId }: { userId: string }) {
         </div>
 
         <div>
-          <div className="flex bg-bg-elevated rounded-xl p-1 mb-3">
-            {(["show", "movie"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`flex-1 py-2 rounded-lg text-sm font-body font-semibold ${tab === t ? "bg-bg-hover text-text-primary" : "text-text-muted"}`}
-              >
-                {t === "show" ? "Shows" : "Movies"}
-              </button>
-            ))}
-          </div>
+          <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-2">Ranked shows</p>
           {list.length === 0 ? (
             <p className="text-text-muted text-sm text-center py-6">Nothing rated yet.</p>
           ) : (
             <div className="space-y-2">
               {list.map((r, i) => {
-                const item = r.type === "movie" ? getMovie(r.id) : getShow(r.id);
+                const item = getShow(r.id);
                 if (!item) return null;
                 return (
                   <button
-                    key={`${r.type}:${r.id}`}
+                    key={r.id}
                     onClick={() =>
-                      pushScreen(r.type === "movie" ? { screen: "movie-detail", movieId: r.id } : { screen: "show-detail", showId: r.id })
+                      pushScreen({ screen: "show-detail", showId: r.id })
                     }
                     className="w-full bg-bg-card border border-border rounded-xl p-2.5 flex items-center gap-3 text-left active:bg-bg-elevated"
                   >

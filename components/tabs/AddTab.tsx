@@ -3,22 +3,20 @@
 import { useEffect, useState } from "react";
 import { useApp } from "@/lib/AppContext";
 import { useSocial } from "@/lib/SocialContext";
-import { ContentType, Movie, Show } from "@/lib/types";
-import { searchableMovies, searchableShows } from "@/lib/mockData";
-import { getMovie, getShow } from "@/lib/catalog";
+import { Show } from "@/lib/types";
+import { searchableShows } from "@/lib/mockData";
+import { getShow } from "@/lib/catalog";
 import { mergeById, useLiveSearch } from "@/lib/useLiveSearch";
 import { getRatingColor } from "@/lib/utils";
 
-type Step = "choose" | "search" | "rate" | "rate-seasons" | "confirm";
+type Step = "search" | "rate" | "rate-seasons" | "confirm";
 
 export default function AddTab() {
-  const { addMovieRating, addShowRating, setActiveTab, getMyShowRating } = useApp();
+  const { addShowRating, setActiveTab, getMyShowRating } = useApp();
   const { pendingRate, clearPendingRate } = useSocial();
 
-  const [step, setStep] = useState<Step>("choose");
-  const [contentType, setContentType] = useState<ContentType>("movie");
+  const [step, setStep] = useState<Step>("search");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [selectedShow, setSelectedShow] = useState<Show | null>(null);
   const [rating, setRating] = useState(7.0);
   const [rateSeasons, setRateSeasons] = useState(false);
@@ -26,26 +24,13 @@ export default function AddTab() {
   const [seasonRatings, setSeasonRatings] = useState<number[]>([7.0]);
 
   const resetFlow = () => {
-    setStep("choose");
+    setStep("search");
     setSearchQuery("");
-    setSelectedMovie(null);
     setSelectedShow(null);
     setRating(7.0);
     setRateSeasons(false);
     setSeasonsWatched(1);
     setSeasonRatings([7.0]);
-  };
-
-  const handleSelectType = (type: ContentType) => {
-    setContentType(type);
-    setSearchQuery("");
-    setStep("search");
-  };
-
-  const handleSelectMovie = (movie: Movie) => {
-    setSelectedMovie(movie);
-    setRating(7.0);
-    setStep("rate");
   };
 
   const handleSelectShow = (show: Show) => {
@@ -60,16 +45,9 @@ export default function AddTab() {
   // Arriving from "Finished Season N" (or another screen asking to rate a title)
   useEffect(() => {
     if (!pendingRate) return;
-    if (pendingRate.type === "movie") {
-      const movie = getMovie(pendingRate.id);
-      if (movie) {
-        setContentType("movie");
-        handleSelectMovie(movie);
-      }
-    } else {
+    {
       const show = getShow(pendingRate.id);
       if (show) {
-        setContentType("show");
         setSelectedShow(show);
         const existing = getMyShowRating(show.id);
         const upTo = Math.max(pendingRate.season ?? 1, existing?.seasonRatings.length ?? 0);
@@ -109,18 +87,6 @@ export default function AddTab() {
     });
   };
 
-  const handleAddMovie = () => {
-    if (!selectedMovie) return;
-    addMovieRating({
-      id: "mr-" + Date.now(),
-      userId: "u1",
-      movie: selectedMovie,
-      rating,
-      createdAt: new Date().toISOString(),
-    });
-    setStep("confirm");
-  };
-
   const handleAddShow = () => {
     if (!selectedShow) return;
     const seasonRatingsArray = rateSeasons
@@ -140,103 +106,30 @@ export default function AddTab() {
     setStep("confirm");
   };
 
-  const handleAdd = () => {
-    if (contentType === "movie") {
-      handleAddMovie();
-    } else {
-      handleAddShow();
-    }
-  };
-
   const live = useLiveSearch(step === "search" ? searchQuery : "");
-  const filteredResults: (Movie | Show)[] =
+  const filteredResults: Show[] =
     searchQuery.length >= 2
-      ? contentType === "movie"
-        ? mergeById(
-            searchableMovies.filter((m) =>
-              m.title.toLowerCase().includes(searchQuery.toLowerCase())
-            ),
-            live.movies
-          )
-        : mergeById(
-            searchableShows.filter((s) =>
-              s.title.toLowerCase().includes(searchQuery.toLowerCase())
-            ),
-            live.shows
-          )
+      ? mergeById(
+          searchableShows.filter((s) =>
+            s.title.toLowerCase().includes(searchQuery.toLowerCase())
+          ),
+          live.shows
+        )
       : [];
-
-  // Step: choose
-  if (step === "choose") {
-    return (
-      <div className="flex flex-col gap-4 p-4">
-        <h1 className="font-display font-bold text-xl text-text-primary">
-          Add to List
-        </h1>
-
-        <button
-          onClick={() => handleSelectType("movie")}
-          className="bg-bg-surface rounded-xl p-6 w-full text-left flex items-center justify-between hover:bg-bg-hover transition-colors"
-        >
-          <div>
-            <h2 className="text-text-primary font-semibold text-lg">Movie</h2>
-            <p className="text-text-secondary text-sm">
-              Log a movie you watched
-            </p>
-          </div>
-          <span className="text-text-muted text-xl">&rarr;</span>
-        </button>
-
-        <button
-          onClick={() => handleSelectType("show")}
-          className="bg-bg-surface rounded-xl p-6 w-full text-left flex items-center justify-between hover:bg-bg-hover transition-colors"
-        >
-          <div>
-            <h2 className="text-text-primary font-semibold text-lg">
-              TV Show
-            </h2>
-            <p className="text-text-secondary text-sm">
-              Log a show or season
-            </p>
-          </div>
-          <span className="text-text-muted text-xl">&rarr;</span>
-        </button>
-      </div>
-    );
-  }
 
   // Step: search
   if (step === "search") {
     return (
       <div className="flex flex-col gap-4 p-4">
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setStep("choose")}
-            className="text-text-secondary hover:text-text-primary transition-colors"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M19 12H5" />
-              <path d="M12 19l-7-7 7-7" />
-            </svg>
-          </button>
           <h1 className="font-display font-bold text-xl text-text-primary">
-            {contentType === "movie" ? "Add Movie" : "Add TV Show"}
+            Rate a show
           </h1>
         </div>
 
         <input
           type="text"
-          placeholder={`Search ${contentType === "movie" ? "movies" : "TV shows"}...`}
+          placeholder="Search shows..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="bg-bg-elevated rounded-lg px-4 py-3 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-accent-purple w-full"
@@ -246,16 +139,12 @@ export default function AddTab() {
           {filteredResults.map((item) => (
             <button
               key={item.id}
-              onClick={() =>
-                contentType === "movie"
-                  ? handleSelectMovie(item as Movie)
-                  : handleSelectShow(item as Show)
-              }
+              onClick={() => handleSelectShow(item)}
               className="bg-bg-surface rounded-lg p-3 text-left hover:bg-bg-hover transition-colors w-full"
             >
               <div className="text-text-primary font-medium">{item.title}</div>
               <div className="text-text-secondary text-sm">
-                {item.year} &middot; {item.genre}
+                {item.year} &middot; {item.genre.slice(0, 2).join(", ")}
               </div>
             </button>
           ))}
@@ -271,7 +160,7 @@ export default function AddTab() {
 
   // Step: rate
   if (step === "rate") {
-    const selected = contentType === "movie" ? selectedMovie : selectedShow;
+    const selected = selectedShow;
     if (!selected) return null;
 
     const ratingColor = getRatingColor(rating);
@@ -337,7 +226,7 @@ export default function AddTab() {
           </div>
         </div>
 
-        {contentType === "show" && selectedShow && (
+        {selectedShow && (
           <div className="bg-bg-surface rounded-lg p-4 flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <span className="text-text-primary font-medium">
@@ -394,7 +283,7 @@ export default function AddTab() {
         )}
 
         <button
-          onClick={handleAdd}
+          onClick={handleAddShow}
           className="bg-accent-purple text-white rounded-lg py-3 font-semibold w-full hover:opacity-90 transition-opacity"
         >
           Add to My List
@@ -474,7 +363,7 @@ export default function AddTab() {
         </div>
 
         <button
-          onClick={handleAdd}
+          onClick={handleAddShow}
           className="bg-accent-purple text-white rounded-lg py-3 font-semibold w-full hover:opacity-90 transition-opacity"
         >
           Add to My List
@@ -485,10 +374,7 @@ export default function AddTab() {
 
   // Step: confirm
   if (step === "confirm") {
-    const title =
-      contentType === "movie"
-        ? selectedMovie?.title
-        : selectedShow?.title;
+    const title = selectedShow?.title;
 
     return (
       <div className="flex flex-col items-center justify-center gap-6 p-4 py-12">

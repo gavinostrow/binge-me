@@ -11,7 +11,7 @@ export default function Onboarding({ onDone }: OnboardingProps) {
       emoji: "🎬",
       title: "Rate Everything",
       description:
-        "Give every movie and show a score from 1–10. Build your ranked list.",
+        "Score every show and every season from 1–10. Build your ranked list.",
       gradient: "from-blue-600 to-blue-400",
     },
     {

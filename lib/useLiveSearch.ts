@@ -1,25 +1,25 @@
 "use client";
 import { useEffect, useState } from "react";
-import type { Movie, Show } from "./types";
-import { searchTitles } from "./tmdb";
+import type { Show } from "./types";
+import { searchShows } from "./tmdb";
 
-/** Live TMDB search (debounced). Returns empty lists when TMDB isn't configured. */
-export function useLiveSearch(query: string): { movies: Movie[]; shows: Show[]; loading: boolean } {
-  const [result, setResult] = useState<{ movies: Movie[]; shows: Show[] }>({ movies: [], shows: [] });
+/** Live TMDB show search (debounced). Returns an empty list when TMDB isn't configured. */
+export function useLiveSearch(query: string): { shows: Show[]; loading: boolean } {
+  const [shows, setShows] = useState<Show[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const q = query.trim();
     if (q.length < 2) {
-      setResult({ movies: [], shows: [] });
+      setShows([]);
       return;
     }
     let cancelled = false;
     const t = setTimeout(async () => {
       setLoading(true);
-      const live = await searchTitles(q);
+      const live = await searchShows(q);
       if (!cancelled) {
-        setResult(live ?? { movies: [], shows: [] });
+        setShows(live ?? []);
         setLoading(false);
       }
     }, 300);
@@ -29,7 +29,7 @@ export function useLiveSearch(query: string): { movies: Movie[]; shows: Show[]; 
     };
   }, [query]);
 
-  return { ...result, loading };
+  return { shows, loading };
 }
 
 /** Sample matches first, then live results that aren't already listed. */

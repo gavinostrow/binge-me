@@ -76,8 +76,7 @@ function GroupListCard({ group, onOpen }: { group: GroupClub; onOpen: () => void
         {group.currentWatch && (
           <div className="flex items-center gap-1 mt-1">
             {" "}
-            <span className="text-xs">{group.currentWatch.type === "show" ? "Show ·" : "Movie ·"}</span>{" "}
-            <span className="text-accent text-xs font-body font-semibold truncate">
+                        <span className="text-accent text-xs font-body font-semibold truncate">
               {" "}
               {group.currentWatch.title}{" "}
               {group.currentWatch.episode && ` · ${group.currentWatch.episode}`}{" "}
@@ -230,8 +229,7 @@ function ChatBubble({ msg, groupId }: { msg: GroupMessage; groupId: string }) {
               className={`flex items-center gap-1 text-[10px] font-body font-semibold mb-1 ${isMe ? "text-white/70" : "text-accent"}`}
             >
               {" "}
-              <span>{msg.contentRef.type === "movie" ? "Movie ·" : "Show ·"}</span>{" "}
-              <span>{msg.contentRef.title}</span>{" "}
+                            <span>{msg.contentRef.title}</span>{" "}
               {msg.contentRef.rating && (
                 <RatingBadge rating={msg.contentRef.rating} size="sm" />
               )}{" "}
@@ -405,8 +403,7 @@ function ChatView({ group }: { group: GroupClub }) {
       {group.currentWatch && (
         <div className="mx-4 mt-2 mb-1 bg-accent/10 border border-accent/30 rounded-xl px-3 py-2 flex items-center gap-2">
           {" "}
-          <span>{group.currentWatch.type === "show" ? "Show ·" : "Movie ·"}</span>{" "}
-          <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0">
             {" "}
             <p className="text-accent text-xs font-body font-semibold truncate">
               {" "}
@@ -869,7 +866,7 @@ function GroupDetail({ group, onBack }: { group: GroupClub; onBack: () => void }
               {group.currentWatch && (
                 <p className="text-accent text-xs font-body truncate">
                   {" "}
-                  {group.currentWatch.type === "show" ? "Show ·" : "Movie ·"} {group.currentWatch.title}{" "}
+                  {group.currentWatch.title}{" "}
                   {group.currentWatch.episode && ` · ${group.currentWatch.episode}`}{" "}
                 </p>
               )}{" "}
@@ -1027,7 +1024,7 @@ function FriendsWatchingModal({ onClose }: { onClose: () => void }) {
                     <div className="flex items-center gap-2">
                       {" "}
                       <p className="text-text-primary text-sm font-body">
-                        {lastActivity.movie?.title ?? lastActivity.show?.title ?? "Unknown"}
+                        {lastActivity.show?.title ?? "Unknown"}
                       </p>{" "}
                       {lastActivity.rating && (
                         <RatingBadge rating={lastActivity.rating} size="sm" />
@@ -1110,7 +1107,7 @@ function CreateGroupModal({ onClose }: { onClose: () => void }) {
                 Group Watch
               </p>{" "}
               <p className="text-text-secondary text-sm font-body">
-                Everyone watching the same show or movie together
+                Everyone watching the same show together
               </p>{" "}
             </button>{" "}
             {/* Friends Club */}{" "}

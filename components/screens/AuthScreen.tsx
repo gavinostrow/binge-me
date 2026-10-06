@@ -52,7 +52,7 @@ export default function AuthScreen() {
             binge
           </h1>{" "}
           <p className="text-text-secondary">
-            Rate movies and shows with friends
+            Rate TV shows with friends
           </p>{" "}
         </div>{" "}
         <div className="flex gap-2 mb-8">

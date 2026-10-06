@@ -14,7 +14,7 @@ export default function CurrentlyWatchingSection() {
   const finish = (showId: string, season: number, total: number) => {
     if (season < total) setWatchingSeason(showId, season + 1);
     else stopWatching(showId);
-    requestRate("show", showId, season);
+    requestRate(showId, season);
     showToast(`Nice — rate Season ${season}`);
     setActiveTab("add");
   };
@@ -51,7 +51,7 @@ export default function CurrentlyWatchingSection() {
                     <p className="text-text-primary text-sm font-display font-semibold truncate">{show.title}</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <span className="text-text-secondary text-xs font-body">Season {w.season}</span>
-                      <ProviderLogos providers={knownExtras("show", show).providers} max={1} />
+                      <ProviderLogos providers={knownExtras(show).providers} max={1} />
                     </div>
                   </div>
                 </button>

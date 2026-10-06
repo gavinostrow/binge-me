@@ -2,20 +2,13 @@
 
 import { useState } from "react";
 import { useApp } from "@/lib/AppContext";
-import { ContentType, RecommendationSource } from "@/lib/types";
-import {
-  searchableMovies,
-  searchableShows,
-  friends,
-  tasteMatchPercentages,
-  communityMovies,
-  communityShows,
-} from "@/lib/mockData";
+import { RecommendationSource } from "@/lib/types";
+import { searchableShows, communityShows } from "@/lib/mockData";
 import { getRatingColor } from "@/lib/utils";
 import RatingBadge from "@/components/RatingBadge";
 import { useSocial } from "@/lib/SocialContext";
 import { allFriendRatings, tasteMatch } from "@/lib/social";
-import { getMovie, getShow } from "@/lib/catalog";
+import { getShow } from "@/lib/catalog";
 import { knownExtras } from "@/lib/useTitleExtras";
 import WhatsNextHub from "@/components/social/WhatsNextHub";
 import { ProviderLogos } from "@/components/social/ProviderChips";
@@ -23,95 +16,75 @@ import { ProviderLogos } from "@/components/social/ProviderChips";
 interface RecommendationResult {
   title: string;
   year: number;
-  genre: string | string[];
+  genre: string[];
   reason: string;
   rating?: number;
   itemId?: string;
 }
 
-function genreText(genre: string | string[]) {
-  return Array.isArray(genre) ? genre.slice(0, 2).join(", ") : genre;
+function genreText(genre: string[]) {
+  return genre.slice(0, 2).join(", ");
 }
 
 export default function WhatsNextTab() {
-  const { movieRatings, showRatings, addToWatchlist, pushScreen } = useApp();
+  const { showRatings, addToWatchlist, pushScreen } = useApp();
   const { followingIds, getUser, myRows, myServices } = useSocial();
   const [onlyMyServices, setOnlyMyServices] = useState(false);
 
   const [source, setSource] = useState<RecommendationSource | null>(null);
-  const [contentType, setContentType] = useState<ContentType>("movie");
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<RecommendationResult | null>(null);
   const [suggestions, setSuggestions] = useState<RecommendationResult[]>([]);
 
-  const ratedTitles = contentType === "movie"
-    ? new Set(movieRatings.map((r) => r.movie.title))
-    : new Set(showRatings.map((r) => r.show.title));
+  const ratedIds = new Set(showRatings.map((r) => r.show.id));
 
   function getGenrePreferences(): Record<string, number> {
     const genreScores: Record<string, { total: number; count: number }> = {};
-    if (contentType === "movie") {
-      for (const r of movieRatings) {
-        const genre = (Array.isArray(r.movie.genre) ? r.movie.genre[0] : r.movie.genre) || "Unknown";
-        if (!genreScores[genre]) genreScores[genre] = { total: 0, count: 0 };
-        genreScores[genre].total += r.rating;
-        genreScores[genre].count += 1;
-      }
-    } else {
-      for (const r of showRatings) {
-        const genre = (Array.isArray(r.show.genre) ? r.show.genre[0] : r.show.genre) || "Unknown";
-        if (!genreScores[genre]) genreScores[genre] = { total: 0, count: 0 };
-        genreScores[genre].total += r.overallRating;
-        genreScores[genre].count += 1;
-      }
+    for (const r of showRatings) {
+      const genre = r.show.genre[0] || "Unknown";
+      if (!genreScores[genre]) genreScores[genre] = { total: 0, count: 0 };
+      genreScores[genre].total += r.overallRating;
+      genreScores[genre].count += 1;
     }
     const avg: Record<string, number> = {};
-    for (const [genre, { total, count }] of Object.entries(genreScores)) {
-      avg[genre] = total / count;
-    }
+    for (const [genre, { total, count }] of Object.entries(genreScores)) avg[genre] = total / count;
     return avg;
   }
 
   function getRecommendations(): RecommendationResult[] {
     if (source === "taste") {
-      const pool = contentType === "movie" ? searchableMovies : searchableShows;
-      const unrated = pool.filter((item) => !ratedTitles.has(item.title));
       const genrePrefs = getGenrePreferences();
-      const sorted = [...unrated].sort((a, b) => {
-        const aScore = genrePrefs[(Array.isArray(a.genre) ? a.genre[0] : a.genre) as string] || 0;
-        const bScore = genrePrefs[(Array.isArray(b.genre) ? b.genre[0] : b.genre) as string] || 0;
-        return bScore - aScore;
-      });
-      return sorted.map((item) => {
-        const topGenre = (Array.isArray(item.genre) ? item.genre[0] : item.genre) as string;
-        const matchScore = genrePrefs[topGenre];
-        const reason = matchScore
-          ? `Matches your ${topGenre} taste (avg rating: ${matchScore.toFixed(1)})`
-          : `Explore something new in ${topGenre}`;
-        return {
-          title: item.title,
-          year: item.year,
-          genre: item.genre,
-          reason,
-          itemId: item.id,
-        };
-      });
+      return searchableShows
+        .filter((item) => !ratedIds.has(item.id))
+        .sort((a, b) => (genrePrefs[b.genre[0]] || 0) - (genrePrefs[a.genre[0]] || 0))
+        .map((item) => {
+          const topGenre = item.genre[0];
+          const matchScore = genrePrefs[topGenre];
+          return {
+            title: item.title,
+            year: item.year,
+            genre: item.genre,
+            reason: matchScore
+              ? `Matches your ${topGenre} taste (avg rating: ${matchScore.toFixed(1)})`
+              : `Explore something new in ${topGenre}`,
+            itemId: item.id,
+          };
+        });
     }
 
     if (source === "friends") {
-      const kind = contentType === "movie" ? "movie" : "show";
       const best = new Map<string, { userId: string; rating: number }>();
       allFriendRatings()
-        .filter((r) => r.type === kind && r.rating >= 8 && followingIds.includes(r.userId))
+        .filter((r) => r.rating >= 8 && followingIds.includes(r.userId))
         .forEach((r) => {
           const cur = best.get(r.id);
           if (!cur || r.rating > cur.rating) best.set(r.id, { userId: r.userId, rating: r.rating });
         });
       return Array.from(best.entries())
         .map(([id, { userId, rating }]) => {
-          const item = kind === "movie" ? getMovie(id) : getShow(id);
+          const item = getShow(id);
           const friend = getUser(userId);
-          if (!item || !friend || ratedTitles.has(item.title)) return null;
+          if (!item || !friend || ratedIds.has(item.id)) return null;
           const match = tasteMatch(myRows, userId).pct;
           return {
             title: item.title,
@@ -126,25 +99,21 @@ export default function WhatsNextTab() {
     }
 
     // community
-    const communityPool = contentType === "movie" ? communityMovies : communityShows;
-    const unrated = communityPool.filter((item) => {
-      const t = item.movie?.title ?? item.show?.title ?? "";
-      return !ratedTitles.has(t);
-    });
-    return unrated.map((item) => ({
-      title: item.movie?.title ?? item.show?.title ?? "",
-      year: item.movie?.year ?? item.show?.year ?? 0,
-      genre: item.movie?.genre ?? item.show?.genre ?? [],
-      reason: `${item.averageRating.toFixed(1)} avg from ${item.ratingCount.toLocaleString()} ratings`,
-      rating: item.averageRating,
-      itemId: item.movie?.id ?? item.show?.id,
-    }));
+    return communityShows
+      .filter((item) => item.show && !ratedIds.has(item.show.id))
+      .map((item) => ({
+        title: item.show!.title,
+        year: item.show!.year,
+        genre: item.show!.genre,
+        reason: `${item.averageRating.toFixed(1)} avg from ${item.ratingCount.toLocaleString()} ratings`,
+        rating: item.averageRating,
+        itemId: item.show!.id,
+      }));
   }
 
   function providersOf(r: RecommendationResult) {
-    if (!r.itemId) return [];
-    const item = contentType === "movie" ? getMovie(r.itemId) : getShow(r.itemId);
-    return item ? knownExtras(contentType, item).providers : [];
+    const item = r.itemId ? getShow(r.itemId) : undefined;
+    return item ? knownExtras(item).providers : [];
   }
 
   function filterByServices(recs: RecommendationResult[]) {
@@ -164,10 +133,10 @@ export default function WhatsNextTab() {
         setResult({
           title: "No recommendations",
           year: 0,
-          genre: "",
+          genre: [],
           reason: onlyMyServices
             ? "Nothing left on your services. Turn off the services filter or try another source."
-            : "You've rated everything! Try a different source or content type.",
+            : "You've rated everything here. Try a different source.",
         });
         setSuggestions([]);
         return;
@@ -179,27 +148,14 @@ export default function WhatsNextTab() {
   }
 
   function handleAddToWatchlist() {
-    if (!result) return;
-    const item = result.itemId ? (contentType === "movie" ? getMovie(result.itemId) : getShow(result.itemId)) : undefined;
-    if (item) {
-      addToWatchlist({
-        id: "wl-" + Date.now(),
-        contentType,
-        ...(contentType === "movie" ? { movie: item as ReturnType<typeof getMovie> } : { show: item as ReturnType<typeof getShow> }),
-        addedDate: new Date().toISOString(),
-        recommendedBy: source ?? undefined,
-      });
-      return;
-    }
+    const item = result?.itemId ? getShow(result.itemId) : undefined;
+    if (!item) return;
     addToWatchlist({
       id: "wl-" + Date.now(),
-      userId: "u1",
-      contentId: result.title,
-      contentType,
-      title: result.title,
-      year: result.year,
-      genre: result.genre,
-      addedAt: new Date().toISOString(),
+      contentType: "show",
+      show: item,
+      addedDate: new Date().toISOString(),
+      recommendedBy: source ?? undefined,
     });
   }
 
@@ -355,41 +311,10 @@ export default function WhatsNextTab() {
         </h1>
       </div>
 
-      {/* Movie / Show toggle */}
       <div className="px-4 pb-4">
-        <div className="flex bg-bg-surface rounded-lg p-1">
-          <button
-            onClick={() => {
-              setContentType("movie");
-              setResult(null);
-              setSuggestions([]);
-            }}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              contentType === "movie"
-                ? "bg-accent-purple text-white"
-                : "text-text-secondary hover:text-text-primary"
-            }`}
-          >
-            Movies
-          </button>
-          <button
-            onClick={() => {
-              setContentType("show");
-              setResult(null);
-              setSuggestions([]);
-            }}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              contentType === "show"
-                ? "bg-accent-purple text-white"
-                : "text-text-secondary hover:text-text-primary"
-            }`}
-          >
-            Shows
-          </button>
-        </div>
         <button
           onClick={() => setOnlyMyServices((v) => !v)}
-          className={`mt-3 w-full flex items-center justify-between rounded-xl px-3 py-2.5 border text-sm font-body transition-colors ${
+          className={`w-full flex items-center justify-between rounded-xl px-3 py-2.5 border text-sm font-body transition-colors ${
             onlyMyServices ? "border-rating-green/40 bg-rating-green/5 text-text-primary" : "border-border bg-bg-surface text-text-secondary"
           }`}
           aria-pressed={onlyMyServices}
@@ -468,11 +393,7 @@ export default function WhatsNextTab() {
             {result.itemId && (
               <button
                 onClick={() =>
-                  pushScreen(
-                    contentType === "movie"
-                      ? { screen: "movie-detail", movieId: result.itemId! }
-                      : { screen: "show-detail", showId: result.itemId! },
-                  )
+                  pushScreen({ screen: "show-detail", showId: result.itemId! })
                 }
                 className="text-accent-light text-sm font-body font-semibold mb-4"
               >

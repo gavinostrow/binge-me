@@ -48,7 +48,7 @@ export function useComingBack(): ComingBackItem[] {
   return useMemo(
     () =>
       candidates
-        .map(({ show, why }) => ({ show, why, next: liveNext[show.id] ?? knownExtras("show", show).next }))
+        .map(({ show, why }) => ({ show, why, next: liveNext[show.id] ?? knownExtras(show).next }))
         .filter((x): x is ComingBackItem => comingBackRank(x.next) !== null)
         .sort((a, b) => comingBackRank(a.next)! - comingBackRank(b.next)!),
     [candidates, liveNext],

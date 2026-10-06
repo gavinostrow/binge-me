@@ -37,7 +37,7 @@ export default function ComingBackScreen() {
                   {label.title}
                 </p>
                 <div className="flex items-center gap-2 mt-1.5">
-                  <ProviderLogos providers={knownExtras("show", show).providers} />
+                  <ProviderLogos providers={knownExtras(show).providers} />
                   <span className="text-text-muted text-[10px] font-body">{WHY[why]}</span>
                 </div>
               </div>

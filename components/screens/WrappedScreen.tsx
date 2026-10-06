@@ -10,7 +10,7 @@ import UserAvatar from "@/components/social/UserAvatar";
 
 /** Binge Wrapped — yearly and quarterly recaps. */
 export default function WrappedScreen({ period: initial }: { period?: string }) {
-  const { movieRatings, showRatings, pushScreen, currentUserData } = useApp();
+  const { showRatings, pushScreen, currentUserData } = useApp();
   const { myRows, followingIds, getUser, showToast } = useSocial();
   const now = new Date();
   const [year, setYear] = useState(initial ? Number(initial.slice(0, 4)) : now.getFullYear());
@@ -19,17 +19,16 @@ export default function WrappedScreen({ period: initial }: { period?: string }) 
   const period = periods.find((p) => p.key === key) ?? periods[0];
 
   const data = useMemo(
-    () => computeWrapped(period, movieRatings, showRatings, myRows, followingIds),
-    [period, movieRatings, showRatings, myRows, followingIds],
+    () => computeWrapped(period, showRatings, myRows, followingIds),
+    [period, showRatings, myRows, followingIds],
   );
 
   const share = async () => {
     if (!data) return;
     const lines = [
       `My Binge Wrapped · ${period.label}`,
-      `${data.total} titles · ~${data.hours} hours`,
-      data.topShow ? `#1 show: ${data.topShow.item.title} (${data.topShow.rating.toFixed(1)})` : "",
-      data.topMovie ? `#1 movie: ${data.topMovie.item.title} (${data.topMovie.rating.toFixed(1)})` : "",
+      `${data.shows} shows · ${data.seasons} seasons · ~${data.hours} hours`,
+      ...data.topShows.map((t, i) => `#${i + 1} ${t.item.title} (${t.rating.toFixed(1)})`),
       data.topGenre ? `Top genre: ${data.topGenre.name}` : "",
       `I'm ${data.persona.title}`,
     ].filter(Boolean);
@@ -111,16 +110,17 @@ export default function WrappedScreen({ period: initial }: { period?: string }) 
             {/* Hero */}
             <Card tone="accent">
               <p className="text-text-muted text-[10px] font-body uppercase tracking-widest">{period.label}</p>
-              <p className="text-text-primary font-mono font-semibold text-5xl leading-none mt-3">{data.total}</p>
-              <p className="text-text-secondary font-body text-sm mt-1">titles logged</p>
+              <p className="text-text-primary font-mono font-semibold text-5xl leading-none mt-3">{data.shows}</p>
+              <p className="text-text-secondary font-body text-sm mt-1">shows rated</p>
               <div className="grid grid-cols-3 gap-4 mt-5 pt-4 border-t border-border">
-                <Stat n={data.shows} label="shows" />
                 <Stat n={data.seasons} label="seasons" />
-                <Stat n={data.movies} label="movies" />
+                <Stat n={data.episodes} label="episodes (est.)" />
+                <Stat n={data.hours} label="hours (est.)" />
               </div>
               <p className="text-text-secondary text-sm font-body mt-4">
-                About <span className="font-semibold text-text-primary">{data.hours} hours</span> of watching
-                {data.hours >= 24 ? ` — that's ${(data.hours / 24).toFixed(1)} full days` : ""}.
+                {data.hours >= 24
+                  ? `That's about ${(data.hours / 24).toFixed(1)} full days of TV.`
+                  : `About ${data.hours} hours of TV.`}
               </p>
             </Card>
 
@@ -134,30 +134,24 @@ export default function WrappedScreen({ period: initial }: { period?: string }) 
               </p>
             </Card>
 
-            {/* Top show / movie */}
-            {(data.topShow || data.topMovie) && (
-              <div className="grid grid-cols-2 gap-3">
-                {data.topShow && (
-                  <TopPick
-                    label="#1 show"
-                    title={data.topShow.item.title}
-                    year={data.topShow.item.year}
-                    posterPath={data.topShow.item.posterPath}
-                    rating={data.topShow.rating}
-                    onClick={() => pushScreen({ screen: "show-detail", showId: data.topShow!.item.id })}
-                  />
-                )}
-                {data.topMovie && (
-                  <TopPick
-                    label="#1 movie"
-                    title={data.topMovie.item.title}
-                    year={data.topMovie.item.year}
-                    posterPath={data.topMovie.item.posterPath}
-                    rating={data.topMovie.rating}
-                    onClick={() => pushScreen({ screen: "movie-detail", movieId: data.topMovie!.item.id })}
-                  />
-                )}
-              </div>
+            {/* Top shows */}
+            {data.topShows.length > 0 && (
+              <SmallCard label={data.topShows.length > 1 ? `Your top ${data.topShows.length}` : "Your #1 show"}>
+                <div className="divide-y divide-border">
+                  {data.topShows.map((t, i) => (
+                    <button
+                      key={t.item.id}
+                      onClick={() => pushScreen({ screen: "show-detail", showId: t.item.id })}
+                      className="w-full flex items-center gap-3 py-2.5 text-left"
+                    >
+                      <span className="w-5 text-center font-mono font-semibold text-text-muted text-sm">{i + 1}</span>
+                      <PosterImage title={t.item.title} year={t.item.year} posterPath={t.item.posterPath} size="sm" />
+                      <p className="flex-1 min-w-0 text-text-primary text-sm font-display font-semibold truncate">{t.item.title}</p>
+                      <RatingBadge rating={t.rating} size="sm" />
+                    </button>
+                  ))}
+                </div>
+              </SmallCard>
             )}
 
             {/* Genre + platform */}
@@ -172,7 +166,7 @@ export default function WrappedScreen({ period: initial }: { period?: string }) 
                 <SmallCard label="Most-watched on">
                   <p className="text-text-primary font-display font-semibold text-xl leading-tight">{data.topPlatform.name}</p>
                   <p className="text-text-secondary text-xs font-body mt-1">
-                    {data.topPlatform.count} title{data.topPlatform.count === 1 ? "" : "s"}
+                    {data.topPlatform.count} show{data.topPlatform.count === 1 ? "" : "s"}
                   </p>
                 </SmallCard>
               )}
@@ -271,32 +265,5 @@ function SmallCard({ label, children }: { label: string; children: React.ReactNo
       <p className="text-text-muted text-[10px] font-body uppercase tracking-wider mb-2">{label}</p>
       {children}
     </div>
-  );
-}
-
-function TopPick({
-  label,
-  title,
-  year,
-  posterPath,
-  rating,
-  onClick,
-}: {
-  label: string;
-  title: string;
-  year: number;
-  posterPath?: string;
-  rating: number;
-  onClick: () => void;
-}) {
-  return (
-    <button onClick={onClick} className="text-left bg-bg-card border border-border rounded-2xl p-3 active:bg-bg-elevated">
-      <p className="text-text-muted text-[10px] font-body uppercase tracking-wider mb-2">{label}</p>
-      <PosterImage title={title} year={year} posterPath={posterPath} size="xl" className="rounded-xl" />
-      <div className="flex items-center justify-between gap-2 mt-2">
-        <p className="text-text-primary text-sm font-display font-bold truncate">{title}</p>
-        <RatingBadge rating={rating} size="sm" />
-      </div>
-    </button>
   );
 }

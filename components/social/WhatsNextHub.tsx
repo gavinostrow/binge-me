@@ -52,7 +52,7 @@ export default function WhatsNextHub() {
                 <div className="flex-1 min-w-0">
                   <p className="text-text-primary text-sm font-body leading-snug">
                     <span className="font-semibold">{u.name.split(" ")[0]}</span> is looking for a new{" "}
-                    {req.kind === "any" ? "thing" : req.kind} to watch
+                    show to watch
                   </p>
                   <p className="text-text-muted text-xs font-body truncate" suppressHydrationWarning>
                     {req.note ? `“${req.note}” · ` : ""}

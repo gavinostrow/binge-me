@@ -2,7 +2,7 @@
 
 ## What is this?
 
-Binge is a social movie and TV show ranking platform. Think Letterboxd meets Beli — dark, minimal, mobile-first, built for both movies AND TV shows with social features and recommendations.
+Binge is a social TV show ranking platform. Think Beli for TV — clean, minimal, mobile-first, TV shows only (no movies), with season-by-season ratings, social features and recommendations.
 
 ## Tech Stack
 
@@ -10,7 +10,7 @@ Binge is a social movie and TV show ranking platform. Think Letterboxd meets Bel
 - **Styling:** Tailwind CSS with a custom dark theme
 - **State:** React Context — `lib/AppContext.tsx` (ratings, feed, watchlist, navigation, auth) and `lib/SocialContext.tsx` (friends, Currently Watching, rec requests, streaming services, predictions, spoiler shield, toasts)
 - **Data:** Sample data in `lib/mockData.ts` + `lib/socialData.ts`; live TMDB via `/api/tmdb/*` (`lib/tmdb.ts`) when `TMDB_READ_TOKEN` is set; Supabase auth when `NEXT_PUBLIC_SUPABASE_*` is set (`lib/supabase.ts`, schema in `supabase/schema.sql`)
-- **Fonts:** Outfit (display/headings) + Karla (body text) via Google Fonts
+- **Fonts:** Geist + Geist Mono via Google Fonts
 
 ## Project Structure
 
@@ -33,7 +33,7 @@ components/
 
 lib/
   types.ts            — All TypeScript interfaces and type aliases
-  mockData.ts         — Mock users, movies, shows, ratings, feed activities
+  mockData.ts         — Sample users, shows, ratings, feed activities
   AppContext.tsx       — React Context provider for global state
   utils.ts            — Helpers: getRatingColor, timeAgo, getInitial
 
@@ -43,9 +43,10 @@ styles/
 
 ## Design System
 
-- **Background:** #0D0D12 (primary), #15151D (surface), #1C1C28 (elevated), #252533 (hover)
-- **Text:** #E8E4DC (primary), #9994A8 (secondary), #5E586E (muted)
-- **Accent:** #8B5CF6 (purple), #D4A843 (gold)
+- **Theme:** colors are CSS variables in `styles/globals.css` (light by default, `.dark` on <html> for dark mode); Tailwind tokens read them
+- **Type:** Geist (UI) + Geist Mono (numbers, ratings)
+- **Shape:** squared corners (rounded-md/xl), flat colors, no gradients or emoji in the UI
+- **Accent:** violet (#7C5CF6), gold for secondary highlights
 - **Rating colors:** green (9+), yellow-green (8+), yellow (7+), orange (6+), red (<6)
 
 ## Commands
@@ -65,8 +66,8 @@ npm run lint         # Lint with ESLint
 
 ## Data layer notes
 
-- Look titles up with `getShow` / `getMovie` from `lib/catalog.ts` (sample catalog + anything fetched from TMDB), never `shows.find(...)`.
-- `useTitleExtras(type, item)` gives next-season status, streaming providers and similar titles (sample first, live TMDB when configured).
+- TV only: there is no movie type. Look shows up with `getShow` from `lib/catalog.ts` (sample catalog + anything fetched from TMDB), never `shows.find(...)`.
+- `useTitleExtras(show)` gives next-season status, streaming providers and similar titles (sample first, live TMDB when configured).
 - Social math (friend ratings, Binge rating, also-liked, taste match, already-watched) lives in `lib/social.ts`.
 - Wrapped math lives in `lib/wrapped.ts`.
 

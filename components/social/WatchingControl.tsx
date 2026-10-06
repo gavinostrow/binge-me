@@ -23,7 +23,7 @@ export default function WatchingControl({ show }: { show: Show }) {
     } else {
       stopWatching(show.id);
     }
-    requestRate("show", show.id, done);
+    requestRate(show.id, done);
     showToast(`Nice — rate Season ${done}`);
     clearStack();
     setActiveTab("add");

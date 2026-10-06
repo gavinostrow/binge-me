@@ -16,7 +16,7 @@ import {
   type RecReply,
   type RecRequest,
 } from "./socialData";
-import { myRatingRows, type Kind } from "./social";
+import { myRatingRows } from "./social";
 import type { UserRating } from "./socialData";
 import type { User } from "./types";
 
@@ -43,8 +43,8 @@ interface SocialContextType {
   stopWatching: (showId: string) => void;
 
   // Rate flow hand-off (e.g. "Finished season" → rate it)
-  pendingRate: { type: Kind; id: string; season?: number } | null;
-  requestRate: (type: Kind, id: string, season?: number) => void;
+  pendingRate: { id: string; season?: number } | null;
+  requestRate: (id: string, season?: number) => void;
   clearPendingRate: () => void;
 
   // Streaming services
@@ -55,9 +55,9 @@ interface SocialContextType {
   recRequests: RecRequest[];
   myOpenRequest: RecRequest | undefined;
   openFriendRequests: RecRequest[];
-  postRequest: (kind: RecRequest["kind"], note?: string) => void;
+  postRequest: (note?: string) => void;
   closeMyRequest: () => void;
-  sendRecToRequest: (requestId: string, type: Kind, itemId: string, note?: string) => void;
+  sendRecToRequest: (requestId: string, itemId: string, note?: string) => void;
 
   // Predictions
   questions: PredictionQuestion[];
@@ -96,7 +96,7 @@ function saveLocal(key: string, value: unknown) {
 }
 
 export function SocialProvider({ children }: { children: ReactNode }) {
-  const { currentUserData, movieRatings, showRatings, sendRecommendation } = useApp();
+  const { currentUserData, showRatings, sendRecommendation } = useApp();
   const myId = currentUserData.id;
 
   const [followingIds, setFollowingIds] = useState<string[]>(friends.map((f) => f.id));
@@ -179,12 +179,12 @@ export function SocialProvider({ children }: { children: ReactNode }) {
   const myOpenRequest = recRequests.find((r) => r.userId === ME && live(r));
   const openFriendRequests = recRequests.filter((r) => r.userId !== ME && live(r) && followingIds.includes(r.userId));
 
-  const postRequest = (kind: RecRequest["kind"], note?: string) => {
+  const postRequest = (note?: string) => {
     const id = `rq_${Date.now()}`;
     const req: RecRequest = {
       id,
       userId: ME,
-      kind,
+      kind: "show",
       note: note?.trim() || undefined,
       createdAt: new Date().toISOString(),
       expiresAt: new Date(Date.now() + 48 * 3600000).toISOString(),
@@ -194,18 +194,17 @@ export function SocialProvider({ children }: { children: ReactNode }) {
     showToast(`Asked ${followingIds.length} friends for a pick`);
 
     // Sample mode: friends "reply" a few seconds later so the flow can be tried end to end.
-    const rated = new Set([...showRatings.map((r) => `show:${r.show.id}`), ...movieRatings.map((r) => `movie:${r.movie.id}`)]);
+    const rated = new Set(showRatings.map((r) => r.show.id));
     const pool: Omit<RecReply, "id" | "createdAt">[] = [
       { fromUserId: "u3", type: "show", itemId: "s15", note: "Best spy show going. Trust." },
       { fromUserId: "u5", type: "show", itemId: "s14", note: "You'll finish it in a weekend" },
       { fromUserId: "u2", type: "show", itemId: "s12", note: "Season 2 is unreal" },
       { fromUserId: "u4", type: "show", itemId: "s9", note: "Funniest thing on TV" },
-      { fromUserId: "u5", type: "movie", itemId: "m9", note: "Watch it with the lights off" },
-      { fromUserId: "u4", type: "movie", itemId: "m17", note: "Comfort movie, no notes" },
-      { fromUserId: "u2", type: "movie", itemId: "m19", note: "Just trust me" },
+      { fromUserId: "u6", type: "show", itemId: "s10", note: "Better than Breaking Bad. Fight me." },
+      { fromUserId: "u2", type: "show", itemId: "s13", note: "Dragons. Need I say more" },
     ];
     const demoReplies = pool
-      .filter((r) => !rated.has(`${r.type}:${r.itemId}`) && (kind === "any" || r.type === kind))
+      .filter((r) => !rated.has(r.itemId))
       .slice(0, 2);
     demoReplies.forEach((reply, i) =>
       setTimeout(() => {
@@ -228,7 +227,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
 
   const closeMyRequest = () => setRecRequests((prev) => prev.filter((r) => r.userId !== ME));
 
-  const sendRecToRequest = (requestId: string, type: Kind, itemId: string, note?: string) => {
+  const sendRecToRequest = (requestId: string, itemId: string, note?: string) => {
     setRecRequests((prev) =>
       prev.map((r) =>
         r.id !== requestId
@@ -237,7 +236,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
               ...r,
               replies: [
                 ...r.replies.filter((x) => x.fromUserId !== ME),
-                { id: `rr_${Date.now()}`, fromUserId: ME, type, itemId, note: note?.trim() || undefined, createdAt: new Date().toISOString() },
+                { id: `rr_${Date.now()}`, fromUserId: ME, type: "show", itemId, note: note?.trim() || undefined, createdAt: new Date().toISOString() },
               ],
             },
       ),
@@ -251,7 +250,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
     setPicks((prev) => ({ ...prev, [questionId]: { ...(prev[questionId] ?? {}), [ME]: optionId } }));
   };
 
-  const myRows = useMemo(() => myRatingRows(ME, movieRatings, showRatings), [movieRatings, showRatings]);
+  const myRows = useMemo(() => myRatingRows(ME, showRatings), [showRatings]);
 
   const value: SocialContextType = {
     allUsers,
@@ -267,7 +266,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
     setWatchingSeason,
     stopWatching,
     pendingRate,
-    requestRate: (type, id, season) => setPendingRate({ type, id, season }),
+    requestRate: (id, season) => setPendingRate({ id, season }),
     clearPendingRate: () => setPendingRate(null),
     myServices,
     toggleService,

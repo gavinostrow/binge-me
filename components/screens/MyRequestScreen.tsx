@@ -2,10 +2,9 @@
 import { useState } from "react";
 import { useApp } from "@/lib/AppContext";
 import { useSocial } from "@/lib/SocialContext";
-import { getMovie, getShow } from "@/lib/catalog";
+import { getShow } from "@/lib/catalog";
 import { knownExtras } from "@/lib/useTitleExtras";
 import { timeAgo } from "@/lib/utils";
-import type { RecRequest } from "@/lib/socialData";
 import PosterImage from "@/components/PosterImage";
 import ScreenHeader from "@/components/social/ScreenHeader";
 import UserAvatar from "@/components/social/UserAvatar";
@@ -17,7 +16,6 @@ const VIBES = ["Something funny", "Short series", "Can't-stop-watching", "Easy b
 export default function MyRequestScreen() {
   const { pushScreen, addToWatchlist, isInWatchlist } = useApp();
   const { myOpenRequest, postRequest, closeMyRequest, getUser, followingIds, showToast } = useSocial();
-  const [kind, setKind] = useState<RecRequest["kind"]>("show");
   const [note, setNote] = useState("");
 
   if (!myOpenRequest) {
@@ -25,23 +23,6 @@ export default function MyRequestScreen() {
       <div className="flex flex-col h-full overflow-y-auto scrollbar-hide bg-bg-primary">
         <ScreenHeader title="Ask your friends" subtitle={`Goes to your ${followingIds.length} friends`} />
         <div className="px-4 pt-4 pb-28 space-y-5">
-          <div>
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-2">Looking for a</p>
-            <div className="flex bg-bg-elevated rounded-xl p-1">
-              {(["show", "movie", "any"] as const).map((k) => (
-                <button
-                  key={k}
-                  onClick={() => setKind(k)}
-                  className={`flex-1 py-2 rounded-lg text-sm font-body font-semibold transition-colors ${
-                    kind === k ? "bg-accent text-white" : "text-text-secondary"
-                  }`}
-                >
-                  {k === "any" ? "Either" : k === "show" ? "Show" : "Movie"}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div>
             <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-2">Vibe (optional)</p>
             <div className="flex flex-wrap gap-2 mb-3">
@@ -69,12 +50,12 @@ export default function MyRequestScreen() {
           <div className="bg-bg-card border border-border rounded-2xl p-3.5 flex items-center gap-3">
             <UserAvatar user={{ id: "u1", name: "You" }} size="md" />
             <p className="text-text-secondary text-sm font-body">
-              Friends will see: <span className="text-text-primary font-semibold">&ldquo;You&apos;re looking for a new {kind === "any" ? "thing" : kind} to watch&rdquo;</span>
+              Friends will see: <span className="text-text-primary font-semibold">&ldquo;You&apos;re looking for a new show to watch&rdquo;</span>
             </p>
           </div>
 
           <button
-            onClick={() => postRequest(kind, note)}
+            onClick={() => postRequest(note)}
             className="w-full py-3.5 rounded-2xl bg-accent text-white font-display font-bold transition-transform"
           >
             Ask friends
@@ -89,7 +70,7 @@ export default function MyRequestScreen() {
     <div className="flex flex-col h-full overflow-y-auto scrollbar-hide bg-bg-primary">
       <ScreenHeader
         title="Your picks"
-        subtitle={myOpenRequest.note ? `“${myOpenRequest.note}”` : `Looking for a ${myOpenRequest.kind === "any" ? "watch" : myOpenRequest.kind}`}
+        subtitle={myOpenRequest.note ? `“${myOpenRequest.note}”` : "Looking for a show"}
       />
       <div className="px-4 pt-4 pb-28 space-y-3">
         {myOpenRequest.replies.length === 0 && (
@@ -100,10 +81,10 @@ export default function MyRequestScreen() {
           </div>
         )}
         {myOpenRequest.replies.map((rep) => {
-          const item = rep.type === "movie" ? getMovie(rep.itemId) : getShow(rep.itemId);
+          const item = getShow(rep.itemId);
           const from = getUser(rep.fromUserId);
           if (!item || !from) return null;
-          const saved = isInWatchlist(rep.type, item.id);
+          const saved = isInWatchlist("show", item.id);
           return (
             <div key={rep.id} className="bg-bg-card border border-border rounded-2xl p-3 flex gap-3 animate-fadeIn">
               <PosterImage
@@ -113,7 +94,7 @@ export default function MyRequestScreen() {
                 size="lg"
                 className="!w-20 !h-28"
                 onClick={() =>
-                  pushScreen(rep.type === "movie" ? { screen: "movie-detail", movieId: item.id } : { screen: "show-detail", showId: item.id })
+                  pushScreen({ screen: "show-detail", showId: item.id })
                 }
               />
               <div className="flex-1 min-w-0 flex flex-col">
@@ -126,14 +107,14 @@ export default function MyRequestScreen() {
                 <p className="text-text-primary font-display font-bold mt-1 truncate">{item.title}</p>
                 {rep.note && <p className="text-text-secondary text-xs italic mt-0.5 line-clamp-2">&ldquo;{rep.note}&rdquo;</p>}
                 <div className="mt-auto pt-2 flex items-center justify-between gap-2">
-                  <ProviderLogos providers={knownExtras(rep.type, item).providers} size="sm" />
+                  <ProviderLogos providers={knownExtras(item).providers} size="sm" />
                   <button
                     disabled={saved}
                     onClick={() => {
                       addToWatchlist({
                         id: `wl_${Date.now()}`,
-                        contentType: rep.type,
-                        ...(rep.type === "movie" ? { movie: item as ReturnType<typeof getMovie> } : { show: item as ReturnType<typeof getShow> }),
+                        contentType: "show",
+                        show: item,
                         addedDate: new Date().toISOString(),
                         recommendedBy: rep.fromUserId,
                       });

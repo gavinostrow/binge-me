@@ -2,19 +2,19 @@
 import { useState } from "react";
 import { useApp } from "@/lib/AppContext";
 import { useSocial } from "@/lib/SocialContext";
-import { average, bingeRating, friendRatingsFor, MIN_BINGE_RATINGS, type Kind } from "@/lib/social";
+import { average, bingeRating, friendRatingsFor, MIN_BINGE_RATINGS } from "@/lib/social";
 import RatingBadge from "@/components/RatingBadge";
 import UserAvatar from "./UserAvatar";
 
 /** You · Friends · Binge — three ratings side by side, friends first. */
-export default function RatingsTrio({ type, id, myRating }: { type: Kind; id: string; myRating?: number }) {
+export default function RatingsTrio({ id, myRating }: { id: string; myRating?: number }) {
   const { pushScreen } = useApp();
   const { followingIds, getUser, myRows } = useSocial();
   const [open, setOpen] = useState(false);
 
-  const friendRows = friendRatingsFor(type, id, followingIds);
+  const friendRows = friendRatingsFor(id, followingIds);
   const friendAvg = average(friendRows.map((r) => r.rating));
-  const binge = bingeRating(type, id, myRows);
+  const binge = bingeRating(id, myRows);
   const bingeShown = binge && binge.count >= MIN_BINGE_RATINGS;
 
   return (

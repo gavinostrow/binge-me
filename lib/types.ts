@@ -11,19 +11,6 @@ export interface User {
   avatarUrl?: string;
 }
 
-export interface Movie {
-  id: string;
-  tmdbId?: number;
-  posterPath?: string;
-  title: string;
-  year: number;
-  genre: string[];
-  director?: string;
-  runtime?: number;
-  description?: string;
-  cast?: string[];
-}
-
 export interface Show {
   id: string;
   tmdbId?: number;
@@ -46,18 +33,6 @@ export interface SeasonRating {
   seasonNumber?: number;
   rating: number;
   review?: string;
-}
-
-export interface MovieRating {
-  id: string;
-  userId?: string;
-  movie: Movie;
-  rating: number;
-  review?: string;
-  isFavorite?: boolean;
-  createdAt?: string;
-  dateWatched?: string;
-  timestamp?: string;
 }
 
 export interface ShowRating {
@@ -89,10 +64,8 @@ export interface FeedActivity {
   id: string;
   userId?: string;
   user?: User;
-  type: "movie_rating" | "show_rating" | "recommendation" | "watchlist_add" | "rec_request";
-  movie?: Movie;
+  type: "show_rating" | "recommendation" | "watchlist_add" | "rec_request";
   show?: Show;
-  movieRating?: MovieRating;
   showRating?: ShowRating;
   rating?: number;
   review?: string;
@@ -112,8 +85,7 @@ export interface FeedActivity {
 
 export interface WatchlistItem {
   id: string;
-  contentType: "movie" | "show";
-  movie?: Movie;
+  contentType: "show";
   show?: Show;
   addedDate?: string;
   addedAt?: string;
@@ -130,13 +102,6 @@ export interface WatchlistItem {
 
 // ─── Community ────────────────────────────────────────────────────────────────
 
-export interface CommunityMovie {
-  movie?: Movie;
-  averageRating: number;
-  ratingCount: number;
-  pct9plus?: number;
-}
-
 export interface CommunityShow {
   show?: Show;
   averageRating: number;
@@ -145,12 +110,6 @@ export interface CommunityShow {
 }
 
 // ─── Friends ratings ─────────────────────────────────────────────────────────
-
-export interface FriendMovieRating {
-  userId: string;
-  rating: number;
-  review?: string;
-}
 
 export interface FriendShowRating {
   userId: string;
@@ -174,7 +133,6 @@ export interface Notification {
     | "prediction";
   fromUserId?: string;
   fromUser?: User;
-  movie?: Movie;
   show?: Show;
   message?: string;
   requestId?: string;
@@ -192,7 +150,7 @@ export interface GroupMessage {
   text: string;
   timestamp: string;
   reactions: Record<string, string[]>;
-  contentRef?: { title: string; type: "movie" | "show"; rating?: number };
+  contentRef?: { title: string; type: "show"; rating?: number };
   spoilerWarning?: boolean;
 }
 
@@ -233,8 +191,7 @@ export interface GroupClub {
   clubType?: "group-watch" | "friends-club";
   currentWatch?: {
     title: string;
-    type: "movie" | "show";
-    movie?: Movie;
+    type: "show";
     show?: Show;
     episode?: string;
   };
@@ -250,56 +207,24 @@ export interface GroupClub {
 export interface NowWatching {
   userId: string;
   title: string;
-  type: "movie" | "show";
+  type: "show";
   episode?: string;
   startedAt: string;
 }
 
 // ─── Misc ─────────────────────────────────────────────────────────────────────
 
-export interface NowPlayingMovie {
-  movie: Movie;
-  inTheaters?: boolean;
-  inTheatersDate?: string;
-  buzz?: string;
-}
-
-export interface UpcomingMovie {
-  movie: Movie;
-  releaseDate: string;
-  buzz?: string;
-}
-
-export interface NewShowEntry {
-  show: Show;
-  episode?: string;
-  network?: string;
-  type?: "new-series" | "new-season" | "returning";
-  premiereDate?: string;
-  season?: number;
-  buzz?: string;
-}
-
-export interface NowStreamingEntry {
-  show?: Show;
-  movie?: Movie;
-  platform: string;
-  arrivedDate?: string;
-  buzz?: string;
-}
-
 // ─── CommunityItem (legacy + current) ────────────────────────────────────────
 
 export interface CommunityItem {
   id?: string;
-  movie?: Movie;
   show?: Show;
   season?: number;
   rank?: number;
   averageRating: number;
   ratingCount: number;
   pct9plus?: number;
-  type?: "movie" | "show";
+  type?: "show";
 }
 
 // ─── Add flow ─────────────────────────────────────────────────────────────────
@@ -307,17 +232,16 @@ export interface CommunityItem {
 export type AddStep =
   | "choose-type"
   | "search"
-  | "rate-movie"
   | "rate-show"
   | "confirm"
   | "recommend";
 
-export type ListContentType = "movies" | "shows" | "all" | "watchlist";
+export type ListContentType = "shows" | "watchlist";
 
 // ─── Tab / View types ────────────────────────────────────────────────────────
 
 export type TabId = "feed" | "add" | "groups" | "next" | "profile";
-export type ContentType = "movie" | "show";
+export type ContentType = "show";
 export type FeedView = "friends" | "community" | "new";
 export type GroupView = "list" | "chat" | "predictions" | "polls" | "members";
 export type RecommendationSource = "taste" | "friends" | "community";

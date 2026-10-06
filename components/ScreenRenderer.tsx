@@ -1,6 +1,5 @@
 "use client";
 import { useApp } from "@/lib/AppContext";
-import MovieDetailScreen from "@/components/screens/MovieDetailScreen";
 import ShowDetailScreen from "@/components/screens/ShowDetailScreen";
 import ProfileDetailScreen from "@/components/screens/ProfileDetailScreen";
 import ProfileEditScreen from "@/components/screens/ProfileEditScreen";
@@ -35,9 +34,6 @@ export default function ScreenRenderer() {
             }}
           >
             {" "}
-            {descriptor.screen === "movie-detail" && (
-              <MovieDetailScreen movieId={descriptor.movieId} />
-            )}{" "}
             {descriptor.screen === "show-detail" && (
               <ShowDetailScreen showId={descriptor.showId} />
             )}{" "}

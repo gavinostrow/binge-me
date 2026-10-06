@@ -2,7 +2,7 @@
 // Set TMDB_READ_TOKEN (the "API Read Access Token") or TMDB_API_KEY in .env.local.
 import { NextRequest, NextResponse } from "next/server";
 
-const ALLOWED = /^(search\/(multi|tv|movie)|tv\/\d+(\/season\/\d+)?|movie\/\d+|trending\/(tv|movie|all)\/(day|week)|configuration)$/;
+const ALLOWED = /^(search\/tv|tv\/\d+(\/season\/\d+)?|trending\/tv\/(day|week)|configuration)$/;
 
 export async function GET(req: NextRequest, { params }: { params: { path: string[] } }) {
   const token = process.env.TMDB_READ_TOKEN;

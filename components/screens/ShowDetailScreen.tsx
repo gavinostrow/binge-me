@@ -29,7 +29,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
   const [scrolled, setScrolled] = useState(false);
 
   const show = getShow(showId);
-  const extras = useTitleExtras("show", show);
+  const extras = useTitleExtras(show);
 
   // Fallback for "also liked": TMDB's similar shows, else same-genre shows.
   const similarShows = useMemo(() => {
@@ -273,7 +273,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
 
         <WatchingControl show={show} />
 
-        <RatingsTrio type="show" id={show.id} myRating={myRating?.overallRating} />
+        <RatingsTrio id={show.id} myRating={myRating?.overallRating} />
 
         <NextSeasonCard next={extras.next} />
 
@@ -389,7 +389,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
           </div>
         )}
 
-        <AlsoLikedRow type="show" id={show.id} fallback={similarShows} />
+        <AlsoLikedRow id={show.id} fallback={similarShows} />
 
         {/* Watchlist button */}
         <button

@@ -3,9 +3,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import type {
   TabId,
   User,
-  Movie,
   Show,
-  MovieRating,
   ShowRating,
   FeedActivity,
   WatchlistItem,
@@ -22,7 +20,6 @@ import type { ScreenDescriptor } from "./navigation";
 import { getSupabase } from "./supabase";
 import {
   currentUser as mockCurrentUser,
-  myMovieRatings as initialMovieRatings,
   myShowRatings as initialShowRatings,
   feedActivities as initialFeedActivities,
   initialWatchlist as mockWatchlist,
@@ -34,9 +31,6 @@ interface AppContextType {
   toggleTheme: () => void;
   activeTab: TabId;
   setActiveTab: (tab: TabId) => void;
-  movieRatings: MovieRating[];
-  addMovieRating: (rating: MovieRating) => void;
-  getMyMovieRating: (movieId: string) => MovieRating | undefined;
   showRatings: ShowRating[];
   addShowRating: (rating: ShowRating) => void;
   getMyShowRating: (showId: string) => ShowRating | undefined;
@@ -72,9 +66,7 @@ interface AppContextType {
   markNotificationSeen: (id: string) => void;
   sendGroupPoll: (groupId: string, poll: GroupPoll) => void;
   voteGroupPoll: (groupId: string, pollId: string, optionId: string, userId: string) => void;
-  toggleMovieFavorite: (ratingId: string) => void;
   toggleShowFavorite: (ratingId: string) => void;
-  updateMovieRating: (ratingId: string, rating: number) => void;
   updateShowRating: (ratingId: string, rating: number) => void;
   myNowWatching: NowWatching | null;
   setMyNowWatching: (status: NowWatching) => void;
@@ -119,7 +111,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const [activeTab, setActiveTab] = useState<TabId>("feed");
-  const [movieRatings, setMovieRatings] = useState<MovieRating[]>(initialMovieRatings);
   const [showRatings, setShowRatings] = useState<ShowRating[]>(initialShowRatings);
   const [feedActivities, setFeedActivities] = useState<FeedActivity[]>(initialFeedActivities);
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>(mockWatchlist);
@@ -156,20 +147,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
     }
   }, []);
-
-  const addMovieRating = (rating: MovieRating) => {
-    setMovieRatings((prev) => {
-      const existing = prev.findIndex((r) => r.movie.id === rating.movie.id);
-      if (existing >= 0) {
-        const updated = [...prev];
-        updated[existing] = rating;
-        return updated;
-      }
-      return [...prev, rating];
-    });
-  };
-
-  const getMyMovieRating = (movieId: string) => movieRatings.find((r) => r.movie.id === movieId);
 
   const addShowRating = (rating: ShowRating) => {
     setShowRatings((prev) => {
@@ -213,7 +190,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const isInWatchlist = (contentType: ContentType, contentId: string) =>
     watchlist.some((w) => {
       if (w.contentType !== contentType) return false;
-      if (contentType === "movie") return w.movie?.id === contentId;
       return w.show?.id === contentId;
     });
 
@@ -413,11 +389,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       })
     );
 
-  const toggleMovieFavorite = (ratingId: string) =>
-    setMovieRatings((prev) =>
-      prev.map((r) => (r.id === ratingId ? { ...r, isFavorite: !r.isFavorite } : r))
-    );
-
   const toggleShowFavorite = (ratingId: string) =>
     setShowRatings((prev) =>
       prev.map((r) => (r.id === ratingId ? { ...r, isFavorite: !r.isFavorite } : r))
@@ -425,9 +396,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const setMyNowWatching = (status: NowWatching) => setMyNowWatchingState(status);
   const clearNowWatching = () => setMyNowWatchingState(null);
-
-  const updateMovieRating = (ratingId: string, rating: number) =>
-    setMovieRatings((prev) => prev.map((r) => (r.id === ratingId ? { ...r, rating } : r)));
 
   const updateShowRating = (ratingId: string, rating: number) =>
     setShowRatings((prev) =>
@@ -437,7 +405,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const value: AppContextType = {
     theme, toggleTheme,
     activeTab, setActiveTab,
-    movieRatings, addMovieRating, getMyMovieRating,
     showRatings, addShowRating, getMyShowRating,
     feedActivities, addFeedActivity, toggleReaction,
     watchlist, addToWatchlist, removeFromWatchlist, isInWatchlist,
@@ -448,8 +415,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     login, signup, logout, updateProfile, currentUserData,
     notifications, addComment, sendRecommendation, markNotificationSeen,
     sendGroupPoll, voteGroupPoll,
-    toggleMovieFavorite, toggleShowFavorite,
-    updateMovieRating, updateShowRating,
+    toggleShowFavorite,
+    updateShowRating,
     myNowWatching, setMyNowWatching, clearNowWatching,
     pendingRecipientId, setPendingRecipientId,
   };
