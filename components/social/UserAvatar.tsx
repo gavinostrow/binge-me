@@ -1,7 +1,7 @@
 "use client";
 import type { User } from "@/lib/types";
 
-const COLORS = ["#A99BF5", "#D59AB8", "#D6B26E", "#7FC6A4", "#8EB2E6", "#E39A8F", "#7EC4C4"];
+const COLORS = ["#7F69E8", "#C25C92", "#B88A2E", "#3A9C70", "#4F84D1", "#CC6253", "#33999A"];
 
 export function userColor(userId: string) {
   const n = parseInt(userId.replace(/\D/g, ""), 10);

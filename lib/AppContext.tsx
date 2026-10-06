@@ -95,13 +95,13 @@ async function loadProfile(id: string, email: string): Promise<User> {
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">("light");
 
   const toggleTheme = () => {
     setTheme((prev) => {
       const next = prev === "dark" ? "light" : "dark";
       if (typeof document !== "undefined") {
-        document.documentElement.classList.toggle("light", next === "light");
+        document.documentElement.classList.toggle("dark", next === "dark");
         localStorage.setItem("binge_theme", next);
       }
       return next;
@@ -111,9 +111,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("binge_theme") as "dark" | "light" | null;
-      if (saved === "light") {
-        setTheme("light");
-        document.documentElement.classList.add("light");
+      if (saved === "dark") {
+        setTheme("dark");
+        document.documentElement.classList.add("dark");
       }
     }
   }, []);

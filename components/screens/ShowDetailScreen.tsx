@@ -168,23 +168,23 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
 
         {/* Title block overlaying bottom of poster */}
         <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
-          <h1 className="font-display text-3xl font-bold text-white leading-tight drop-shadow-lg">
+          <h1 className="font-display text-3xl font-bold text-text-primary leading-tight">
             {show.title}
           </h1>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <span className="text-white/70 text-sm font-body">{show.year}</span>
+            <span className="text-text-secondary text-sm font-body">{show.year}</span>
             {show.seasons && (
               <>
-                <span className="text-white/40 text-xs">·</span>
-                <span className="text-white/70 text-sm font-body">
+                <span className="text-text-muted text-xs">·</span>
+                <span className="text-text-secondary text-sm font-body">
                   {show.seasons} season{show.seasons !== 1 ? "s" : ""}
                 </span>
               </>
             )}
             {show.network && (
               <>
-                <span className="text-white/40 text-xs">·</span>
-                <span className="text-white/70 text-sm font-body">
+                <span className="text-text-muted text-xs">·</span>
+                <span className="text-text-secondary text-sm font-body">
                   {show.network}
                 </span>
               </>
@@ -193,8 +193,8 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
               <span
                 className={`text-xs px-2 py-0.5 rounded-md font-semibold backdrop-blur-sm ${
                   show.status === "ongoing"
-                    ? "bg-green-500/20 text-green-300 border border-green-400/30"
-                    : "bg-white/15 text-white/70 border border-white/20"
+                    ? "bg-rating-green/10 text-rating-green border border-rating-green/30"
+                    : "bg-bg-elevated text-text-secondary border border-border"
                 }`}
               >
                 {show.status === "ongoing" ? "Ongoing" : "Ended"}
@@ -206,7 +206,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
             {show.genre.map((g) => (
               <span
                 key={g}
-                className="px-2.5 py-1 rounded-md text-xs font-body font-semibold bg-white/15 backdrop-blur-sm text-white border border-white/20"
+                className="px-2.5 py-1 rounded-md text-xs font-body font-semibold bg-bg-card text-text-secondary border border-border"
               >
                 {g}
               </span>

@@ -596,7 +596,7 @@ function MovieRow({
           {" "}
           <span
             className="font-display font-bold w-5 text-center flex-shrink-0 text-xs"
-            style={{ color: rank <= 3 ? "#F5A623" : "#606080" }}
+            style={{ color: rank <= 3 ? "#F5A623" : "rgb(var(--text-muted))" }}
           >
             {" "}
             {rank}{" "}
@@ -680,7 +680,7 @@ function ShowRow({
           {" "}
           <span
             className="font-display font-bold w-5 text-center flex-shrink-0 text-xs"
-            style={{ color: rank <= 3 ? "#F5A623" : "#606080" }}
+            style={{ color: rank <= 3 ? "#F5A623" : "rgb(var(--text-muted))" }}
           >
             {" "}
             {rank}{" "}
@@ -721,7 +721,7 @@ function ShowRow({
                 height="12"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#606080"
+                stroke="rgb(var(--text-muted))"
                 strokeWidth={2}
                 strokeLinecap="round"
                 className={`transition-transform ${expanded ? "rotate-180" : ""}`}

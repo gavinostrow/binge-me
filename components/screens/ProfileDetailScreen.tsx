@@ -81,7 +81,7 @@ export default function ProfileDetailScreen({ userId }: { userId: string }) {
           <div className="bg-bg-card border border-border rounded-2xl p-4 flex items-center gap-4">
             <div className="relative w-16 h-16 flex-shrink-0">
               <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
-                <circle cx="18" cy="18" r="15.5" fill="none" stroke="#252533" strokeWidth="3.5" />
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgb(var(--border))" strokeWidth="3.5" />
                 <circle
                   cx="18"
                   cy="18"

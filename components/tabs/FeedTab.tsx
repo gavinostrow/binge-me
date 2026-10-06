@@ -83,7 +83,7 @@ export default function FeedTab() {
   };
 
   return (
-    <div className="flex flex-col gap-4 pb-24">
+    <div className="flex flex-col gap-4 pb-24 px-4">
       {/* Header */}
       <div className="pt-4 px-1 flex items-center justify-between">
         <h1 className="text-2xl font-bold lowercase font-display text-text-primary">
@@ -216,7 +216,7 @@ export default function FeedTab() {
               return (
                 <div
                   key={activity.id}
-                  className="bg-bg-surface rounded-xl p-4 flex flex-col gap-3"
+                  className="bg-bg-card border border-border rounded-xl p-4 flex flex-col gap-3"
                 >
                   {/* User row */}
                   <div className="flex items-center gap-2">

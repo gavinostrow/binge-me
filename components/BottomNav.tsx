@@ -129,13 +129,13 @@ export default function BottomNav() {
               aria-label={tab.label}
             >
               {" "}
-              <span style={{ color: isActive ? "#E8E4DC" : "#5E586E" }}>
+              <span style={{ color: isActive ? "rgb(var(--text-primary))" : "rgb(var(--text-muted))" }}>
                 {" "}
                 {tab.icon(isActive)}{" "}
               </span>{" "}
               <span
                 className="text-[10px] font-body font-medium"
-                style={{ color: isActive ? "#E8E4DC" : "#5E586E" }}
+                style={{ color: isActive ? "rgb(var(--text-primary))" : "rgb(var(--text-muted))" }}
               >
                 {" "}
                 {tab.label}{" "}

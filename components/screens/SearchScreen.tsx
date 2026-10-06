@@ -109,7 +109,7 @@ function FriendRow({ user, onPress }: { user: User; onPress: () => void }) {
         height="16"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#55556A"
+        stroke="rgb(var(--text-muted))"
         strokeWidth={2}
         strokeLinecap="round"
       >
@@ -150,7 +150,7 @@ function MovieRow({ movie, onPress }: { movie: Movie; onPress: () => void }) {
           )}
         </div>
       </div>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#55556A" strokeWidth={2} strokeLinecap="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgb(var(--text-muted))" strokeWidth={2} strokeLinecap="round">
         <polyline points="9 18 15 12 9 6" />
       </svg>
     </button>
@@ -190,7 +190,7 @@ function ShowRow({ show, onPress }: { show: Show; onPress: () => void }) {
           )}
         </div>
       </div>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#55556A" strokeWidth={2} strokeLinecap="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgb(var(--text-muted))" strokeWidth={2} strokeLinecap="round">
         <polyline points="9 18 15 12 9 6" />
       </svg>
     </button>

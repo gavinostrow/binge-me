@@ -13,7 +13,7 @@ export const PROVIDERS: Record<string, Provider> = {
   max: { id: 1899, key: "max", name: "Max", short: "max", color: "#002BE7" },
   hulu: { id: 15, key: "hulu", name: "Hulu", short: "hulu", color: "#1CE783", textColor: "#0B0C0F" },
   disney: { id: 337, key: "disney", name: "Disney+", short: "D+", color: "#113CCF" },
-  apple: { id: 350, key: "apple", name: "Apple TV+", short: "tv+", color: "#E8E4DC", textColor: "#0D0D12" },
+  apple: { id: 350, key: "apple", name: "Apple TV+", short: "tv+", color: "#1D1D1F" },
   prime: { id: 9, key: "prime", name: "Prime Video", short: "prime", color: "#00A8E1" },
   peacock: { id: 386, key: "peacock", name: "Peacock", short: "P", color: "#F2B705", textColor: "#0D0D12" },
   paramount: { id: 531, key: "paramount", name: "Paramount+", short: "P+", color: "#0064FF" },

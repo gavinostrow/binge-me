@@ -44,8 +44,8 @@ function GroupListCard({ group, onOpen }: { group: GroupClub; onOpen: () => void
       <div
         className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
         style={{
-          background: "#1C1C28",
-          border: "1px solid #35355A",
+          background: "rgb(var(--bg-elevated))",
+          border: "1px solid rgb(var(--border))",
         }}
       >
         {" "}
@@ -486,7 +486,7 @@ function ChatView({ group }: { group: GroupClub }) {
             disabled={!input.trim()}
             className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-40"
             style={{
-              background: input.trim() ? "#8B5CF6" : "#252533",
+              background: input.trim() ? "rgb(var(--accent))" : "rgb(var(--bg-hover))",
             }}
           >
             {" "}
@@ -525,7 +525,7 @@ function PredictionCard({ pred, groupId }: { pred: Prediction; groupId: string }
   return (
     <div
       className="bg-bg-card rounded-2xl p-4 border transition-all"
-      style={{ borderColor: pred.revealed ? "#22C55E50" : pred.locked ? "#7C5CF650" : "#2A2A45" }}
+      style={{ borderColor: pred.revealed ? "#22C55E50" : pred.locked ? "#7C5CF650" : "rgb(var(--border))" }}
     >
       {" "}
       {/* Header */}{" "}

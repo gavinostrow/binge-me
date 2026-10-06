@@ -149,25 +149,25 @@ export default function MovieDetailScreen({ movieId }: { movieId: string }) {
 
         {/* Title block overlaying bottom of poster */}
         <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
-          <h1 className="font-display text-3xl font-bold text-white leading-tight drop-shadow-lg">
+          <h1 className="font-display text-3xl font-bold text-text-primary leading-tight">
             {movie.title}
           </h1>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <span className="text-white/70 text-sm font-body">
+            <span className="text-text-secondary text-sm font-body">
               {movie.year}
             </span>
             {movie.runtime && (
               <>
-                <span className="text-white/40 text-xs">·</span>
-                <span className="text-white/70 text-sm font-body">
+                <span className="text-text-muted text-xs">·</span>
+                <span className="text-text-secondary text-sm font-body">
                   {Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m
                 </span>
               </>
             )}
             {movie.director && (
               <>
-                <span className="text-white/40 text-xs">·</span>
-                <span className="text-white/70 text-sm font-body">
+                <span className="text-text-muted text-xs">·</span>
+                <span className="text-text-secondary text-sm font-body">
                   dir. {movie.director}
                 </span>
               </>
@@ -178,7 +178,7 @@ export default function MovieDetailScreen({ movieId }: { movieId: string }) {
             {movie.genre.map((g) => (
               <span
                 key={g}
-                className="px-2.5 py-1 rounded-md text-xs font-body font-semibold bg-white/15 backdrop-blur-sm text-white border border-white/20"
+                className="px-2.5 py-1 rounded-md text-xs font-body font-semibold bg-bg-card text-text-secondary border border-border"
               >
                 {g}
               </span>

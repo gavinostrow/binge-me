@@ -213,7 +213,7 @@ function QuestionCard({
                     : "border-border bg-bg-elevated"
               }`}
             >
-              {reveal && <span className="absolute inset-y-0 left-0 bg-white/5" style={{ width: `${share}%` }} aria-hidden />}
+              {reveal && <span className="absolute inset-y-0 left-0 bg-text-primary/5" style={{ width: `${share}%` }} aria-hidden />}
               <span className="relative flex items-center gap-2">
                 <span className="flex-1 text-sm font-body font-semibold text-text-primary">
                   {o.label}
