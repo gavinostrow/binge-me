@@ -112,7 +112,7 @@ export default function FeedTab() {
               <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
             {unseen > 0 && (
-              <span className="absolute top-0.5 right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-accent text-white text-[10px] font-bold flex items-center justify-center">
+              <span className="absolute top-0.5 right-0.5 min-w-[16px] h-4 px-1 rounded-md bg-accent text-white text-[10px] font-bold flex items-center justify-center">
                 {unseen}
               </span>
             )}
@@ -191,7 +191,7 @@ export default function FeedTab() {
               <button
                 key={req.id}
                 onClick={() => pushScreen({ screen: "rec-request", requestId: req.id })}
-                className="w-full bg-gradient-to-r from-accent/20 to-transparent border border-accent/40 rounded-xl p-3.5 flex items-center gap-3 text-left active:scale-[0.99] transition-transform"
+                className="w-full bg-bg-card border border-border rounded-xl p-3.5 flex items-center gap-3 text-left transition-transform"
               >
                 <UserAvatar user={u} size="md" />
                 <div className="flex-1 min-w-0">

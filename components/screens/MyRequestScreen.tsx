@@ -49,7 +49,7 @@ export default function MyRequestScreen() {
                 <button
                   key={v}
                   onClick={() => setNote((n) => (n === v ? "" : v))}
-                  className={`px-3 py-1.5 rounded-full text-xs font-body border transition-colors ${
+                  className={`px-3 py-1.5 rounded-md text-xs font-body border transition-colors ${
                     note === v ? "border-accent bg-accent/15 text-text-primary" : "border-border text-text-secondary"
                   }`}
                 >
@@ -75,7 +75,7 @@ export default function MyRequestScreen() {
 
           <button
             onClick={() => postRequest(kind, note)}
-            className="w-full py-3.5 rounded-2xl bg-accent text-white font-display font-bold active:scale-[0.98] transition-transform"
+            className="w-full py-3.5 rounded-2xl bg-accent text-white font-display font-bold transition-transform"
           >
             Ask friends
           </button>

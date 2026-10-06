@@ -76,7 +76,7 @@ export default function MovieDetailScreen({ movieId }: { movieId: string }) {
         <div className="sticky top-0 z-20 bg-bg-primary/95 backdrop-blur-sm border-b border-border px-4 py-3 flex items-center gap-3 animate-fadeIn">
           <button
             onClick={popScreen}
-            className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center flex-shrink-0 active:scale-95 transition-all"
+            className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center flex-shrink-0 transition-all"
           >
             <svg
               width="16"
@@ -113,7 +113,7 @@ export default function MovieDetailScreen({ movieId }: { movieId: string }) {
         <button
           onClick={popScreen}
           aria-label="Back"
-          className="absolute top-4 left-4 z-10 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-95 transition-all"
+          className="absolute top-4 left-4 z-10 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center transition-all"
         >
           <svg
             width="16"
@@ -131,7 +131,7 @@ export default function MovieDetailScreen({ movieId }: { movieId: string }) {
         {/* Watchlist button on poster */}
         <button
           onClick={handleWatchlistToggle}
-          className="absolute top-4 right-4 z-10 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-95 transition-all"
+          className="absolute top-4 right-4 z-10 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center transition-all"
         >
           <svg
             width="16"
@@ -178,7 +178,7 @@ export default function MovieDetailScreen({ movieId }: { movieId: string }) {
             {movie.genre.map((g) => (
               <span
                 key={g}
-                className="px-2.5 py-1 rounded-full text-xs font-body font-semibold bg-white/15 backdrop-blur-sm text-white border border-white/20"
+                className="px-2.5 py-1 rounded-md text-xs font-body font-semibold bg-white/15 backdrop-blur-sm text-white border border-white/20"
               >
                 {g}
               </span>
@@ -214,7 +214,7 @@ export default function MovieDetailScreen({ movieId }: { movieId: string }) {
         ) : (
           <button
             onClick={() => setActiveTab("add")}
-            className="w-full py-3.5 bg-gradient-to-r from-accent to-accent-light text-white font-display font-bold text-base rounded-2xl active:scale-[0.98] transition-all"
+            className="w-full py-3.5 bg-accent text-white font-display font-bold text-base rounded-2xl transition-all"
           >
             Rate This Movie
           </button>
@@ -264,7 +264,7 @@ export default function MovieDetailScreen({ movieId }: { movieId: string }) {
         {/* Watchlist button (bottom) */}
         <button
           onClick={handleWatchlistToggle}
-          className={`w-full py-3 rounded-2xl font-body font-semibold transition-all active:scale-[0.98] ${
+          className={`w-full py-3 rounded-2xl font-body font-semibold transition-all ${
             inWatchlist
               ? "bg-accent/10 text-accent border border-accent"
               : "bg-bg-card text-text-secondary border border-border"

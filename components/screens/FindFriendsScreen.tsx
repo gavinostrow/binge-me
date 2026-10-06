@@ -97,9 +97,9 @@ export default function FindFriendsScreen() {
 
         <button
           onClick={invite}
-          className="w-full rounded-2xl p-4 text-left bg-gradient-to-br from-accent/25 to-transparent border border-accent/40 flex items-center gap-3 active:scale-[0.99] transition-transform"
+          className="w-full rounded-2xl p-4 text-left bg-bg-card border border-border flex items-center gap-3 transition-transform"
         >
-          <span className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-white font-display font-black text-lg">+</span>
+          <span className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-white font-display font-bold text-lg">+</span>
           <div className="flex-1">
             <p className="text-text-primary font-display font-bold">Invite friends</p>
             <p className="text-text-secondary text-xs font-body">Text them a link to add you · @{currentUserData.username}</p>

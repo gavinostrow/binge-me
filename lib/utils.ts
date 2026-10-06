@@ -1,9 +1,9 @@
 export function getRatingColor(rating: number): string {
-  if (rating >= 9) return "#22C55E";
-  if (rating >= 7.5) return "#84CC16";
-  if (rating >= 6) return "#EAB308";
-  if (rating >= 4) return "#F97316";
-  return "#EF4444";
+  if (rating >= 9) return "#3DBE7A";
+  if (rating >= 7.5) return "#9BC24A";
+  if (rating >= 6) return "#D9B13B";
+  if (rating >= 4) return "#E0823D";
+  return "#E05A5A";
 }
 export function getRatingColorClass(rating: number): string {
   if (rating >= 9) return "text-green-500";

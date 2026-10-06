@@ -38,7 +38,7 @@ export default function WhereToWatch({ providers, source }: { providers: Provide
       <div className="flex items-center justify-between mb-3">
         <p className="text-text-muted text-xs font-body uppercase tracking-wider">Where to watch</p>
         {onMine.length > 0 && (
-          <span className="text-[10px] font-body font-semibold text-rating-green bg-rating-green/10 border border-rating-green/30 rounded-full px-2 py-0.5">
+          <span className="text-[10px] font-body font-semibold text-rating-green bg-rating-green/10 border border-rating-green/30 rounded-md px-2 py-0.5">
             On your services
           </span>
         )}

@@ -9,7 +9,7 @@ export default function ScreenHeader({ title, subtitle, right }: { title: string
       <button
         onClick={popScreen}
         aria-label="Back"
-        className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center flex-shrink-0 active:scale-95 transition-all"
+        className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center flex-shrink-0 transition-all"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
           <polyline points="15 18 9 12 15 6" />

@@ -170,7 +170,7 @@ export default function SettingsScreen() {
       <div className="sticky top-0 z-10 bg-bg-primary/95 backdrop-blur-md border-b border-border px-4 py-3 flex items-center gap-3">
         <button
           onClick={popScreen}
-          className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center active:scale-95 transition-all"
+          className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center transition-all"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
             <polyline points="15 18 9 12 15 6" />
@@ -358,7 +358,7 @@ export default function SettingsScreen() {
         </Section>
 
         <p className="text-center text-text-muted text-xs font-body mt-8 pb-4">
-          Binge v1.0.0 · Made with 🎬
+          Binge v1.0.0
         </p>
       </div>
     </div>

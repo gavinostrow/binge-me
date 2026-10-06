@@ -93,7 +93,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
         <div className="sticky top-0 z-20 bg-bg-primary/95 backdrop-blur-sm border-b border-border px-4 py-3 flex items-center gap-3 animate-fadeIn">
           <button
             onClick={popScreen}
-            className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center flex-shrink-0 active:scale-95 transition-all"
+            className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center flex-shrink-0 transition-all"
           >
             <svg
               width="16"
@@ -132,7 +132,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
         <button
           onClick={popScreen}
           aria-label="Back"
-          className="absolute top-4 left-4 z-10 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-95 transition-all"
+          className="absolute top-4 left-4 z-10 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center transition-all"
         >
           <svg
             width="16"
@@ -150,7 +150,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
         {/* Watchlist button on poster */}
         <button
           onClick={handleWatchlistToggle}
-          className="absolute top-4 right-4 z-10 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-95 transition-all"
+          className="absolute top-4 right-4 z-10 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center transition-all"
         >
           <svg
             width="16"
@@ -191,7 +191,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
             )}
             {show.status && (
               <span
-                className={`text-xs px-2 py-0.5 rounded-full font-semibold backdrop-blur-sm ${
+                className={`text-xs px-2 py-0.5 rounded-md font-semibold backdrop-blur-sm ${
                   show.status === "ongoing"
                     ? "bg-green-500/20 text-green-300 border border-green-400/30"
                     : "bg-white/15 text-white/70 border border-white/20"
@@ -206,7 +206,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
             {show.genre.map((g) => (
               <span
                 key={g}
-                className="px-2.5 py-1 rounded-full text-xs font-body font-semibold bg-white/15 backdrop-blur-sm text-white border border-white/20"
+                className="px-2.5 py-1 rounded-md text-xs font-body font-semibold bg-white/15 backdrop-blur-sm text-white border border-white/20"
               >
                 {g}
               </span>
@@ -265,7 +265,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
         ) : (
           <button
             onClick={() => setActiveTab("add")}
-            className="w-full py-3.5 bg-gradient-to-r from-accent to-accent-light text-white font-display font-bold text-base rounded-2xl active:scale-[0.98] transition-all"
+            className="w-full py-3.5 bg-accent text-white font-display font-bold text-base rounded-2xl transition-all"
           >
             Rate This Show
           </button>
@@ -311,9 +311,9 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
         {openPredictions.length > 0 && (
           <button
             onClick={() => pushScreen({ screen: "predictions", showId: show.id })}
-            className="w-full bg-gradient-to-r from-accent/20 to-accent-gold/10 border border-accent/40 rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.99] transition-transform"
+            className="w-full bg-bg-card border border-border rounded-2xl p-4 flex items-center gap-3 text-left transition-transform"
           >
-            <span className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center font-display font-black text-accent-light text-lg">?</span>
+            <span className="w-10 h-10 rounded-lg border border-border bg-bg-elevated flex items-center justify-center font-mono font-semibold text-text-secondary text-base">?</span>
             <div className="flex-1 min-w-0">
               <p className="text-text-primary text-sm font-display font-bold">Make your predictions</p>
               <p className="text-text-secondary text-xs font-body">
@@ -394,7 +394,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
         {/* Watchlist button */}
         <button
           onClick={handleWatchlistToggle}
-          className={`w-full py-3 rounded-2xl font-body font-semibold transition-all active:scale-[0.98] ${
+          className={`w-full py-3 rounded-2xl font-body font-semibold transition-all ${
             inWatchlist
               ? "bg-accent/10 text-accent border border-accent"
               : "bg-bg-card text-text-secondary border border-border"

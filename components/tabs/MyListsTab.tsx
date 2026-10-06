@@ -67,7 +67,7 @@ export default function MyListsTab() {
             <button
               key={genre}
               onClick={() => setSelectedGenre(genre)}
-              className={`whitespace-nowrap text-sm px-3 py-1.5 rounded-full transition-colors ${
+              className={`whitespace-nowrap text-sm px-3 py-1.5 rounded-md transition-colors ${
                 selectedGenre === genre
                   ? "bg-accent-purple/20 text-accent-purple"
                   : "bg-bg-elevated text-text-secondary"

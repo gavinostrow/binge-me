@@ -13,7 +13,7 @@ export default function SpoilerText({ text, hidden, reason }: { text: string; hi
         &ldquo;{text}&rdquo;
       </p>
       <span className="absolute inset-0 flex items-center justify-center">
-        <span className="bg-bg-primary/85 border border-border rounded-full px-3 py-1 text-[11px] font-body font-semibold text-text-secondary">
+        <span className="bg-bg-primary/85 border border-border rounded-md px-3 py-1 text-[11px] font-body font-semibold text-text-secondary">
           Spoiler shield · {reason} · tap to show
         </span>
       </span>

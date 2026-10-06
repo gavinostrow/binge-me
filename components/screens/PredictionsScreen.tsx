@@ -140,7 +140,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
   return (
     <button
       onClick={onClick}
-      className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-body font-semibold border transition-colors ${
+      className={`flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-body font-semibold border transition-colors ${
         active ? "bg-accent border-accent text-white" : "border-border text-text-secondary"
       }`}
     >

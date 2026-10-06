@@ -55,8 +55,8 @@ const tabs: {
         height="22"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="white"
-        strokeWidth={2.2}
+        stroke="currentColor"
+        strokeWidth={1.8}
         strokeLinecap="round"
         strokeLinejoin="round"
       >
@@ -121,29 +121,6 @@ export default function BottomNav() {
         {" "}
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
-          const isAdd = tab.id === "add";
-          if (isAdd) {
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className="flex flex-col items-center gap-0.5 -mt-4"
-                aria-label="Add"
-              >
-                {" "}
-                <div
-                  className="rounded-full flex items-center justify-center active:scale-95 transition-transform"
-                  style={{ width: 48, height: 48, backgroundColor: "#7C5CF6" }}
-                >
-                  {" "}
-                  {tab.icon(isActive)}{" "}
-                </div>{" "}
-                <span className="text-[9px] font-body font-semibold text-text-muted tracking-wide">
-                  Add
-                </span>{" "}
-              </button>
-            );
-          }
           return (
             <button
               key={tab.id}
@@ -152,13 +129,13 @@ export default function BottomNav() {
               aria-label={tab.label}
             >
               {" "}
-              <span style={{ color: isActive ? "#7C5CF6" : "#55556A" }}>
+              <span style={{ color: isActive ? "#E8E4DC" : "#5E586E" }}>
                 {" "}
                 {tab.icon(isActive)}{" "}
               </span>{" "}
               <span
-                className="text-[9px] font-body font-semibold tracking-wide"
-                style={{ color: isActive ? "#7C5CF6" : "#55556A" }}
+                className="text-[10px] font-body font-medium"
+                style={{ color: isActive ? "#E8E4DC" : "#5E586E" }}
               >
                 {" "}
                 {tab.label}{" "}

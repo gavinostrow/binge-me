@@ -19,7 +19,7 @@ export default function WhatsNextHub() {
       <div className="px-4">
         <button
           onClick={() => pushScreen({ screen: "my-request" })}
-          className="w-full rounded-2xl p-4 text-left bg-gradient-to-br from-accent/25 via-accent/10 to-transparent border border-accent/40 active:scale-[0.99] transition-transform"
+          className="w-full rounded-2xl p-4 text-left bg-bg-card border border-border transition-transform"
         >
           {myOpenRequest ? (
             <>

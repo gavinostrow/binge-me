@@ -1,7 +1,7 @@
 "use client";
 import type { User } from "@/lib/types";
 
-const COLORS = ["#7C5CF6", "#EC4899", "#F59E0B", "#10B981", "#3B82F6", "#EF4444", "#14B8A6"];
+const COLORS = ["#A99BF5", "#D59AB8", "#D6B26E", "#7FC6A4", "#8EB2E6", "#E39A8F", "#7EC4C4"];
 
 export function userColor(userId: string) {
   const n = parseInt(userId.replace(/\D/g, ""), 10);
@@ -23,10 +23,10 @@ export default function UserAvatar({
 }) {
   return (
     <div
-      className={`${SIZES[size]} rounded-full flex items-center justify-center font-display font-bold text-white flex-shrink-0 overflow-hidden ${
+      className={`${SIZES[size]} rounded-full flex items-center justify-center font-display font-semibold flex-shrink-0 overflow-hidden ${
         ring ? "ring-2 ring-bg-primary" : ""
       }`}
-      style={{ backgroundColor: user.avatarColor ?? userColor(user.id) }}
+      style={{ color: user.avatarColor ?? userColor(user.id), backgroundColor: `${user.avatarColor ?? userColor(user.id)}26` }}
       aria-hidden
     >
       {user.avatarUrl ? (

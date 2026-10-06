@@ -139,7 +139,7 @@ export default function AuthScreen() {
           <button
             onClick={mode === "signin" ? handleSignIn : handleSignUp}
             disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-accent to-accent-light text-white font-display font-bold rounded-2xl disabled:opacity-50 transition"
+            className="w-full py-3 bg-accent text-white font-display font-bold rounded-2xl disabled:opacity-50 transition"
           >
             {" "}
             {loading

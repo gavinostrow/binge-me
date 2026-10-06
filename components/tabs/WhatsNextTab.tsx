@@ -357,14 +357,14 @@ export default function WhatsNextTab() {
 
       {/* Movie / Show toggle */}
       <div className="px-4 pb-4">
-        <div className="flex bg-bg-surface rounded-full p-1">
+        <div className="flex bg-bg-surface rounded-lg p-1">
           <button
             onClick={() => {
               setContentType("movie");
               setResult(null);
               setSuggestions([]);
             }}
-            className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors ${
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
               contentType === "movie"
                 ? "bg-accent-purple text-white"
                 : "text-text-secondary hover:text-text-primary"
@@ -378,7 +378,7 @@ export default function WhatsNextTab() {
               setResult(null);
               setSuggestions([]);
             }}
-            className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors ${
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
               contentType === "show"
                 ? "bg-accent-purple text-white"
                 : "text-text-secondary hover:text-text-primary"
@@ -408,7 +408,7 @@ export default function WhatsNextTab() {
         <button
           onClick={spin}
           disabled={spinning}
-          className={`w-24 h-24 rounded-full bg-accent-purple flex items-center justify-center shadow-lg shadow-accent-purple/30 hover:bg-accent-purple/90 transition-all active:scale-95 ${
+          className={`w-24 h-24 rounded-full bg-accent-purple flex items-center justify-center shadow-lg shadow-accent-purple/30 hover:bg-accent-purple/90 transition-all ${
             spinning ? "animate-spin-slow" : ""
           }`}
         >

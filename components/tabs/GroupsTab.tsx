@@ -37,19 +37,19 @@ function GroupListCard({ group, onOpen }: { group: GroupClub; onOpen: () => void
   return (
     <button
       onClick={onOpen}
-      className="w-full bg-bg-card rounded-2xl p-4 border border-border flex gap-3 active:scale-[0.98] transition-all text-left"
+      className="w-full bg-bg-card rounded-2xl p-4 border border-border flex gap-3 transition-all text-left"
     >
       {" "}
       {/* Emoji */}{" "}
       <div
         className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
         style={{
-          background: "linear-gradient(135deg, #252540, #1C1C2E)",
+          background: "#1C1C28",
           border: "1px solid #35355A",
         }}
       >
         {" "}
-        {group.emoji}{" "}
+        {group.name.charAt(0).toUpperCase()}{" "}
       </div>{" "}
       <div className="flex-1 min-w-0">
         {" "}
@@ -61,7 +61,7 @@ function GroupListCard({ group, onOpen }: { group: GroupClub; onOpen: () => void
               {group.name}
             </p>{" "}
             {group.clubType && (
-              <span className="text-[9px] font-body font-semibold px-2 py-0.5 rounded-full bg-bg-elevated border border-border text-text-secondary flex-shrink-0">
+              <span className="text-[9px] font-body font-semibold px-2 py-0.5 rounded-md bg-bg-elevated border border-border text-text-secondary flex-shrink-0">
                 {" "}
                 {group.clubType === "group-watch" ? "Group Watch" : "Friends Club"}{" "}
               </span>
@@ -76,7 +76,7 @@ function GroupListCard({ group, onOpen }: { group: GroupClub; onOpen: () => void
         {group.currentWatch && (
           <div className="flex items-center gap-1 mt-1">
             {" "}
-            <span className="text-xs">{group.currentWatch.type === "show" ? "📺" : "🎬"}</span>{" "}
+            <span className="text-xs">{group.currentWatch.type === "show" ? "Show ·" : "Movie ·"}</span>{" "}
             <span className="text-accent text-xs font-body font-semibold truncate">
               {" "}
               {group.currentWatch.title}{" "}
@@ -122,9 +122,9 @@ function GroupListCard({ group, onOpen }: { group: GroupClub; onOpen: () => void
             {group.memberIds.length} members
           </span>{" "}
           {pendingPredictions > 0 && (
-            <span className="text-[10px] font-body font-semibold px-1.5 py-0.5 rounded-full bg-accent/20 text-accent">
+            <span className="text-[10px] font-body font-semibold px-1.5 py-0.5 rounded-md bg-accent/20 text-accent">
               {" "}
-              🔮 {pendingPredictions} open{" "}
+              {pendingPredictions} open{" "}
             </span>
           )}{" "}
         </div>{" "}
@@ -190,7 +190,7 @@ function PollMessage({ poll, groupId }: { poll: GroupPoll; groupId: string }) {
   );
 }
 // ─── Chat View ────────────────────────────────────────────────────────────────
-const CHAT_REACTIONS = ["🔥", "❤️", "😂", "👏", "😭", "🫣", "💀", "👀"];
+const CHAT_REACTIONS = ["", "❤️", "", "", "", "", "", ""];
 function ChatBubble({ msg, groupId }: { msg: GroupMessage; groupId: string }) {
   const { toggleGroupReaction } = useApp();
   const isMe = msg.userId === currentUser.id;
@@ -212,9 +212,9 @@ function ChatBubble({ msg, groupId }: { msg: GroupMessage; groupId: string }) {
         )}{" "}
         {/* Spoiler warning */}{" "}
         {msg.spoilerWarning && (
-          <div className="flex items-center gap-1 text-[10px] text-accent font-body font-semibold bg-accent/10 border border-accent/30 rounded-full px-2 py-0.5">
+          <div className="flex items-center gap-1 text-[10px] text-accent font-body font-semibold bg-accent/10 border border-accent/30 rounded-md px-2 py-0.5">
             {" "}
-            ⚠️ Spoiler ahead{" "}
+            Spoiler ahead{" "}
           </div>
         )}{" "}
         {/* Bubble */}{" "}
@@ -230,7 +230,7 @@ function ChatBubble({ msg, groupId }: { msg: GroupMessage; groupId: string }) {
               className={`flex items-center gap-1 text-[10px] font-body font-semibold mb-1 ${isMe ? "text-white/70" : "text-accent"}`}
             >
               {" "}
-              <span>{msg.contentRef.type === "movie" ? "🎬" : "📺"}</span>{" "}
+              <span>{msg.contentRef.type === "movie" ? "Movie ·" : "Show ·"}</span>{" "}
               <span>{msg.contentRef.title}</span>{" "}
               {msg.contentRef.rating && (
                 <RatingBadge rating={msg.contentRef.rating} size="sm" />
@@ -247,7 +247,7 @@ function ChatBubble({ msg, groupId }: { msg: GroupMessage; groupId: string }) {
               <button
                 key={emoji}
                 onClick={() => toggleGroupReaction(groupId, msg.id, emoji, currentUser.id)}
-                className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs border transition-all ${myReactions.includes(emoji) ? "bg-accent/30 border-accent/50" : "bg-bg-elevated border-border"}`}
+                className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs border transition-all ${myReactions.includes(emoji) ? "bg-accent/30 border-accent/50" : "bg-bg-elevated border-border"}`}
               >
                 {" "}
                 <span>{emoji}</span>{" "}
@@ -356,7 +356,7 @@ function CreatePollModal({ groupId, onClose }: { groupId: string; onClose: () =>
         {options.length < 4 && (
           <button
             onClick={addOption}
-            className="w-full py-2.5 rounded-xl border border-dashed border-accent/50 text-accent text-sm font-body font-semibold mb-4 active:scale-95 transition-all"
+            className="w-full py-2.5 rounded-xl border border-dashed border-accent/50 text-accent text-sm font-body font-semibold mb-4 transition-all"
           >
             {" "}
             + Add Option{" "}
@@ -365,8 +365,8 @@ function CreatePollModal({ groupId, onClose }: { groupId: string; onClose: () =>
         <button
           onClick={submit}
           disabled={!question.trim() || options.filter((o) => o.trim()).length < 2}
-          className="w-full py-4 rounded-2xl font-display font-bold text-white text-base transition-all active:scale-95 disabled:opacity-40"
-          style={{ background: "linear-gradient(135deg, #A78BFA, #7C5CF6)" }}
+          className="w-full py-4 rounded-2xl font-display font-bold text-white text-base transition-all disabled:opacity-40"
+          style={{ background: "#8B5CF6" }}
         >
           {" "}
           Send Poll{" "}
@@ -405,7 +405,7 @@ function ChatView({ group }: { group: GroupClub }) {
       {group.currentWatch && (
         <div className="mx-4 mt-2 mb-1 bg-accent/10 border border-accent/30 rounded-xl px-3 py-2 flex items-center gap-2">
           {" "}
-          <span>{group.currentWatch.type === "show" ? "📺" : "🎬"}</span>{" "}
+          <span>{group.currentWatch.type === "show" ? "Show ·" : "Movie ·"}</span>{" "}
           <div className="flex-1 min-w-0">
             {" "}
             <p className="text-accent text-xs font-body font-semibold truncate">
@@ -425,7 +425,7 @@ function ChatView({ group }: { group: GroupClub }) {
         {group.messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center py-16 text-center text-text-muted">
             {" "}
-            <p className="text-4xl mb-3">{group.emoji}</p>{" "}
+            <p className="text-4xl mb-3">{group.name.charAt(0).toUpperCase()}</p>{" "}
             <p className="font-body text-sm">No messages yet.</p>{" "}
             <p className="font-body text-xs mt-1">Start the conversation!</p>{" "}
           </div>
@@ -440,7 +440,7 @@ function ChatView({ group }: { group: GroupClub }) {
         {spoiler && (
           <div className="flex items-center gap-2 mb-2 text-xs text-accent font-body">
             {" "}
-            <span>⚠️ Spoiler warning will be added</span>{" "}
+            <span>Spoiler warning will be added</span>{" "}
             <button onClick={() => setSpoiler(false)} className="text-text-muted">
               ✕
             </button>{" "}
@@ -470,23 +470,23 @@ function ChatView({ group }: { group: GroupClub }) {
               title="Mark as spoiler"
             >
               {" "}
-              ⚠️{" "}
+              {" "}
             </button>{" "}
           </div>{" "}
           <button
             onClick={() => setShowPollModal(true)}
-            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-95 text-text-muted hover:text-accent"
+            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all text-text-muted hover:text-accent"
             title="Create poll"
           >
             {" "}
-            📊{" "}
+            {" "}
           </button>{" "}
           <button
             onClick={send}
             disabled={!input.trim()}
-            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-95 disabled:opacity-40"
+            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-40"
             style={{
-              background: input.trim() ? "linear-gradient(135deg, #A78BFA, #7C5CF6)" : "#252540",
+              background: input.trim() ? "#8B5CF6" : "#252533",
             }}
           >
             {" "}
@@ -547,7 +547,7 @@ function PredictionCard({ pred, groupId }: { pred: Prediction; groupId: string }
         </div>{" "}
         {/* Status badge */}{" "}
         <span
-          className="text-[10px] font-body font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
+          className="text-[10px] font-body font-semibold px-2 py-0.5 rounded-md flex-shrink-0"
           style={
             pred.revealed
               ? { backgroundColor: "#22C55E25", color: "#22C55E" }
@@ -557,7 +557,7 @@ function PredictionCard({ pred, groupId }: { pred: Prediction; groupId: string }
           }
         >
           {" "}
-          {pred.revealed ? "✓ Revealed" : pred.locked ? "🔒 Locked" : "✏️ Draft"}{" "}
+          {pred.revealed ? "✓ Revealed" : pred.locked ? "Locked" : "Draft"}{" "}
         </span>{" "}
       </div>{" "}
       {/* Prediction text */}{" "}
@@ -580,17 +580,17 @@ function PredictionCard({ pred, groupId }: { pred: Prediction; groupId: string }
           <span className="text-text-muted text-xs font-body">Was this right?</span>{" "}
           <button
             onClick={() => votePrediction(groupId, pred.id, "right")}
-            className={`px-3 py-1 rounded-full text-xs font-body font-semibold border transition-all ${myVote === "right" ? "bg-green-500/20 border-green-500/50 text-green-400" : "border-border text-text-secondary"}`}
+            className={`px-3 py-1 rounded-md text-xs font-body font-semibold border transition-all ${myVote === "right" ? "bg-green-500/20 border-green-500/50 text-green-400" : "border-border text-text-secondary"}`}
           >
             {" "}
-            👍 Right {rightVotes > 0 && `(${rightVotes})`}{" "}
+            Right {rightVotes > 0 && `(${rightVotes})`}{" "}
           </button>{" "}
           <button
             onClick={() => votePrediction(groupId, pred.id, "wrong")}
-            className={`px-3 py-1 rounded-full text-xs font-body font-semibold border transition-all ${myVote === "wrong" ? "bg-red-500/20 border-red-500/50 text-red-400" : "border-border text-text-secondary"}`}
+            className={`px-3 py-1 rounded-md text-xs font-body font-semibold border transition-all ${myVote === "wrong" ? "bg-red-500/20 border-red-500/50 text-red-400" : "border-border text-text-secondary"}`}
           >
             {" "}
-            👎 Wrong {wrongVotes > 0 && `(${wrongVotes})`}{" "}
+            Wrong {wrongVotes > 0 && `(${wrongVotes})`}{" "}
           </button>{" "}
         </div>
       )}{" "}
@@ -601,19 +601,19 @@ function PredictionCard({ pred, groupId }: { pred: Prediction; groupId: string }
           {!pred.locked && (
             <button
               onClick={() => lockPrediction(groupId, pred.id)}
-              className="flex-1 py-2 rounded-xl text-xs font-body font-semibold border border-accent/50 text-accent bg-accent/10 active:scale-95 transition-all"
+              className="flex-1 py-2 rounded-xl text-xs font-body font-semibold border border-accent/50 text-accent bg-accent/10 transition-all"
             >
               {" "}
-              🔒 Lock In{" "}
+              Lock In{" "}
             </button>
           )}{" "}
           {pred.locked && !pred.revealed && (
             <button
               onClick={() => setShowRevealForm((v) => !v)}
-              className="flex-1 py-2 rounded-xl text-xs font-body font-semibold border border-green-500/50 text-green-400 bg-green-500/10 active:scale-95 transition-all"
+              className="flex-1 py-2 rounded-xl text-xs font-body font-semibold border border-green-500/50 text-green-400 bg-green-500/10 transition-all"
             >
               {" "}
-              👁 Reveal Result{" "}
+              Reveal Result{" "}
             </button>
           )}{" "}
         </div>
@@ -637,7 +637,7 @@ function PredictionCard({ pred, groupId }: { pred: Prediction; groupId: string }
                 setRevealInput("");
               }
             }}
-            className="px-3 py-2 rounded-xl bg-green-500 text-white text-xs font-body font-semibold active:scale-95 transition-all"
+            className="px-3 py-2 rounded-xl bg-green-500 text-white text-xs font-body font-semibold transition-all"
           >
             {" "}
             Submit{" "}
@@ -688,7 +688,7 @@ function NewPredictionForm({ groupId, onDone }: { groupId: string; onDone: () =>
         {" "}
         <button
           onClick={onDone}
-          className="flex-1 py-2.5 rounded-xl border border-border text-text-secondary text-sm font-body font-semibold active:scale-95"
+          className="flex-1 py-2.5 rounded-xl border border-border text-text-secondary text-sm font-body font-semibold "
         >
           {" "}
           Cancel{" "}
@@ -696,7 +696,7 @@ function NewPredictionForm({ groupId, onDone }: { groupId: string; onDone: () =>
         <button
           onClick={submit}
           disabled={!text.trim()}
-          className="flex-1 py-2.5 rounded-xl bg-accent text-white text-sm font-body font-semibold active:scale-95 disabled:opacity-40 transition-all"
+          className="flex-1 py-2.5 rounded-xl bg-accent text-white text-sm font-body font-semibold disabled:opacity-40 transition-all"
         >
           {" "}
           Add Prediction{" "}
@@ -716,10 +716,10 @@ function PredictionsView({ group }: { group: GroupClub }) {
       {!showForm && group.currentWatch && (
         <button
           onClick={() => setShowForm(true)}
-          className="w-full py-3 rounded-2xl border border-dashed border-accent/50 text-accent text-sm font-body font-semibold flex items-center justify-center gap-2 active:scale-95 transition-all"
+          className="w-full py-3 rounded-2xl border border-dashed border-accent/50 text-accent text-sm font-body font-semibold flex items-center justify-center gap-2 transition-all"
         >
           {" "}
-          🔮 Add a Prediction{" "}
+          Add a Prediction{" "}
         </button>
       )}{" "}
       {showForm && <NewPredictionForm groupId={group.id} onDone={() => setShowForm(false)} />}{" "}
@@ -748,7 +748,6 @@ function PredictionsView({ group }: { group: GroupClub }) {
       {group.predictions.length === 0 && !showForm && (
         <div className="py-12 text-center text-text-muted">
           {" "}
-          <p className="text-3xl mb-2">🔮</p>{" "}
           <p className="font-body text-sm">No predictions yet.</p>{" "}
           <p className="font-body text-xs mt-1">Lock in your takes before watching!</p>{" "}
         </div>
@@ -792,7 +791,7 @@ function MembersView({ group }: { group: GroupClub }) {
                   {user.id === currentUser.id ? "You" : user.name}{" "}
                 </p>{" "}
                 {user.id === currentUser.id && (
-                  <span className="text-[10px] text-text-muted font-body border border-border rounded-full px-1.5">
+                  <span className="text-[10px] text-text-muted font-body border border-border rounded-md px-1.5">
                     you
                   </span>
                 )}{" "}
@@ -844,7 +843,7 @@ function GroupDetail({ group, onBack }: { group: GroupClub; onBack: () => void }
           {" "}
           <button
             onClick={onBack}
-            className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center active:scale-95"
+            className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center "
           >
             {" "}
             <svg
@@ -861,7 +860,7 @@ function GroupDetail({ group, onBack }: { group: GroupClub; onBack: () => void }
           </button>{" "}
           <div className="flex items-center gap-2 flex-1 min-w-0">
             {" "}
-            <span className="text-2xl">{group.emoji}</span>{" "}
+            <span className="text-2xl">{group.name.charAt(0).toUpperCase()}</span>{" "}
             <div className="min-w-0">
               {" "}
               <p className="font-display font-bold text-text-primary text-base truncate">
@@ -870,7 +869,7 @@ function GroupDetail({ group, onBack }: { group: GroupClub; onBack: () => void }
               {group.currentWatch && (
                 <p className="text-accent text-xs font-body truncate">
                   {" "}
-                  {group.currentWatch.type === "show" ? "📺" : "🎬"} {group.currentWatch.title}{" "}
+                  {group.currentWatch.type === "show" ? "Show ·" : "Movie ·"} {group.currentWatch.title}{" "}
                   {group.currentWatch.episode && ` · ${group.currentWatch.episode}`}{" "}
                 </p>
               )}{" "}
@@ -951,7 +950,7 @@ function FriendsWatchingModal({ onClose }: { onClose: () => void }) {
           {" "}
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center active:scale-95"
+            className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center "
           >
             {" "}
             <svg
@@ -977,7 +976,6 @@ function FriendsWatchingModal({ onClose }: { onClose: () => void }) {
         {activeFriends.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center text-text-muted">
             {" "}
-            <p className="text-4xl mb-3">👀</p>{" "}
             <p className="font-body text-sm">No friends watching right now.</p>{" "}
           </div>
         ) : (
@@ -987,7 +985,7 @@ function FriendsWatchingModal({ onClose }: { onClose: () => void }) {
               <button
                 key={friend.id}
                 onClick={() => handleNavigateToProfile(friend.id)}
-                className="bg-bg-card rounded-2xl p-4 border border-border text-left active:scale-[0.98] transition-all"
+                className="bg-bg-card rounded-2xl p-4 border border-border text-left transition-all"
               >
                 {" "}
                 {/* Friend header */}{" "}
@@ -1051,13 +1049,13 @@ function FriendsWatchingModal({ onClose }: { onClose: () => void }) {
   );
 }
 // ─── Create Group Modal ───────────────────────────────────────────────────────
-const EMOJI_OPTIONS = ["🎬", "📺", "🎭", "🩸", "🔥", "👻", "🌙", "🎪", "🍿", "🎥", "🕵️", "🦁"];
+const EMOJI_OPTIONS = ["", "", "", "", "", "", "", "", "", "", "", ""];
 function CreateGroupModal({ onClose }: { onClose: () => void }) {
   const { createGroup } = useApp();
   const [step, setStep] = useState<"type" | "details">("type");
   const [clubType, setClubType] = useState<"group-watch" | "friends-club" | null>(null);
   const [name, setName] = useState("");
-  const [emoji, setEmoji] = useState("🎬");
+  const [emoji, setEmoji] = useState("");
   const [desc, setDesc] = useState("");
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const toggleFriend = (id: string) => {
@@ -1109,7 +1107,7 @@ function CreateGroupModal({ onClose }: { onClose: () => void }) {
             >
               {" "}
               <p className="font-display font-semibold text-text-primary text-base mb-1">
-                🎬 Group Watch
+                Group Watch
               </p>{" "}
               <p className="text-text-secondary text-sm font-body">
                 Everyone watching the same show or movie together
@@ -1125,7 +1123,7 @@ function CreateGroupModal({ onClose }: { onClose: () => void }) {
             >
               {" "}
               <p className="font-display font-semibold text-text-primary text-base mb-1">
-                👥 Friends Club
+                Friends Club
               </p>{" "}
               <p className="text-text-secondary text-sm font-body">
                 Keep up with what your friends are watching
@@ -1134,7 +1132,7 @@ function CreateGroupModal({ onClose }: { onClose: () => void }) {
           </div>{" "}
           <button
             onClick={onClose}
-            className="w-full py-4 rounded-2xl font-display font-bold text-text-secondary text-base border border-border transition-all active:scale-95"
+            className="w-full py-4 rounded-2xl font-display font-bold text-text-secondary text-base border border-border transition-all "
           >
             {" "}
             Cancel{" "}
@@ -1159,7 +1157,7 @@ function CreateGroupModal({ onClose }: { onClose: () => void }) {
           {" "}
           <button
             onClick={() => setStep("type")}
-            className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center active:scale-95"
+            className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center "
           >
             {" "}
             <svg
@@ -1247,8 +1245,8 @@ function CreateGroupModal({ onClose }: { onClose: () => void }) {
         <button
           onClick={submit}
           disabled={!name.trim() || selectedFriends.length === 0}
-          className="w-full py-4 rounded-2xl font-display font-bold text-white text-base transition-all active:scale-95 disabled:opacity-40"
-          style={{ background: "linear-gradient(135deg, #A78BFA, #7C5CF6)" }}
+          className="w-full py-4 rounded-2xl font-display font-bold text-white text-base transition-all disabled:opacity-40"
+          style={{ background: "#8B5CF6" }}
         >
           {" "}
           Create Club{" "}
@@ -1285,7 +1283,7 @@ export default function GroupsTab() {
           <h1 className="font-display font-bold text-2xl text-text-primary">Clubs</h1>{" "}
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-accent text-white text-sm font-body font-semibold active:scale-95 transition-all"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-accent text-white text-sm font-body font-semibold transition-all"
           >
             {" "}
             <svg
@@ -1309,9 +1307,9 @@ export default function GroupsTab() {
         {/* Predictions */}
         <button
           onClick={() => pushScreen({ screen: "predictions" })}
-          className="w-full bg-gradient-to-r from-accent/25 to-accent-gold/10 border border-accent/40 rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.99] transition-transform"
+          className="w-full bg-bg-card border border-border rounded-2xl p-4 flex items-center gap-3 text-left transition-transform"
         >
-          <span className="w-11 h-11 rounded-xl bg-accent/25 flex items-center justify-center font-display font-black text-accent-light text-xl">?</span>
+          <span className="w-10 h-10 rounded-lg border border-border bg-bg-elevated flex items-center justify-center font-mono font-semibold text-text-secondary text-base">?</span>
           <div className="flex-1 min-w-0">
             <p className="text-text-primary font-display font-bold">Predictions</p>
             <p className="text-text-secondary text-xs font-body">
@@ -1319,19 +1317,19 @@ export default function GroupsTab() {
             </p>
           </div>
           {unpicked > 0 && (
-            <span className="min-w-[22px] h-[22px] px-1.5 rounded-full bg-accent text-white text-xs font-bold flex items-center justify-center">{unpicked}</span>
+            <span className="min-w-[22px] h-[22px] px-1.5 rounded-md bg-accent text-white text-xs font-bold flex items-center justify-center">{unpicked}</span>
           )}
         </button>
         {/* Friends Watching Button Card */}{" "}
         {allWatching.length > 0 && (
           <button
             onClick={() => setShowFriendsWatching(true)}
-            className="w-full bg-bg-card rounded-2xl p-4 border border-border flex items-center justify-between active:scale-[0.98] transition-all"
+            className="w-full bg-bg-card rounded-2xl p-4 border border-border flex items-center justify-between transition-all"
           >
             {" "}
             <div className="flex items-center gap-2">
               {" "}
-              <span className="text-lg">👁</span>{" "}
+              
               <span className="font-display font-semibold text-text-primary">
                 Friends Watching Now
               </span>{" "}
@@ -1362,8 +1360,7 @@ export default function GroupsTab() {
           </p>{" "}
           {groups.length === 0 ? (
             <div className="bg-bg-card rounded-2xl p-8 border border-border text-center text-text-muted">
-              {" "}
-              <p className="text-4xl mb-3">🎬</p> <p className="font-body text-sm">No clubs yet.</p>{" "}
+              {" "} <p className="font-body text-sm">No clubs yet.</p>{" "}
               <p className="font-body text-xs mt-1">
                 Create one to watch and predict together!
               </p>{" "}

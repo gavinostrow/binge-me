@@ -83,7 +83,7 @@ export default function NotificationsScreen() {
               {n.fromUser ? (
                 <UserAvatar user={n.fromUser} size="md" />
               ) : (
-                <span className="w-10 h-10 rounded-full bg-rating-green/15 text-rating-green flex items-center justify-center flex-shrink-0 font-display font-black">
+                <span className="w-10 h-10 rounded-full bg-rating-green/15 text-rating-green flex items-center justify-center flex-shrink-0 font-display font-bold">
                   ↻
                 </span>
               )}

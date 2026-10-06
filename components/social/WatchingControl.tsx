@@ -47,7 +47,7 @@ export default function WatchingControl({ show }: { show: Show }) {
           />
           <button
             onClick={finishSeason}
-            className="flex-1 py-2.5 rounded-xl bg-accent text-white text-sm font-display font-bold active:scale-[0.98] transition-transform"
+            className="flex-1 py-2.5 rounded-xl bg-accent text-white text-sm font-display font-bold transition-transform"
           >
             Finished Season {entry.season}
           </button>
@@ -68,7 +68,7 @@ export default function WatchingControl({ show }: { show: Show }) {
               setPicking(false);
               showToast(`Added to Currently Watching`);
             }}
-            className="flex-1 py-2.5 rounded-xl bg-accent text-white text-sm font-display font-bold active:scale-[0.98] transition-transform"
+            className="flex-1 py-2.5 rounded-xl bg-accent text-white text-sm font-display font-bold transition-transform"
           >
             Save
           </button>

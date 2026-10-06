@@ -59,8 +59,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function RatingLegend() {
   const legend = [
-    { label: "Friends avg", color: "#7C5CF6", icon: "👥" },
-    { label: "Community avg", color: "#D4A843", icon: "🌐" },
+    { label: "Friends avg", color: "#7C5CF6", icon: "F" },
+    { label: "Community avg", color: "#D4A843", icon: "B" },
   ];
   return (
     <div className="flex gap-4 mb-4 px-1">
@@ -98,7 +98,7 @@ function FriendRow({ user, onPress }: { user: User; onPress: () => void }) {
       </div>
       {match && (
         <span
-          className="text-xs font-body font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
+          className="text-xs font-body font-semibold px-2 py-0.5 rounded-md flex-shrink-0"
           style={{ backgroundColor: "#7C5CF620", color: "#7C5CF6" }}
         >
           {match}% match
@@ -140,12 +140,12 @@ function MovieRow({ movie, onPress }: { movie: Movie; onPress: () => void }) {
         <div className="flex items-center gap-3 mt-1.5">
           {friendAvg !== null && (
             <span className="text-[10px] font-body font-semibold" style={{ color: "#7C5CF6" }}>
-              👥 {friendAvg.toFixed(1)}
+              Friends {friendAvg.toFixed(1)}
             </span>
           )}
           {community && (
             <span className="text-[10px] font-body font-semibold" style={{ color: "#D4A843" }}>
-              🌐 {community.averageRating.toFixed(1)}
+              Binge {community.averageRating.toFixed(1)}
             </span>
           )}
         </div>
@@ -180,12 +180,12 @@ function ShowRow({ show, onPress }: { show: Show; onPress: () => void }) {
         <div className="flex items-center gap-3 mt-1.5">
           {friendAvg !== null && (
             <span className="text-[10px] font-body font-semibold" style={{ color: "#7C5CF6" }}>
-              👥 {friendAvg.toFixed(1)}
+              Friends {friendAvg.toFixed(1)}
             </span>
           )}
           {community && (
             <span className="text-[10px] font-body font-semibold" style={{ color: "#D4A843" }}>
-              🌐 {community.averageRating.toFixed(1)}
+              Binge {community.averageRating.toFixed(1)}
             </span>
           )}
         </div>
@@ -274,7 +274,7 @@ export default function SearchScreen({ initialQuery }: { initialQuery?: string }
         <div className="flex items-center gap-3 mb-3">
           <button
             onClick={popScreen}
-            className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center flex-shrink-0 active:scale-95 transition-all"
+            className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center flex-shrink-0 transition-all"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
               <polyline points="15 18 9 12 15 6" />
@@ -320,7 +320,7 @@ export default function SearchScreen({ initialQuery }: { initialQuery?: string }
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`px-3 py-1.5 rounded-full text-xs font-body font-semibold border transition-all ${
+              className={`px-3 py-1.5 rounded-md text-xs font-body font-semibold border transition-all ${
                 tab === t.id
                   ? "bg-accent border-accent text-white"
                   : "border-border text-text-secondary"

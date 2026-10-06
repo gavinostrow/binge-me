@@ -9,7 +9,7 @@ export default function Toast() {
       <div
         key={toast.id}
         role="status"
-        className="animate-fadeIn bg-text-primary text-bg-primary text-sm font-body font-semibold rounded-full px-4 py-2.5 shadow-lg max-w-app"
+        className="animate-fadeIn bg-text-primary text-bg-primary text-sm font-body font-semibold rounded-md px-4 py-2.5 shadow-lg max-w-app"
       >
         {toast.text}
       </div>

@@ -79,7 +79,7 @@ export default function WrappedScreen({ period: initial }: { period?: string }) 
             <button
               key={p.key}
               onClick={() => setKey(p.key)}
-              className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-display font-bold border transition-colors ${
+              className={`flex-shrink-0 px-3.5 py-1.5 rounded-md text-xs font-display font-bold border transition-colors ${
                 p.key === key ? "bg-accent border-accent text-white" : "border-border text-text-secondary"
               }`}
             >
@@ -109,28 +109,28 @@ export default function WrappedScreen({ period: initial }: { period?: string }) 
         ) : (
           <>
             {/* Hero */}
-            <Card gradient="from-[#8B5CF6] via-[#6D28D9] to-[#1C1C28]">
-              <p className="text-white/70 text-xs font-body uppercase tracking-[0.2em]">{period.label}</p>
-              <p className="text-white font-display font-black text-6xl leading-none mt-4">{data.total}</p>
-              <p className="text-white font-display font-bold text-xl mt-1">titles logged</p>
-              <div className="flex gap-6 mt-6">
+            <Card tone="accent">
+              <p className="text-text-muted text-[10px] font-body uppercase tracking-widest">{period.label}</p>
+              <p className="text-text-primary font-mono font-semibold text-5xl leading-none mt-3">{data.total}</p>
+              <p className="text-text-secondary font-body text-sm mt-1">titles logged</p>
+              <div className="grid grid-cols-3 gap-4 mt-5 pt-4 border-t border-border">
                 <Stat n={data.shows} label="shows" />
                 <Stat n={data.seasons} label="seasons" />
                 <Stat n={data.movies} label="movies" />
               </div>
-              <p className="text-white/80 text-sm font-body mt-6">
-                About <span className="font-bold text-white">{data.hours} hours</span> of watching
+              <p className="text-text-secondary text-sm font-body mt-4">
+                About <span className="font-semibold text-text-primary">{data.hours} hours</span> of watching
                 {data.hours >= 24 ? ` — that's ${(data.hours / 24).toFixed(1)} full days` : ""}.
               </p>
             </Card>
 
             {/* Persona */}
-            <Card gradient="from-[#D4A843] via-[#B45309] to-[#1C1C28]">
-              <p className="text-white/70 text-xs font-body uppercase tracking-[0.2em]">Your watcher type</p>
-              <p className="text-white font-display font-black text-3xl leading-tight mt-3">{data.persona.title}</p>
-              <p className="text-white/85 text-sm font-body mt-1">{data.persona.line}</p>
-              <p className="text-white/85 text-sm font-body mt-4">
-                Average rating <span className="font-display font-bold text-white text-lg">{data.avg.toFixed(1)}</span>
+            <Card tone="gold">
+              <p className="text-text-muted text-[10px] font-body uppercase tracking-widest">Your watcher type</p>
+              <p className="text-text-primary font-display font-semibold text-2xl leading-tight mt-2">{data.persona.title}</p>
+              <p className="text-text-secondary text-sm font-body mt-1">{data.persona.line}</p>
+              <p className="text-text-secondary text-sm font-body mt-4">
+                Average rating <span className="font-mono font-semibold text-text-primary text-base">{data.avg.toFixed(1)}</span>
               </p>
             </Card>
 
@@ -164,13 +164,13 @@ export default function WrappedScreen({ period: initial }: { period?: string }) 
             <div className="grid grid-cols-2 gap-3">
               {data.topGenre && (
                 <SmallCard label="Top genre">
-                  <p className="text-text-primary font-display font-black text-2xl leading-tight">{data.topGenre.name}</p>
+                  <p className="text-text-primary font-display font-semibold text-xl leading-tight">{data.topGenre.name}</p>
                   <p className="text-text-secondary text-xs font-body mt-1">{data.topGenre.share}% of what you watched</p>
                 </SmallCard>
               )}
               {data.topPlatform && (
                 <SmallCard label="Most-watched on">
-                  <p className="text-text-primary font-display font-black text-2xl leading-tight">{data.topPlatform.name}</p>
+                  <p className="text-text-primary font-display font-semibold text-xl leading-tight">{data.topPlatform.name}</p>
                   <p className="text-text-secondary text-xs font-body mt-1">
                     {data.topPlatform.count} title{data.topPlatform.count === 1 ? "" : "s"}
                   </p>
@@ -246,15 +246,21 @@ export default function WrappedScreen({ period: initial }: { period?: string }) 
   );
 }
 
-function Card({ gradient, children }: { gradient: string; children: React.ReactNode }) {
-  return <div className={`rounded-3xl p-6 bg-gradient-to-br ${gradient} animate-fadeIn`}>{children}</div>;
+function Card({ tone, children }: { tone: "accent" | "gold"; children: React.ReactNode }) {
+  return (
+    <div
+      className={`rounded-2xl p-5 border animate-fadeIn ${tone === "accent" ? "bg-accent/10 border-accent/30" : "bg-accent-gold/10 border-accent-gold/30"}`}
+    >
+      {children}
+    </div>
+  );
 }
 
 function Stat({ n, label }: { n: number; label: string }) {
   return (
     <div>
-      <p className="text-white font-display font-black text-2xl leading-none">{n}</p>
-      <p className="text-white/70 text-xs font-body mt-1">{label}</p>
+      <p className="text-text-primary font-mono font-semibold text-xl leading-none">{n}</p>
+      <p className="text-text-muted text-xs font-body mt-1">{label}</p>
     </div>
   );
 }

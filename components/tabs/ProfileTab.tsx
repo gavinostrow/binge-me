@@ -205,17 +205,16 @@ function UserHeader() {
       {/* Tappable avatar with camera overlay */}{" "}
       <button
         onClick={() => avatarInputRef.current?.click()}
-        className="relative group active:scale-95 transition-transform"
+        className="relative group transition-transform"
         aria-label="Change profile photo"
       >
         {" "}
         <div
-          className="w-20 h-20 rounded-full flex items-center justify-center text-4xl font-display font-bold text-white shadow-lg overflow-hidden"
+          className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-display font-semibold overflow-hidden"
           style={{
-            background: currentUserData.avatarUrl
-              ? undefined
-              : `linear-gradient(135deg, ${colors[0]}, ${colors[1]})`,
-            boxShadow: `0 4px 24px ${colors[0]}50`,
+            background: currentUserData.avatarUrl ? undefined : `${colors[0]}26`,
+            color: colors[0],
+            boxShadow: `inset 0 0 0 1px ${colors[0]}40`,
           }}
         >
           {" "}
@@ -266,7 +265,7 @@ function UserHeader() {
         <div className="flex items-center justify-center gap-1.5 mt-2">
           {" "}
           <span
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-body font-bold tracking-widest uppercase"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-body font-bold tracking-widest uppercase"
             style={{
               backgroundColor: `${level.color}18`,
               color: level.color,
@@ -298,7 +297,7 @@ function UserHeader() {
         {isAuthenticated ? (
           <button
             onClick={() => pushScreen({ screen: "profile-edit" })}
-            className="px-4 py-1.5 rounded-full border border-border text-text-secondary text-xs font-body font-semibold hover:border-accent hover:text-accent transition-colors"
+            className="px-4 py-1.5 rounded-md border border-border text-text-secondary text-xs font-body font-semibold hover:border-accent hover:text-accent transition-colors"
           >
             {" "}
             Edit Profile{" "}
@@ -306,7 +305,7 @@ function UserHeader() {
         ) : (
           <button
             onClick={() => pushScreen({ screen: "auth" })}
-            className="px-4 py-1.5 rounded-full bg-accent text-white text-xs font-body font-semibold hover:bg-accent-light transition-colors"
+            className="px-4 py-1.5 rounded-md bg-accent text-white text-xs font-body font-semibold hover:bg-accent-light transition-colors"
           >
             {" "}
             Sign In / Sign Up{" "}
@@ -314,7 +313,7 @@ function UserHeader() {
         )}{" "}
         <button
           onClick={handleShare}
-          className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full border text-xs font-body font-semibold transition-all ${copied ? "border-green-500 text-green-500 bg-green-500/10" : "border-border text-text-secondary hover:border-accent hover:text-accent"}`}
+          className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md border text-xs font-body font-semibold transition-all ${copied ? "border-green-500 text-green-500 bg-green-500/10" : "border-border text-text-secondary hover:border-accent hover:text-accent"}`}
         >
           {" "}
           {copied ? (
@@ -497,7 +496,7 @@ function GenreFilter({
       {" "}
       <button
         onClick={() => onChange(null)}
-        className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-body font-semibold border transition-all ${selected === null ? "bg-accent border-accent text-white" : "border-border text-text-secondary"}`}
+        className={`flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-body font-semibold border transition-all ${selected === null ? "bg-accent border-accent text-white" : "border-border text-text-secondary"}`}
       >
         {" "}
         All{" "}
@@ -506,7 +505,7 @@ function GenreFilter({
         <button
           key={g}
           onClick={() => onChange(selected === g ? null : g)}
-          className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-body font-semibold border transition-all ${selected === g ? "bg-accent border-accent text-white" : "border-border text-text-secondary"}`}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-body font-semibold border transition-all ${selected === g ? "bg-accent border-accent text-white" : "border-border text-text-secondary"}`}
         >
           {" "}
           {g}{" "}
@@ -562,7 +561,7 @@ function InlineReRatePanel({
         </button>{" "}
         <button
           onClick={() => onSave(draft)}
-          className="px-4 py-1.5 bg-accent text-white text-xs font-body font-semibold rounded-full hover:bg-accent-light transition-colors active:scale-95"
+          className="px-4 py-1.5 bg-accent text-white text-xs font-body font-semibold rounded-md hover:bg-accent-light transition-colors "
         >
           {" "}
           Save{" "}
@@ -812,7 +811,7 @@ function WatchlistRow({ item }: { item: ReturnType<typeof useApp>["watchlist"][n
             <span className="text-text-muted text-xs">{year}</span>{" "}
             <span className="text-text-muted text-xs">·</span>{" "}
             <span
-              className="text-[10px] font-body font-semibold px-1.5 py-0.5 rounded-full"
+              className="text-[10px] font-body font-semibold px-1.5 py-0.5 rounded-md"
               style={{
                 backgroundColor: isMovie ? "#7C5CF620" : "#F056A820",
                 color: isMovie ? "#7C5CF6" : "#F056A8",
@@ -885,7 +884,7 @@ function MyListsSection() {
         {contentType !== "watchlist" && (
           <button
             onClick={() => setSortBy((v) => (v === "rating" ? "recent" : "rating"))}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-bg-elevated border border-border text-text-secondary text-xs font-body"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-bg-elevated border border-border text-text-secondary text-xs font-body"
           >
             {" "}
             <svg
@@ -1011,7 +1010,7 @@ function GenreBreakdown({ breakdown }: { breakdown: [string, number][] }) {
                   className="h-full rounded-full transition-all"
                   style={{
                     width: `${pct}%`,
-                    background: "linear-gradient(90deg, #7C5CF6AA, #7C5CF6)",
+                    background: "#8B5CF6",
                   }}
                 />{" "}
               </div>{" "}

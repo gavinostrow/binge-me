@@ -168,7 +168,7 @@ export default function RecRequestScreen({ requestId }: { requestId: string }) {
             placeholder="Add a note (optional) — e.g. trust me on this"
             className="w-full bg-bg-elevated border border-border rounded-xl px-3 py-2 text-sm text-text-primary placeholder-text-muted outline-none focus:border-accent font-body"
           />
-          <button onClick={send} className="w-full py-3 rounded-xl bg-accent text-white font-display font-bold active:scale-[0.98] transition-transform">
+          <button onClick={send} className="w-full py-3 rounded-xl bg-accent text-white font-display font-bold transition-transform">
             Send {selected.item.title} to {firstName}
           </button>
         </div>

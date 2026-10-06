@@ -35,8 +35,18 @@ module.exports = {
         },
       },
       fontFamily: {
-        display: ["Outfit", "sans-serif"],
-        body: ["Karla", "sans-serif"],
+        display: ["Geist", "Helvetica Neue", "Arial", "sans-serif"],
+        body: ["Geist", "Helvetica Neue", "Arial", "sans-serif"],
+        mono: ["Geist Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+      },
+      borderRadius: {
+        sm: "3px",
+        DEFAULT: "4px",
+        md: "5px",
+        lg: "6px",
+        xl: "8px",
+        "2xl": "10px",
+        "3xl": "12px",
       },
       maxWidth: {
         app: "480px",

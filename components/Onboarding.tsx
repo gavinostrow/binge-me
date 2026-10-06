@@ -65,16 +65,13 @@ export default function Onboarding({ onDone }: OnboardingProps) {
               className={`absolute inset-0 flex flex-col items-center justify-center px-8 transition-all duration-500 ${idx === currentCard ? "opacity-100" : "opacity-0 pointer-events-none"}`}
             >
               {" "}
-              <div
-                className={`bg-gradient-to-br ${card.gradient} rounded-full w-32 h-32 flex items-center justify-center mb-8`}
-              >
-                {" "}
-                <span className="text-7xl">{card.emoji}</span>{" "}
-              </div>{" "}
-              <h2 className="font-display text-3xl font-bold text-text-primary text-center mb-4">
+              <p className="font-mono text-xs text-text-muted tracking-widest mb-4">
+                {String(idx + 1).padStart(2, "0")} / {String(cards.length).padStart(2, "0")}
+              </p>
+              <h2 className="font-display text-2xl font-semibold text-text-primary text-center mb-3">
                 {card.title}
               </h2>{" "}
-              <p className="text-text-secondary text-center text-lg leading-relaxed">
+              <p className="text-text-secondary text-center text-base leading-relaxed max-w-xs">
                 {card.description}
               </p>{" "}
             </div>
@@ -89,14 +86,14 @@ export default function Onboarding({ onDone }: OnboardingProps) {
             <button
               key={idx}
               onClick={() => setCurrentCard(idx)}
-              className={`w-2 h-2 rounded-full transition ${idx === currentCard ? "bg-accent w-8" : "bg-text-muted"}`}
+              className={`h-0.5 w-6 rounded-sm transition ${idx === currentCard ? "bg-text-primary" : "bg-border"}`}
             />
           ))}{" "}
         </div>{" "}
         {currentCard === cards.length - 1 ? (
           <button
             onClick={handleGetStarted}
-            className="w-full py-3 bg-gradient-to-r from-accent to-accent-light text-white font-display font-bold rounded-2xl"
+            className="w-full py-3 bg-accent text-white font-display font-semibold rounded-lg"
           >
             {" "}
             Get Started{" "}
@@ -104,7 +101,7 @@ export default function Onboarding({ onDone }: OnboardingProps) {
         ) : (
           <button
             onClick={() => setCurrentCard(currentCard + 1)}
-            className="w-full py-3 bg-accent text-white font-display font-bold rounded-2xl"
+            className="w-full py-3 bg-accent text-white font-display font-semibold rounded-lg"
           >
             {" "}
             Next{" "}

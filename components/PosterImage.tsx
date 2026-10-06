@@ -8,18 +8,12 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 // Deterministic gradient from title string
 function getPosterGradient(title: string): [string, string] {
   const gradients: [string, string][] = [
-    ["#7C5CF6", "#4338CA"],
-    ["#EC4899", "#9D174D"],
-    ["#F59E0B", "#B45309"],
-    ["#14B8A6", "#0E7490"],
-    ["#22C55E", "#15803D"],
-    ["#3B82F6", "#1D4ED8"],
-    ["#EF4444", "#991B1B"],
-    ["#F97316", "#C2410C"],
-    ["#8B5CF6", "#6D28D9"],
-    ["#06B6D4", "#0369A1"],
-    ["#10B981", "#065F46"],
-    ["#6366F1", "#3730A3"],
+    ["#23212F", "#1A1922"],
+    ["#26222B", "#1B1920"],
+    ["#212530", "#191B22"],
+    ["#22282A", "#1A1E1F"],
+    ["#2A2522", "#1F1B19"],
+    ["#252231", "#1B1924"],
   ];
   const hash = title.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
   return gradients[hash % gradients.length];
@@ -60,7 +54,7 @@ export default function PosterImage({
     <Wrapper
       onClick={onClick}
       className={`${sizeClass} ${className} relative rounded-xl overflow-hidden flex-shrink-0 ${
-        onClick ? "active:scale-95 transition-transform" : ""
+        onClick ? "transition-transform" : ""
       }`}
       style={{ background: `linear-gradient(160deg, ${color1}, ${color2})` }}
     >
@@ -77,13 +71,13 @@ export default function PosterImage({
       ) : (
         <div className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center">
           <p
-            className="font-display font-black text-white leading-tight"
+            className="font-display font-semibold text-text-secondary leading-tight"
             style={{ fontSize: size === "sm" ? "8px" : size === "md" ? "9px" : "13px" }}
           >
             {title}
           </p>
           {year && size !== "sm" && (
-            <p className="text-white/60 font-body mt-0.5" style={{ fontSize: "8px" }}>
+            <p className="text-text-muted font-mono mt-0.5" style={{ fontSize: "8px" }}>
               {year}
             </p>
           )}
@@ -94,7 +88,7 @@ export default function PosterImage({
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "linear-gradient(160deg, rgba(255,255,255,0.12) 0%, transparent 60%)",
+          boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)",
         }}
       />
     </Wrapper>
