@@ -30,7 +30,7 @@ export default function AlsoLikedRow({ id, fallback }: { id: string; fallback: S
 
   return (
     <div>
-      <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-3 px-1">People who liked this also liked</p>
+      <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em] mb-3">People who liked this also liked</p>
       <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
         {items.map(({ item, fans }) => (
           <button

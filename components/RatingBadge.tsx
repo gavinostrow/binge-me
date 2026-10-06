@@ -7,19 +7,19 @@ interface RatingBadgeProps {
   size?: "sm" | "md" | "lg";
 }
 
-/** Score in mono numerals on a faint tint of its rating color. */
+/** Score set like a newspaper box score: bold tabular numerals, a thin rule in the score's color. */
 export default function RatingBadge({ rating, size = "md" }: RatingBadgeProps) {
   const color = getRatingColor(rating);
   const sizeClasses = {
-    sm: "text-[11px] px-1.5 h-5 min-w-[34px]",
-    md: "text-[13px] px-2 h-6 min-w-[40px]",
-    lg: "text-base px-2.5 h-8 min-w-[52px]",
+    sm: "text-[12px] px-1 h-5 min-w-[32px]",
+    md: "text-[14px] px-1.5 h-6 min-w-[38px]",
+    lg: "text-lg px-2 h-8 min-w-[50px]",
   };
 
   return (
     <span
-      className={`inline-flex items-center justify-center rounded font-mono font-semibold leading-none ${sizeClasses[size]}`}
-      style={{ color, backgroundColor: `${color}1A`, boxShadow: `inset 0 0 0 1px ${color}40` }}
+      className={`inline-flex items-center justify-center font-mono font-bold leading-none ${sizeClasses[size]}`}
+      style={{ color, boxShadow: `inset 0 0 0 1px ${color}` }}
     >
       {rating.toFixed(1)}
     </span>

@@ -61,8 +61,8 @@ export default function WhatsNextHub() {
                 </div>
                 <button
                   onClick={() => pushScreen({ screen: "rec-request", requestId: req.id })}
-                  className={`px-3 py-2 rounded-xl text-xs font-display font-bold flex-shrink-0 ${
-                    answered ? "bg-bg-elevated text-text-secondary" : "bg-accent text-white"
+                  className={`px-3 py-2 rounded-xl text-xs font-body font-semibold flex-shrink-0 ${
+                    answered ? "bg-bg-elevated text-text-secondary" : "bg-accent text-bg-primary"
                   }`}
                 >
                   {answered ? "Sent ✓" : "Recommend"}
@@ -77,7 +77,7 @@ export default function WhatsNextHub() {
       {comingBack.length > 0 && (
         <div>
           <div className="px-4 flex items-center justify-between mb-2">
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider">Coming back</p>
+            <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em]">Coming back</p>
             <button onClick={() => pushScreen({ screen: "coming-back" })} className="text-accent-light text-xs font-body font-semibold">
               See all
             </button>

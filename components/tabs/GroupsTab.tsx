@@ -8,7 +8,7 @@ import { timeAgo, getInitial } from "@/lib/utils";
 import RatingBadge from "@/components/RatingBadge";
 import type { GroupClub, GroupMessage, Prediction, GroupView, GroupPoll } from "@/lib/types";
 // ─── Avatar ───────────────────────────────────────────────────────────────────
-const AVATAR_COLORS = ["#7C5CF6", "#EC4899", "#F59E0B", "#10B981", "#3B82F6", "#EF4444"];
+const AVATAR_COLORS = ["#2B2B2B", "#454545", "#5C5C5C", "#3A3A3A", "#525252", "#666666"];
 function UserAvatar({ userId, size = "sm" }: { userId: string; size?: "sm" | "md" | "lg" }) {
   const allUsers = [currentUser, ...friends];
   const user = allUsers.find((u) => u.id === userId);
@@ -219,7 +219,7 @@ function ChatBubble({ msg, groupId }: { msg: GroupMessage; groupId: string }) {
         {/* Bubble */}{" "}
         <button
           onClick={() => setShowReactions((v) => !v)}
-          className={`rounded-2xl px-3.5 py-2.5 text-left ${isMe ? "bg-accent text-white rounded-br-sm" : "bg-bg-elevated text-text-primary rounded-bl-sm border border-border"}`}
+          className={`rounded-2xl px-3.5 py-2.5 text-left ${isMe ? "bg-accent text-bg-primary rounded-br-sm" : "bg-bg-elevated text-text-primary rounded-bl-sm border border-border"}`}
           style={{ wordBreak: "break-word" }}
         >
           {" "}
@@ -363,8 +363,8 @@ function CreatePollModal({ groupId, onClose }: { groupId: string; onClose: () =>
         <button
           onClick={submit}
           disabled={!question.trim() || options.filter((o) => o.trim()).length < 2}
-          className="w-full py-4 rounded-2xl font-display font-bold text-white text-base transition-all disabled:opacity-40"
-          style={{ background: "#8B5CF6" }}
+          className="w-full py-4 rounded-2xl font-body font-semibold text-white text-base transition-all disabled:opacity-40"
+          style={{ background: "rgb(var(--text-primary))" }}
         >
           {" "}
           Send Poll{" "}
@@ -522,7 +522,7 @@ function PredictionCard({ pred, groupId }: { pred: Prediction; groupId: string }
   return (
     <div
       className="bg-bg-card rounded-2xl p-4 border transition-all"
-      style={{ borderColor: pred.revealed ? "#22C55E50" : pred.locked ? "#7C5CF650" : "rgb(var(--border))" }}
+      style={{ borderColor: pred.revealed ? "#22C55E50" : pred.locked ? "rgba(18,18,18,0.31)" : "rgb(var(--border))" }}
     >
       {" "}
       {/* Header */}{" "}
@@ -549,7 +549,7 @@ function PredictionCard({ pred, groupId }: { pred: Prediction; groupId: string }
             pred.revealed
               ? { backgroundColor: "#22C55E25", color: "#22C55E" }
               : pred.locked
-                ? { backgroundColor: "#7C5CF625", color: "#A78BFA" }
+                ? { backgroundColor: "rgba(18,18,18,0.15)", color: "rgb(var(--text-primary))" }
                 : { backgroundColor: "#F5A62325", color: "#F5A623" }
           }
         >
@@ -693,7 +693,7 @@ function NewPredictionForm({ groupId, onDone }: { groupId: string; onDone: () =>
         <button
           onClick={submit}
           disabled={!text.trim()}
-          className="flex-1 py-2.5 rounded-xl bg-accent text-white text-sm font-body font-semibold disabled:opacity-40 transition-all"
+          className="flex-1 py-2.5 rounded-xl bg-accent text-bg-primary text-sm font-body font-semibold disabled:opacity-40 transition-all"
         >
           {" "}
           Add Prediction{" "}
@@ -904,7 +904,7 @@ function GroupDetail({ group, onBack }: { group: GroupClub; onBack: () => void }
             <button
               key={tab.id}
               onClick={() => setView(tab.id)}
-              className={`flex-1 py-2 rounded-lg text-xs font-body font-semibold transition-all ${view === tab.id ? "bg-accent text-white shadow-sm" : "text-text-secondary"}`}
+              className={`flex-1 py-2 rounded-lg text-xs font-body font-semibold transition-all ${view === tab.id ? "bg-accent text-bg-primary shadow-sm" : "text-text-secondary"}`}
             >
               {" "}
               {tab.label}{" "}
@@ -1129,7 +1129,7 @@ function CreateGroupModal({ onClose }: { onClose: () => void }) {
           </div>{" "}
           <button
             onClick={onClose}
-            className="w-full py-4 rounded-2xl font-display font-bold text-text-secondary text-base border border-border transition-all "
+            className="w-full py-4 rounded-2xl font-body font-semibold text-text-secondary text-base border border-border transition-all "
           >
             {" "}
             Cancel{" "}
@@ -1242,8 +1242,8 @@ function CreateGroupModal({ onClose }: { onClose: () => void }) {
         <button
           onClick={submit}
           disabled={!name.trim() || selectedFriends.length === 0}
-          className="w-full py-4 rounded-2xl font-display font-bold text-white text-base transition-all disabled:opacity-40"
-          style={{ background: "#8B5CF6" }}
+          className="w-full py-4 rounded-2xl font-body font-semibold text-white text-base transition-all disabled:opacity-40"
+          style={{ background: "rgb(var(--text-primary))" }}
         >
           {" "}
           Create Club{" "}
@@ -1280,7 +1280,7 @@ export default function GroupsTab() {
           <h1 className="font-display font-bold text-2xl text-text-primary">Clubs</h1>{" "}
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-accent text-white text-sm font-body font-semibold transition-all"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-accent text-bg-primary text-sm font-body font-semibold transition-all"
           >
             {" "}
             <svg
@@ -1314,7 +1314,7 @@ export default function GroupsTab() {
             </p>
           </div>
           {unpicked > 0 && (
-            <span className="min-w-[22px] h-[22px] px-1.5 rounded-md bg-accent text-white text-xs font-bold flex items-center justify-center">{unpicked}</span>
+            <span className="min-w-[22px] h-[22px] px-1.5 rounded-md bg-accent text-bg-primary text-xs font-bold flex items-center justify-center">{unpicked}</span>
           )}
         </button>
         {/* Friends Watching Button Card */}{" "}

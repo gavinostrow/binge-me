@@ -43,11 +43,14 @@ styles/
 
 ## Design System
 
-- **Theme:** colors are CSS variables in `styles/globals.css` (light by default, `.dark` on <html> for dark mode); Tailwind tokens read them
-- **Type:** Geist (UI) + Geist Mono (numbers, ratings)
-- **Shape:** squared corners (rounded-md/xl), flat colors, no gradients or emoji in the UI
-- **Accent:** violet (#7C5CF6), gold for secondary highlights
-- **Rating colors:** green (9+), yellow-green (8+), yellow (7+), orange (6+), red (<6)
+Newspaper look (think a national daily's app), TV only.
+
+- **Theme:** colors are CSS variables in `styles/globals.css` — white paper, ink-black text, hairline rules (light by default; `.dark` on <html> for dark mode). Tailwind tokens read them.
+- **Type:** Newsreader serif (`font-display`) for the masthead, show titles, headlines and quotes; Libre Franklin (`font-body`) for UI, labels and numbers.
+- **Structure:** sections are separated by a black top rule with a small bold uppercase label, not boxed cards. Square corners everywhere (radius 0); circles only for avatars and dots.
+- **Buttons:** solid ink (`bg-accent text-bg-primary`) or outlined; links/active text use `text-accent-light` (news blue).
+- **Rating colors:** muted green (9+), olive (7.5+), ochre (6+), rust (4+), red (<4), shown as bold numerals in a thin colored box.
+- No gradients, no emoji in the UI.
 
 ## Commands
 

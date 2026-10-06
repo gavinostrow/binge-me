@@ -24,7 +24,7 @@ export default function MyRequestScreen() {
         <ScreenHeader title="Ask your friends" subtitle={`Goes to your ${followingIds.length} friends`} />
         <div className="px-4 pt-4 pb-28 space-y-5">
           <div>
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-2">Vibe (optional)</p>
+            <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em] mb-2">Vibe (optional)</p>
             <div className="flex flex-wrap gap-2 mb-3">
               {VIBES.map((v) => (
                 <button
@@ -56,7 +56,7 @@ export default function MyRequestScreen() {
 
           <button
             onClick={() => postRequest(note)}
-            className="w-full py-3.5 rounded-2xl bg-accent text-white font-display font-bold transition-transform"
+            className="w-full py-3.5 rounded-2xl bg-accent text-bg-primary font-body font-semibold transition-transform"
           >
             Ask friends
           </button>
@@ -105,7 +105,7 @@ export default function MyRequestScreen() {
                   </p>
                 </div>
                 <p className="text-text-primary font-display font-bold mt-1 truncate">{item.title}</p>
-                {rep.note && <p className="text-text-secondary text-xs italic mt-0.5 line-clamp-2">&ldquo;{rep.note}&rdquo;</p>}
+                {rep.note && <p className="text-text-secondary text-xs italic font-display mt-0.5 line-clamp-2">&ldquo;{rep.note}&rdquo;</p>}
                 <div className="mt-auto pt-2 flex items-center justify-between gap-2">
                   <ProviderLogos providers={knownExtras(item).providers} size="sm" />
                   <button
@@ -120,8 +120,8 @@ export default function MyRequestScreen() {
                       });
                       showToast("Added to your watchlist");
                     }}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-display font-bold ${
-                      saved ? "bg-bg-elevated text-text-muted" : "bg-accent text-white"
+                    className={`px-3 py-1.5 rounded-lg text-xs font-body font-semibold ${
+                      saved ? "bg-bg-elevated text-text-muted" : "bg-accent text-bg-primary"
                     }`}
                   >
                     {saved ? "On watchlist" : "+ Watchlist"}

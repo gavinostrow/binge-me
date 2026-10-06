@@ -218,14 +218,14 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
       <div className="px-4 pb-28 space-y-5 -mt-1">
         {/* Rate / Edit CTA */}
         {myRating ? (
-          <div className="bg-bg-card rounded-2xl p-4 border border-border">
+          <div className="border-t border-text-primary pt-3">
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
-                <p className="text-text-muted text-xs font-body uppercase tracking-wider">
+                <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em]">
                   Your Rating
                 </p>
                 {myRating.review && (
-                  <p className="text-text-secondary text-sm mt-1 italic line-clamp-2">
+                  <p className="text-text-secondary text-sm mt-1 italic font-display line-clamp-2">
                     "{myRating.review}"
                   </p>
                 )}
@@ -243,7 +243,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
             {/* Season ratings mini-grid */}
             {myRating.seasonRatings && myRating.seasonRatings.length > 0 && (
               <div className="mt-3 pt-3 border-t border-border">
-                <p className="text-text-muted text-[10px] font-body uppercase tracking-wider mb-2">
+                <p className="text-text-primary text-[10px] font-body uppercase font-bold tracking-[0.08em] mb-2">
                   Season Ratings
                 </p>
                 <div className="flex gap-2 flex-wrap">
@@ -265,7 +265,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
         ) : (
           <button
             onClick={() => setActiveTab("add")}
-            className="w-full py-3.5 bg-accent text-white font-display font-bold text-base rounded-2xl transition-all"
+            className="w-full py-3.5 bg-accent text-bg-primary font-body font-semibold text-base rounded-2xl transition-all"
           >
             Rate This Show
           </button>
@@ -281,8 +281,8 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
 
         {/* Friends watching now */}
         {watchingNow.length > 0 && (
-          <div className="bg-bg-card rounded-2xl p-4 border border-border">
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-3">
+          <div className="border-t border-text-primary pt-3">
+            <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em] mb-3">
               Friends watching now
             </p>
             <div className="flex gap-2 flex-wrap">
@@ -326,8 +326,8 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
 
         {/* Season ratings */}
         {show.seasons > 1 && !myRating?.seasonRatings?.length && seasonCommunityRatings.length > 0 ? (
-          <div className="bg-bg-card rounded-2xl p-4 border border-border">
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-3">
+          <div className="border-t border-text-primary pt-3">
+            <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em] mb-3">
               Season ratings on Binge
             </p>
             <div className="grid grid-cols-4 gap-2">
@@ -357,7 +357,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
         {/* Description */}
         {show.description && (
           <div>
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-2 px-1">
+            <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em] mb-2">
               About
             </p>
             <p className="text-text-secondary text-sm leading-relaxed font-body">
@@ -369,7 +369,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
         {/* Cast */}
         {show.cast && show.cast.length > 0 && (
           <div>
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-3 px-1">
+            <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em] mb-3">
               Cast
             </p>
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">

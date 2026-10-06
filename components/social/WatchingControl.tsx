@@ -34,7 +34,7 @@ export default function WatchingControl({ show }: { show: Show }) {
       <div className="bg-bg-card rounded-2xl p-4 border border-accent/40">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-rating-green animate-pulse" />
-          <p className="text-text-muted text-xs font-body uppercase tracking-wider">Currently watching</p>
+          <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em]">Currently watching</p>
           <button onClick={() => stopWatching(show.id)} className="ml-auto text-text-muted text-xs font-body">
             Remove
           </button>
@@ -47,7 +47,7 @@ export default function WatchingControl({ show }: { show: Show }) {
           />
           <button
             onClick={finishSeason}
-            className="flex-1 py-2.5 rounded-xl bg-accent text-white text-sm font-display font-bold transition-transform"
+            className="flex-1 py-2.5 rounded-xl bg-accent text-bg-primary text-sm font-body font-semibold transition-transform"
           >
             Finished Season {entry.season}
           </button>
@@ -58,7 +58,7 @@ export default function WatchingControl({ show }: { show: Show }) {
 
   if (picking) {
     return (
-      <div className="bg-bg-card rounded-2xl p-4 border border-border animate-fadeIn">
+      <div className="border-t border-text-primary pt-3 animate-fadeIn">
         <p className="text-text-primary text-sm font-display font-semibold mb-3">Which season are you on?</p>
         <div className="flex items-center gap-3">
           <SeasonStepper value={season} max={totalSeasons} onChange={setSeason} />
@@ -68,7 +68,7 @@ export default function WatchingControl({ show }: { show: Show }) {
               setPicking(false);
               showToast(`Added to Currently Watching`);
             }}
-            className="flex-1 py-2.5 rounded-xl bg-accent text-white text-sm font-display font-bold transition-transform"
+            className="flex-1 py-2.5 rounded-xl bg-accent text-bg-primary text-sm font-body font-semibold transition-transform"
           >
             Save
           </button>
@@ -83,7 +83,7 @@ export default function WatchingControl({ show }: { show: Show }) {
   return (
     <button
       onClick={() => setPicking(true)}
-      className="w-full py-3 rounded-2xl bg-bg-card border border-border text-text-primary text-sm font-display font-semibold flex items-center justify-center gap-2 active:bg-bg-elevated transition-colors"
+      className="w-full py-3 rounded-2xl bg-bg-card border border-border text-text-primary text-sm font-body font-semibold flex items-center justify-center gap-2 active:bg-bg-elevated transition-colors"
     >
       <span className="w-2 h-2 rounded-full bg-rating-green" />
       I&apos;m watching this

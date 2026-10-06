@@ -62,8 +62,8 @@ export default function FindFriendsScreen() {
               showToast(`Added ${u.name.split(" ")[0]}`);
             }
           }}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-display font-bold flex-shrink-0 ${
-            on ? "bg-bg-elevated text-text-secondary border border-border" : "bg-accent text-white"
+          className={`px-3.5 py-1.5 rounded-lg text-xs font-body font-semibold flex-shrink-0 ${
+            on ? "bg-bg-elevated text-text-secondary border border-border" : "bg-accent text-bg-primary"
           }`}
         >
           {on ? "Friends" : "Add"}
@@ -99,7 +99,7 @@ export default function FindFriendsScreen() {
           onClick={invite}
           className="w-full rounded-2xl p-4 text-left bg-bg-card border border-border flex items-center gap-3 transition-transform"
         >
-          <span className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-white font-display font-bold text-lg">+</span>
+          <span className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-bg-primary font-display font-bold text-lg">+</span>
           <div className="flex-1">
             <p className="text-text-primary font-display font-bold">Invite friends</p>
             <p className="text-text-secondary text-xs font-body">Text them a link to add you · @{currentUserData.username}</p>
@@ -108,14 +108,14 @@ export default function FindFriendsScreen() {
 
         {!q && suggested.length > 0 && (
           <div>
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-1">People you may know</p>
+            <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em] mb-1">People you may know</p>
             <div className="divide-y divide-border">{suggested.map((u) => <Row key={u.id} u={u} />)}</div>
           </div>
         )}
 
         {!q && (
           <div>
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-1">Your friends · {following.length}</p>
+            <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em] mb-1">Your friends · {following.length}</p>
             <div className="divide-y divide-border">{following.map((u) => <Row key={u.id} u={u} />)}</div>
           </div>
         )}

@@ -34,9 +34,9 @@ export default function WhereToWatch({ providers, source }: { providers: Provide
   const { myServices } = useSocial();
   const onMine = providers.filter((p) => myServices.includes(p.key));
   return (
-    <div className="bg-bg-card rounded-2xl p-4 border border-border">
+    <div className="border-t border-text-primary pt-3">
       <div className="flex items-center justify-between mb-3">
-        <p className="text-text-muted text-xs font-body uppercase tracking-wider">Where to watch</p>
+        <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em]">Where to watch</p>
         {onMine.length > 0 && (
           <span className="text-[10px] font-body font-semibold text-rating-green bg-rating-green/10 border border-rating-green/30 rounded-md px-2 py-0.5">
             On your services

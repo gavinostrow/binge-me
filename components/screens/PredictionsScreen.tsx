@@ -73,8 +73,8 @@ export default function PredictionsScreen({ showId }: { showId?: string }) {
 
         {/* Leaderboard */}
         {leaderboard.length > 0 && (
-          <div className="bg-bg-card border border-border rounded-2xl p-4">
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-3">Friends leaderboard</p>
+          <div className="border-t border-text-primary pt-3">
+            <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em] mb-3">Friends leaderboard</p>
             <div className="space-y-2">
               {leaderboard.slice(0, 6).map((r, i) => {
                 const u = getUser(r.id);
@@ -141,7 +141,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
     <button
       onClick={onClick}
       className={`flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-body font-semibold border transition-colors ${
-        active ? "bg-accent border-accent text-white" : "border-border text-text-secondary"
+        active ? "bg-accent border-accent text-bg-primary" : "border-border text-text-secondary"
       }`}
     >
       {children}
@@ -152,7 +152,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-2">{title}</p>
+      <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em] mb-2">{title}</p>
       <div className="space-y-3">{children}</div>
     </div>
   );
@@ -179,13 +179,13 @@ function QuestionCard({
   const reveal = locked; // friends' picks only become visible after the lock
 
   return (
-    <div className="bg-bg-card border border-border rounded-2xl p-4">
+    <div className="border-t border-text-primary pt-3">
       <div className="flex items-start gap-3 mb-3">
         {showTitle && show && (
           <PosterImage title={show.title} year={show.year} posterPath={show.posterPath} size="sm" onClick={onOpenShow} />
         )}
         <div className="flex-1 min-w-0">
-          <p className="text-text-muted text-[10px] font-body uppercase tracking-wider">
+          <p className="text-text-primary text-[10px] font-body uppercase font-bold tracking-[0.08em]">
             {showTitle && show ? `${show.title} · ` : ""}
             {q.label}
           </p>

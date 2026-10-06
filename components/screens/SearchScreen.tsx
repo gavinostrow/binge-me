@@ -16,7 +16,7 @@ import { getInitial } from "@/lib/utils";
 
 type SearchTab = "all" | "shows" | "friends";
 
-const FRIEND_COLORS = ["#7C5CF6", "#EC4899", "#F59E0B", "#10B981", "#3B82F6"];
+const FRIEND_COLORS = ["#2B2B2B", "#454545", "#5C5C5C", "#3A3A3A", "#525252", "#666666"];
 function friendColor(userId: string) {
   return FRIEND_COLORS[parseInt(userId.replace(/\D/g, "")) % FRIEND_COLORS.length];
 }
@@ -34,7 +34,7 @@ function getCommunityShow(showId: string) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-6">
-      <p className="text-[10px] font-body font-semibold uppercase tracking-widest text-text-muted mb-3 px-1">
+      <p className="text-[10px] font-body font-bold uppercase tracking-[0.08em] text-text-primary mb-3">
         {title}
       </p>
       <div className="bg-bg-card rounded-2xl border border-border divide-y divide-border px-4">
@@ -46,7 +46,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function RatingLegend() {
   const legend = [
-    { label: "Friends avg", color: "#7C5CF6", icon: "F" },
+    { label: "Friends avg", color: "rgb(var(--text-primary))", icon: "F" },
     { label: "Community avg", color: "#D4A843", icon: "B" },
   ];
   return (
@@ -86,7 +86,7 @@ function FriendRow({ user, onPress }: { user: User; onPress: () => void }) {
       {match && (
         <span
           className="text-xs font-body font-semibold px-2 py-0.5 rounded-md flex-shrink-0"
-          style={{ backgroundColor: "#7C5CF620", color: "#7C5CF6" }}
+          style={{ backgroundColor: "rgba(18,18,18,0.13)", color: "rgb(var(--text-primary))" }}
         >
           {match}% match
         </span>
@@ -128,7 +128,7 @@ function ShowRow({ show, onPress }: { show: Show; onPress: () => void }) {
         </p>
         <div className="flex items-center gap-3 mt-1.5">
           {friendAvg !== null && (
-            <span className="text-[10px] font-body font-semibold" style={{ color: "#7C5CF6" }}>
+            <span className="text-[10px] font-body font-semibold" style={{ color: "rgb(var(--text-primary))" }}>
               Friends {friendAvg.toFixed(1)}
             </span>
           )}
@@ -256,7 +256,7 @@ export default function SearchScreen({ initialQuery }: { initialQuery?: string }
               onClick={() => setTab(t.id)}
               className={`px-3 py-1.5 rounded-md text-xs font-body font-semibold border transition-all ${
                 tab === t.id
-                  ? "bg-accent border-accent text-white"
+                  ? "bg-accent border-accent text-bg-primary"
                   : "border-border text-text-secondary"
               }`}
             >
@@ -268,7 +268,7 @@ export default function SearchScreen({ initialQuery }: { initialQuery?: string }
 
       <div className="px-4 pt-4 pb-24">
         {showEmpty && (
-          <p className="text-[10px] font-body font-semibold uppercase tracking-widest text-text-muted mb-4 px-1">
+          <p className="text-[10px] font-body font-bold uppercase tracking-[0.08em] text-text-primary mb-4">
             Browse
           </p>
         )}

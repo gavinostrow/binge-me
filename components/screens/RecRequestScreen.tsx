@@ -72,14 +72,14 @@ export default function RecRequestScreen({ requestId }: { requestId: string }) {
               <p className="text-text-primary text-sm font-body">
                 <span className="font-semibold">{firstName}</span> is looking for a new show to watch
               </p>
-              {req.note && <p className="text-text-secondary text-sm italic mt-0.5">&ldquo;{req.note}&rdquo;</p>}
+              {req.note && <p className="text-text-secondary text-sm italic font-display mt-0.5">&ldquo;{req.note}&rdquo;</p>}
             </div>
           </div>
         )}
 
         {others.length > 0 && (
-          <div className="bg-bg-card border border-border rounded-2xl p-3">
-            <p className="text-text-muted text-[10px] font-body uppercase tracking-wider mb-2">Already suggested</p>
+          <div className="border-t border-text-primary pt-3">
+            <p className="text-text-primary text-[10px] font-body uppercase font-bold tracking-[0.08em] mb-2">Already suggested</p>
             {others.map((r) => {
               const it = getShow(r.itemId);
               const u = getUser(r.fromUserId);
@@ -99,7 +99,7 @@ export default function RecRequestScreen({ requestId }: { requestId: string }) {
           className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder-text-muted outline-none focus:border-accent font-body"
         />
 
-        <p className="text-text-muted text-xs font-body uppercase tracking-wider">
+        <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em]">
           {query ? "Results" : "Your top rated"}
         </p>
 
@@ -159,7 +159,7 @@ export default function RecRequestScreen({ requestId }: { requestId: string }) {
             placeholder="Add a note (optional) — e.g. trust me on this"
             className="w-full bg-bg-elevated border border-border rounded-xl px-3 py-2 text-sm text-text-primary placeholder-text-muted outline-none focus:border-accent font-body"
           />
-          <button onClick={send} className="w-full py-3 rounded-xl bg-accent text-white font-display font-bold transition-transform">
+          <button onClick={send} className="w-full py-3 rounded-xl bg-accent text-bg-primary font-body font-semibold transition-transform">
             Send {selected.item.title} to {firstName}
           </button>
         </div>

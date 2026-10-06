@@ -59,14 +59,14 @@ export default function AuthScreen() {
           {" "}
           <button
             onClick={() => setMode("signin")}
-            className={`flex-1 py-2 rounded-lg font-body font-semibold transition ${mode === "signin" ? "bg-accent text-white" : "bg-bg-card text-text-secondary hover:bg-bg-elevated"}`}
+            className={`flex-1 py-2 rounded-lg font-body font-semibold transition ${mode === "signin" ? "bg-accent text-bg-primary" : "bg-bg-card text-text-secondary hover:bg-bg-elevated"}`}
           >
             {" "}
             Sign In{" "}
           </button>{" "}
           <button
             onClick={() => setMode("signup")}
-            className={`flex-1 py-2 rounded-lg font-body font-semibold transition ${mode === "signup" ? "bg-accent text-white" : "bg-bg-card text-text-secondary hover:bg-bg-elevated"}`}
+            className={`flex-1 py-2 rounded-lg font-body font-semibold transition ${mode === "signup" ? "bg-accent text-bg-primary" : "bg-bg-card text-text-secondary hover:bg-bg-elevated"}`}
           >
             {" "}
             Sign Up{" "}
@@ -139,7 +139,7 @@ export default function AuthScreen() {
           <button
             onClick={mode === "signin" ? handleSignIn : handleSignUp}
             disabled={loading}
-            className="w-full py-3 bg-accent text-white font-display font-bold rounded-2xl disabled:opacity-50 transition"
+            className="w-full py-3 bg-accent text-bg-primary font-body font-semibold rounded-2xl disabled:opacity-50 transition"
           >
             {" "}
             {loading

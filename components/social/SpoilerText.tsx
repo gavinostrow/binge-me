@@ -5,11 +5,11 @@ import { useState } from "react";
 export default function SpoilerText({ text, hidden, reason }: { text: string; hidden: boolean; reason: string }) {
   const [revealed, setRevealed] = useState(false);
   if (!hidden || revealed) {
-    return <p className="text-text-secondary text-sm italic leading-relaxed">&ldquo;{text}&rdquo;</p>;
+    return <p className="text-text-secondary text-sm italic font-display leading-relaxed">&ldquo;{text}&rdquo;</p>;
   }
   return (
     <button onClick={() => setRevealed(true)} className="relative w-full text-left rounded-lg overflow-hidden" aria-label={`Spoiler hidden: ${reason}. Tap to reveal.`}>
-      <p className="text-text-secondary text-sm italic leading-relaxed blur-sm select-none" aria-hidden>
+      <p className="text-text-secondary text-sm italic font-display leading-relaxed blur-sm select-none" aria-hidden>
         &ldquo;{text}&rdquo;
       </p>
       <span className="absolute inset-0 flex items-center justify-center">

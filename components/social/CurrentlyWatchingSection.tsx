@@ -20,11 +20,11 @@ export default function CurrentlyWatchingSection() {
   };
 
   return (
-    <div className="bg-bg-card border border-border rounded-2xl p-4">
+    <div className="border-t border-text-primary pt-3">
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           {myWatching.length > 0 && <span className="w-2 h-2 rounded-full bg-rating-green animate-pulse" />}
-          <p className="text-text-muted text-xs font-body uppercase tracking-wider">Currently watching</p>
+          <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em]">Currently watching</p>
         </div>
         <button onClick={() => pushScreen({ screen: "search" })} className="text-accent-light text-xs font-body font-semibold">
           + Add

@@ -93,7 +93,7 @@ export default function Onboarding({ onDone }: OnboardingProps) {
         {currentCard === cards.length - 1 ? (
           <button
             onClick={handleGetStarted}
-            className="w-full py-3 bg-accent text-white font-display font-semibold rounded-lg"
+            className="w-full py-3 bg-accent text-bg-primary font-body font-semibold rounded-lg"
           >
             {" "}
             Get Started{" "}
@@ -101,7 +101,7 @@ export default function Onboarding({ onDone }: OnboardingProps) {
         ) : (
           <button
             onClick={() => setCurrentCard(currentCard + 1)}
-            className="w-full py-3 bg-accent text-white font-display font-semibold rounded-lg"
+            className="w-full py-3 bg-accent text-bg-primary font-body font-semibold rounded-lg"
           >
             {" "}
             Next{" "}

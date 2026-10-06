@@ -94,7 +94,7 @@ export default function NotificationsScreen() {
                   {timeAgo(n.timestamp ?? n.createdAt ?? "")}
                 </p>
                 {n.type === "rec_request" && (
-                  <span className="inline-block mt-2 px-3 py-1.5 rounded-lg bg-accent text-white text-xs font-display font-bold">Recommend</span>
+                  <span className="inline-block mt-2 px-3 py-1.5 rounded-lg bg-accent text-bg-primary text-xs font-body font-semibold">Recommend</span>
                 )}
               </div>
               {title && <PosterImage title={title.title} year={title.year} posterPath={title.posterPath} size="sm" />}

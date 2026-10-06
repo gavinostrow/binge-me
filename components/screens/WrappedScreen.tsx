@@ -54,7 +54,7 @@ export default function WrappedScreen({ period: initial }: { period?: string }) 
         subtitle={period.inProgress ? `${period.label} · so far` : period.label}
         right={
           data ? (
-            <button onClick={share} className="px-3 py-1.5 rounded-lg bg-accent text-white text-xs font-display font-bold">
+            <button onClick={share} className="px-3 py-1.5 rounded-lg bg-accent text-bg-primary text-xs font-body font-semibold">
               Share
             </button>
           ) : undefined
@@ -78,8 +78,8 @@ export default function WrappedScreen({ period: initial }: { period?: string }) 
             <button
               key={p.key}
               onClick={() => setKey(p.key)}
-              className={`flex-shrink-0 px-3.5 py-1.5 rounded-md text-xs font-display font-bold border transition-colors ${
-                p.key === key ? "bg-accent border-accent text-white" : "border-border text-text-secondary"
+              className={`flex-shrink-0 px-3.5 py-1.5 rounded-md text-xs font-body font-semibold border transition-colors ${
+                p.key === key ? "bg-accent border-accent text-bg-primary" : "border-border text-text-secondary"
               }`}
             >
               {p.short === "Year" ? year : p.short}
@@ -109,7 +109,7 @@ export default function WrappedScreen({ period: initial }: { period?: string }) 
           <>
             {/* Hero */}
             <Card tone="accent">
-              <p className="text-text-muted text-[10px] font-body uppercase tracking-widest">{period.label}</p>
+              <p className="text-text-primary text-[10px] font-body uppercase font-bold tracking-[0.08em]">{period.label}</p>
               <p className="text-text-primary font-mono font-semibold text-5xl leading-none mt-3">{data.shows}</p>
               <p className="text-text-secondary font-body text-sm mt-1">shows rated</p>
               <div className="grid grid-cols-3 gap-4 mt-5 pt-4 border-t border-border">
@@ -126,7 +126,7 @@ export default function WrappedScreen({ period: initial }: { period?: string }) 
 
             {/* Persona */}
             <Card tone="gold">
-              <p className="text-text-muted text-[10px] font-body uppercase tracking-widest">Your watcher type</p>
+              <p className="text-text-primary text-[10px] font-body uppercase font-bold tracking-[0.08em]">Your watcher type</p>
               <p className="text-text-primary font-display font-semibold text-2xl leading-tight mt-2">{data.persona.title}</p>
               <p className="text-text-secondary text-sm font-body mt-1">{data.persona.line}</p>
               <p className="text-text-secondary text-sm font-body mt-4">
@@ -220,7 +220,7 @@ export default function WrappedScreen({ period: initial }: { period?: string }) 
                   <UserAvatar user={twin} size="md" ring />
                 </div>
                 <div className="flex-1">
-                  <p className="text-text-muted text-[10px] font-body uppercase tracking-wider">Your taste twin</p>
+                  <p className="text-text-primary text-[10px] font-body uppercase font-bold tracking-[0.08em]">Your taste twin</p>
                   <p className="text-text-primary font-display font-bold">
                     {twin.name.split(" ")[0]} · {data.tasteTwin.pct}% match
                   </p>
@@ -261,8 +261,8 @@ function Stat({ n, label }: { n: number; label: string }) {
 
 function SmallCard({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="bg-bg-card border border-border rounded-2xl p-4">
-      <p className="text-text-muted text-[10px] font-body uppercase tracking-wider mb-2">{label}</p>
+    <div className="border-t border-text-primary pt-3">
+      <p className="text-text-primary text-[10px] font-body uppercase font-bold tracking-[0.08em] mb-2">{label}</p>
       {children}
     </div>
   );

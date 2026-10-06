@@ -73,11 +73,8 @@ export default function FeedTab() {
   return (
     <div className="flex flex-col gap-4 pb-24 px-4">
       {/* Header */}
-      <div className="pt-4 px-1 flex items-center justify-between">
-        <h1 className="text-2xl font-bold lowercase font-display text-text-primary">
-          binge
-        </h1>
-        <div className="flex items-center gap-1">
+      <div className="pt-3">
+        <div className="flex items-center justify-between -mx-1">
           <button
             onClick={() => pushScreen({ screen: "find-friends" })}
             aria-label="Find friends"
@@ -90,6 +87,7 @@ export default function FeedTab() {
               <line x1="22" y1="11" x2="16" y2="11" />
             </svg>
           </button>
+          <h1 className="font-display font-bold text-[40px] leading-none tracking-tight text-text-primary">Binge</h1>
           <button
             onClick={() => pushScreen({ screen: "notifications" })}
             aria-label={unseen ? `Notifications, ${unseen} new` : "Notifications"}
@@ -100,11 +98,17 @@ export default function FeedTab() {
               <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
             {unseen > 0 && (
-              <span className="absolute top-0.5 right-0.5 min-w-[16px] h-4 px-1 rounded-md bg-accent text-white text-[10px] font-bold flex items-center justify-center">
+              <span className="absolute top-0.5 right-0.5 min-w-[16px] h-4 px-1 rounded-md bg-accent text-bg-primary text-[10px] font-bold flex items-center justify-center">
                 {unseen}
               </span>
             )}
           </button>
+        </div>
+        <div className="mt-3 border-t border-text-primary rule-double py-1.5 flex items-center justify-between text-[10px] font-body font-semibold uppercase tracking-[0.08em] text-text-primary">
+          <span suppressHydrationWarning>
+            {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+          </span>
+          <span className="text-text-secondary">TV, ranked by your friends</span>
         </div>
       </div>
 
@@ -115,17 +119,17 @@ export default function FeedTab() {
           placeholder="Search friends and shows..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-bg-elevated text-text-primary placeholder-text-muted rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-accent-purple"
+          className="w-full bg-transparent text-text-primary placeholder-text-muted border-b border-border px-0 py-2 text-sm font-body outline-none focus:border-text-primary"
         />
       </div>
 
       {/* Friends / Community toggle */}
-      <div className="flex bg-bg-elevated rounded-lg p-1">
+      <div className="flex gap-6 border-b border-border">
         <button
           onClick={() => setFeedView("friends")}
-          className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors ${
+          className={`pb-2 -mb-px text-xs font-bold uppercase tracking-[0.08em] transition-colors ${
             feedView === "friends"
-              ? "bg-bg-hover text-text-primary"
+              ? "text-text-primary border-b-2 border-text-primary"
               : "text-text-muted"
           }`}
         >
@@ -133,9 +137,9 @@ export default function FeedTab() {
         </button>
         <button
           onClick={() => setFeedView("community")}
-          className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors ${
+          className={`pb-2 -mb-px text-xs font-bold uppercase tracking-[0.08em] transition-colors ${
             feedView === "community"
-              ? "bg-bg-hover text-text-primary"
+              ? "text-text-primary border-b-2 border-text-primary"
               : "text-text-muted"
           }`}
         >
@@ -164,7 +168,7 @@ export default function FeedTab() {
                   </p>
                   {req.note && <p className="text-text-muted text-xs truncate">&ldquo;{req.note}&rdquo;</p>}
                 </div>
-                <span className={`px-3 py-1.5 rounded-lg text-xs font-display font-bold flex-shrink-0 ${answered ? "bg-bg-elevated text-text-secondary" : "bg-accent text-white"}`}>
+                <span className={`px-3 py-1.5 rounded-lg text-xs font-body font-semibold flex-shrink-0 ${answered ? "bg-bg-elevated text-text-secondary" : "bg-accent text-bg-primary"}`}>
                   {answered ? "Sent ✓" : "Recommend"}
                 </span>
               </button>
@@ -180,13 +184,12 @@ export default function FeedTab() {
               return (
                 <div
                   key={activity.id}
-                  className="bg-bg-card border border-border rounded-xl p-4 flex flex-col gap-3"
+                  className="border-b border-border pb-4 flex flex-col gap-3"
                 >
                   {/* User row */}
                   <div className="flex items-center gap-2">
                     <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
-                      style={{ backgroundColor: friend.avatarColor ?? "#7C5CF6" }}
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-display font-semibold text-text-primary bg-bg-elevated border border-border shrink-0"
                     >
                       {(friend.displayName ?? friend.name).charAt(0).toUpperCase()}
                     </div>
@@ -205,7 +208,7 @@ export default function FeedTab() {
 
                   {/* Title line */}
                   <div className="flex items-center gap-2">
-                    <span className="font-display font-semibold text-text-primary">
+                    <span className="font-display font-bold text-lg leading-snug text-text-primary">
                       {activity.show?.title ?? activity.title}
                       {activity.season != null && (
                         <span className="text-text-secondary">

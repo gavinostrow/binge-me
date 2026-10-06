@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Libre+Franklin:wght@400;500;600;700;800&display=swap');
 
 * {
   box-sizing: border-box;
@@ -12,41 +12,41 @@
 
 /* Light is the default; .dark on <html> switches the palette. Values are RGB channels. */
 :root {
-  --bg-primary: 246 245 249;
+  --bg-primary: 255 255 255;
   --bg-surface: 255 255 255;
   --bg-card: 255 255 255;
-  --bg-elevated: 239 238 244;
-  --bg-hover: 228 226 236;
-  --border: 226 224 233;
-  --text-primary: 24 22 32;
-  --text-secondary: 92 88 108;
-  --text-muted: 138 133 152;
-  --accent: 124 92 246;
-  --accent-text: 101 70 222;
-  --gold: 166 124 26;
+  --bg-elevated: 246 246 244;
+  --bg-hover: 236 236 233;
+  --border: 223 223 223;
+  --text-primary: 18 18 18;
+  --text-secondary: 90 90 90;
+  --text-muted: 128 128 128;
+  --accent: 18 18 18;
+  --accent-text: 50 104 145;
+  --gold: 140 106 30;
   color-scheme: light;
 }
 
 .dark {
-  --bg-primary: 13 13 18;
-  --bg-surface: 21 21 29;
-  --bg-card: 21 21 29;
-  --bg-elevated: 28 28 40;
-  --bg-hover: 37 37 51;
-  --border: 37 37 51;
-  --text-primary: 232 228 220;
-  --text-secondary: 153 148 168;
-  --text-muted: 94 88 110;
-  --accent: 139 92 246;
-  --accent-text: 167 139 250;
-  --gold: 212 168 67;
+  --bg-primary: 18 18 18;
+  --bg-surface: 24 24 24;
+  --bg-card: 24 24 24;
+  --bg-elevated: 34 34 34;
+  --bg-hover: 46 46 46;
+  --border: 58 58 58;
+  --text-primary: 236 236 236;
+  --text-secondary: 168 168 168;
+  --text-muted: 120 120 120;
+  --accent: 236 236 236;
+  --accent-text: 120 170 210;
+  --gold: 205 170 90;
   color-scheme: dark;
 }
 
 html, body {
   background-color: rgb(var(--bg-primary));
   color: rgb(var(--text-primary));
-  font-family: 'Geist', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Libre Franklin', 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -85,16 +85,21 @@ input[type="range"]::-moz-range-thumb {
 }
 
 @layer utilities {
+  /* Headlines and titles: serif. UI, labels and numbers: Franklin. */
   .font-display {
-    font-family: 'Geist', 'Helvetica Neue', Arial, sans-serif;
-    letter-spacing: -0.01em;
+    font-family: 'Newsreader', Georgia, 'Times New Roman', serif;
+    letter-spacing: -0.005em;
   }
   .font-body {
-    font-family: 'Geist', 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Libre Franklin', 'Helvetica Neue', Arial, sans-serif;
   }
   .font-mono {
-    font-family: 'Geist Mono', ui-monospace, Menlo, monospace;
+    font-family: 'Libre Franklin', 'Helvetica Neue', Arial, sans-serif;
     font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+  }
+  .rule-double {
+    border-bottom: 3px double rgb(var(--text-primary));
   }
 }
 

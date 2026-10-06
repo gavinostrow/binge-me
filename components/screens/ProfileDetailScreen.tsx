@@ -45,7 +45,7 @@ export default function ProfileDetailScreen({ userId }: { userId: string }) {
         {isSelf ? (
           <button
             onClick={() => pushScreen({ screen: "profile-edit" })}
-            className="w-full py-2.5 rounded-xl bg-bg-card border border-border text-text-primary text-sm font-display font-semibold"
+            className="w-full py-2.5 rounded-xl bg-bg-card border border-border text-text-primary text-sm font-body font-semibold"
           >
             Edit profile
           </button>
@@ -59,8 +59,8 @@ export default function ProfileDetailScreen({ userId }: { userId: string }) {
                   showToast(`Added ${user.name.split(" ")[0]}`);
                 }
               }}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-display font-bold ${
-                following ? "bg-bg-card border border-border text-text-primary" : "bg-accent text-white"
+              className={`flex-1 py-2.5 rounded-xl text-sm font-body font-semibold ${
+                following ? "bg-bg-card border border-border text-text-primary" : "bg-accent text-bg-primary"
               }`}
             >
               {following ? "Friends ✓" : "Add friend"}
@@ -68,7 +68,7 @@ export default function ProfileDetailScreen({ userId }: { userId: string }) {
             {openRequest && (
               <button
                 onClick={() => pushScreen({ screen: "rec-request", requestId: openRequest.id })}
-                className="flex-1 py-2.5 rounded-xl bg-accent text-white text-sm font-display font-bold"
+                className="flex-1 py-2.5 rounded-xl bg-accent text-bg-primary text-sm font-body font-semibold"
               >
                 Send a pick
               </button>
@@ -86,7 +86,7 @@ export default function ProfileDetailScreen({ userId }: { userId: string }) {
                   cy="18"
                   r="15.5"
                   fill="none"
-                  stroke="#8B5CF6"
+                  stroke="rgb(var(--text-primary))"
                   strokeWidth="3.5"
                   strokeLinecap="round"
                   strokeDasharray={`${(match.pct / 100) * 97.4} 97.4`}
@@ -110,10 +110,10 @@ export default function ProfileDetailScreen({ userId }: { userId: string }) {
         )}
 
         {watching.length > 0 && (
-          <div className="bg-bg-card border border-border rounded-2xl p-4">
+          <div className="border-t border-text-primary pt-3">
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-rating-green animate-pulse" />
-              <p className="text-text-muted text-xs font-body uppercase tracking-wider">Currently watching</p>
+              <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em]">Currently watching</p>
             </div>
             <div className="divide-y divide-border">
               {watching.map((w) => {
@@ -144,14 +144,14 @@ export default function ProfileDetailScreen({ userId }: { userId: string }) {
             { label: "Avg", value: avg },
           ].map((s) => (
             <div key={s.label} className="bg-bg-card border border-border rounded-xl p-3 text-center">
-              <p className="text-text-muted text-[10px] uppercase tracking-wider font-body">{s.label}</p>
+              <p className="text-text-primary text-[10px] uppercase font-bold tracking-[0.08em] font-body">{s.label}</p>
               <p className="text-xl font-display font-bold text-text-primary mt-1">{s.value}</p>
             </div>
           ))}
         </div>
 
         <div>
-          <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-2">Ranked shows</p>
+          <p className="text-text-primary text-xs font-body uppercase font-bold tracking-[0.08em] mb-2">Ranked shows</p>
           {list.length === 0 ? (
             <p className="text-text-muted text-sm text-center py-6">Nothing rated yet.</p>
           ) : (
@@ -171,7 +171,7 @@ export default function ProfileDetailScreen({ userId }: { userId: string }) {
                     <PosterImage title={item.title} year={item.year} posterPath={item.posterPath} size="sm" />
                     <div className="flex-1 min-w-0">
                       <p className="text-text-primary text-sm font-display font-semibold truncate">{item.title}</p>
-                      {r.review && <p className="text-text-secondary text-xs italic truncate">&ldquo;{r.review}&rdquo;</p>}
+                      {r.review && <p className="text-text-secondary text-xs italic font-display truncate">&ldquo;{r.review}&rdquo;</p>}
                     </div>
                     <RatingBadge rating={r.rating} size="sm" />
                   </button>

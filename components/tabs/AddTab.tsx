@@ -273,7 +273,7 @@ export default function AddTab() {
 
                 <button
                   onClick={() => setStep("rate-seasons")}
-                  className="bg-accent-purple text-white rounded-lg py-3 font-semibold w-full hover:opacity-90 transition-opacity"
+                  className="bg-accent-purple text-bg-primary rounded-lg py-3 font-semibold w-full hover:opacity-90 transition-opacity"
                 >
                   Next: Rate Seasons
                 </button>
@@ -284,7 +284,7 @@ export default function AddTab() {
 
         <button
           onClick={handleAddShow}
-          className="bg-accent-purple text-white rounded-lg py-3 font-semibold w-full hover:opacity-90 transition-opacity"
+          className="bg-accent-purple text-bg-primary rounded-lg py-3 font-semibold w-full hover:opacity-90 transition-opacity"
         >
           Add to My List
         </button>
@@ -364,7 +364,7 @@ export default function AddTab() {
 
         <button
           onClick={handleAddShow}
-          className="bg-accent-purple text-white rounded-lg py-3 font-semibold w-full hover:opacity-90 transition-opacity"
+          className="bg-accent-purple text-bg-primary rounded-lg py-3 font-semibold w-full hover:opacity-90 transition-opacity"
         >
           Add to My List
         </button>
@@ -386,7 +386,7 @@ export default function AddTab() {
             height="40"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#8B5CF6"
+            stroke="rgb(var(--text-primary))"
             strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -410,7 +410,7 @@ export default function AddTab() {
         <div className="flex flex-col gap-3 w-full">
           <button
             onClick={resetFlow}
-            className="bg-accent-purple text-white rounded-lg py-3 font-semibold w-full hover:opacity-90 transition-opacity"
+            className="bg-accent-purple text-bg-primary rounded-lg py-3 font-semibold w-full hover:opacity-90 transition-opacity"
           >
             Add Another
           </button>

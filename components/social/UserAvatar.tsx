@@ -23,10 +23,10 @@ export default function UserAvatar({
 }) {
   return (
     <div
-      className={`${SIZES[size]} rounded-full flex items-center justify-center font-display font-semibold flex-shrink-0 overflow-hidden ${
+      className={`${SIZES[size]} rounded-full flex items-center justify-center font-display font-semibold flex-shrink-0 not-italic overflow-hidden ${
         ring ? "ring-2 ring-bg-primary" : ""
       }`}
-      style={{ color: user.avatarColor ?? userColor(user.id), backgroundColor: `${user.avatarColor ?? userColor(user.id)}26` }}
+      style={{ color: "rgb(var(--text-primary))", backgroundColor: "rgb(var(--bg-elevated))", boxShadow: "inset 0 0 0 1px rgb(var(--border))" }}
       aria-hidden
     >
       {user.avatarUrl ? (

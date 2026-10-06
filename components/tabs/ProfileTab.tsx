@@ -164,7 +164,7 @@ function calcGenreBreakdown(showRatings: ShowRating[]) {
     .slice(0, 6);
 }
 // ─── Now Watching ─────────────────────────────────────────────────────────────
-const FRIEND_COLORS = ["#7C5CF6", "#EC4899", "#F59E0B", "#10B981", "#3B82F6"];
+const FRIEND_COLORS = ["#2B2B2B", "#454545", "#5C5C5C", "#3A3A3A", "#525252", "#666666"];
 function friendColor(userId: string) {
   return FRIEND_COLORS[parseInt(userId.replace(/\D/g, "")) % FRIEND_COLORS.length];
 }
@@ -173,7 +173,7 @@ function UserHeader() {
     useApp();
   const total = showRatings.length;
   const level = getMemberLevel(total);
-  const colors = ["#7C5CF6", "#8B5CF6"];
+  const colors = ["rgb(var(--text-primary))", "rgb(var(--text-primary))"];
   const [copied, setCopied] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const handleShare = () => {
@@ -203,11 +203,11 @@ function UserHeader() {
       >
         {" "}
         <div
-          className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-display font-semibold overflow-hidden"
+          className="w-20 h-20 rounded-full flex items-center justify-center text-4xl font-display font-medium overflow-hidden"
           style={{
-            background: currentUserData.avatarUrl ? undefined : `${colors[0]}26`,
-            color: colors[0],
-            boxShadow: `inset 0 0 0 1px ${colors[0]}40`,
+            background: currentUserData.avatarUrl ? undefined : "rgb(var(--bg-elevated))",
+            color: "rgb(var(--text-primary))",
+            boxShadow: "inset 0 0 0 1px rgb(var(--border))",
           }}
         >
           {" "}
@@ -278,7 +278,7 @@ function UserHeader() {
           </p>
         )}{" "}
         {currentUserData.bio && (
-          <p className="text-text-secondary text-xs font-body mt-2 italic max-w-[260px]">
+          <p className="text-text-secondary text-xs font-body mt-2 italic font-display max-w-[260px]">
             {" "}
             "{currentUserData.bio}"{" "}
           </p>
@@ -298,7 +298,7 @@ function UserHeader() {
         ) : (
           <button
             onClick={() => pushScreen({ screen: "auth" })}
-            className="px-4 py-1.5 rounded-md bg-accent text-white text-xs font-body font-semibold hover:bg-accent-light transition-colors"
+            className="px-4 py-1.5 rounded-md bg-accent text-bg-primary text-xs font-body font-semibold hover:bg-accent-light transition-colors"
           >
             {" "}
             Sign In / Sign Up{" "}
@@ -380,11 +380,11 @@ function FavoritesSection({ showRatings }: { showRatings: ShowRating[] }) {
   const favShows = showRatings.filter((r) => r.isFavorite);
   const hasFavorites = favShows.length > 0;
   return (
-    <div className="bg-bg-card rounded-2xl p-4 border border-border">
+    <div className="border-t border-text-primary pt-3">
       {" "}
       <div className="flex items-center gap-2 mb-3">
         {" "}
-        <span className="text-[10px] font-body font-semibold uppercase tracking-widest text-text-muted">
+        <span className="text-[10px] font-body font-bold uppercase tracking-[0.08em] text-text-primary">
           Favorites
         </span>{" "}
       </div>{" "}
@@ -447,7 +447,7 @@ function GenreFilter({
       {" "}
       <button
         onClick={() => onChange(null)}
-        className={`flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-body font-semibold border transition-all ${selected === null ? "bg-accent border-accent text-white" : "border-border text-text-secondary"}`}
+        className={`flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-body font-semibold border transition-all ${selected === null ? "bg-accent border-accent text-bg-primary" : "border-border text-text-secondary"}`}
       >
         {" "}
         All{" "}
@@ -456,7 +456,7 @@ function GenreFilter({
         <button
           key={g}
           onClick={() => onChange(selected === g ? null : g)}
-          className={`flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-body font-semibold border transition-all ${selected === g ? "bg-accent border-accent text-white" : "border-border text-text-secondary"}`}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-body font-semibold border transition-all ${selected === g ? "bg-accent border-accent text-bg-primary" : "border-border text-text-secondary"}`}
         >
           {" "}
           {g}{" "}
@@ -512,7 +512,7 @@ function InlineReRatePanel({
         </button>{" "}
         <button
           onClick={() => onSave(draft)}
-          className="px-4 py-1.5 bg-accent text-white text-xs font-body font-semibold rounded-md hover:bg-accent-light transition-colors "
+          className="px-4 py-1.5 bg-accent text-bg-primary text-xs font-body font-semibold rounded-md hover:bg-accent-light transition-colors "
         >
           {" "}
           Save{" "}
@@ -574,7 +574,7 @@ function ShowRow({
               <span className="text-text-muted text-xs">{rating.seasonRatings.length}S</span>{" "}
             </div>{" "}
             {rating.review && (
-              <p className="text-text-secondary text-xs mt-1 italic truncate">"{rating.review}"</p>
+              <p className="text-text-secondary text-xs mt-1 italic font-display truncate">"{rating.review}"</p>
             )}{" "}
           </div>{" "}
         </button>{" "}
@@ -718,7 +718,7 @@ function MyListsSection() {
       {/* List header */}{" "}
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         {" "}
-        <span className="text-[10px] font-body font-semibold uppercase tracking-widest text-text-muted">
+        <span className="text-[10px] font-body font-bold uppercase tracking-[0.08em] text-text-primary">
           My Lists
         </span>{" "}
         {contentType !== "watchlist" && (
@@ -750,7 +750,7 @@ function MyListsSection() {
           <button
             key={t.id}
             onClick={() => setContentType(t.id)}
-            className={`flex-1 py-1.5 rounded-lg text-xs font-body font-semibold transition-all ${contentType === t.id ? "bg-accent text-white shadow-sm" : "text-text-secondary"}`}
+            className={`flex-1 py-1.5 rounded-lg text-xs font-body font-semibold transition-all ${contentType === t.id ? "bg-accent text-bg-primary shadow-sm" : "text-text-secondary"}`}
           >
             {" "}
             {t.label}{" "}
@@ -807,9 +807,9 @@ function MyListsSection() {
 function GenreBreakdown({ breakdown }: { breakdown: [string, number][] }) {
   const max = breakdown[0]?.[1] ?? 1;
   return (
-    <div className="bg-bg-card rounded-2xl p-4 border border-border">
+    <div className="border-t border-text-primary pt-3">
       {" "}
-      <p className="text-[10px] font-body font-semibold uppercase tracking-widest text-text-muted mb-3">
+      <p className="text-[10px] font-body font-bold uppercase tracking-[0.08em] text-text-primary mb-3">
         Taste Profile
       </p>{" "}
       <div className="flex flex-col gap-2.5">
@@ -830,7 +830,7 @@ function GenreBreakdown({ breakdown }: { breakdown: [string, number][] }) {
                   className="h-full rounded-full transition-all"
                   style={{
                     width: `${pct}%`,
-                    background: "#8B5CF6",
+                    background: "rgb(var(--text-primary))",
                   }}
                 />{" "}
               </div>{" "}
@@ -855,9 +855,9 @@ function RatingDistribution({ showRatings }: { showRatings: ShowRating[] }) {
   }));
   const maxCount = Math.max(...counts.map((c) => c.count), 1);
   return (
-    <div className="bg-bg-card rounded-2xl p-4 border border-border">
+    <div className="border-t border-text-primary pt-3">
       {" "}
-      <p className="text-[10px] font-body font-semibold uppercase tracking-widest text-text-muted mb-3">
+      <p className="text-[10px] font-body font-bold uppercase tracking-[0.08em] text-text-primary mb-3">
         Rating Distribution
       </p>{" "}
       <div className="flex items-end gap-2 h-16">
@@ -893,9 +893,9 @@ function ActivityTimeline() {
     .slice(0, 8)
     .sort((a, b) => new Date(b.timestamp ?? b.createdAt ?? 0).getTime() - new Date(a.timestamp ?? a.createdAt ?? 0).getTime());
   return (
-    <div className="bg-bg-card rounded-2xl p-4 border border-border">
+    <div className="border-t border-text-primary pt-3">
       {" "}
-      <p className="text-[10px] font-body font-semibold uppercase tracking-widest text-text-muted mb-3">
+      <p className="text-[10px] font-body font-bold uppercase tracking-[0.08em] text-text-primary mb-3">
         Recent Activity
       </p>{" "}
       {myActivities.length === 0 ? (
@@ -913,7 +913,7 @@ function ActivityTimeline() {
                 <div
                   className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white"
                   style={{
-                    backgroundColor: ["#7C5CF6", "#EC4899", "#F59E0B", "#10B981", "#3B82F6"][
+                    backgroundColor: ["#2B2B2B", "#454545", "#5C5C5C", "#3A3A3A", "#525252"][
                       parseInt((a.user?.id ?? a.userId ?? "0").replace(/\D/g, "")) % 5
                     ],
                   }}
@@ -989,7 +989,7 @@ export default function ProfileTab() {
         <UserHeader />
         <button
           onClick={() => pushScreen({ screen: "find-friends" })}
-          className="w-full py-2.5 rounded-xl bg-bg-card border border-border text-text-primary text-sm font-display font-semibold"
+          className="w-full py-2.5 rounded-xl bg-bg-card border border-border text-text-primary text-sm font-body font-semibold"
         >
           Find &amp; invite friends
         </button>

@@ -99,7 +99,7 @@ export default function ProfileEditScreen() {
             type="file"
             accept="image/*"
             onChange={handleAvatarChange}
-            className="w-full bg-bg-card border border-border rounded-xl px-4 py-3 text-text-primary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-accent-light"
+            className="w-full bg-bg-card border border-border rounded-xl px-4 py-3 text-text-primary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-bg-primary hover:file:bg-accent-light"
           />{" "}
         </div>{" "}
         <div className="space-y-3">
@@ -113,7 +113,7 @@ export default function ProfileEditScreen() {
               <button
                 key={genre}
                 onClick={() => toggleGenre(genre)}
-                className={`px-3 py-2 rounded-lg text-sm font-body transition ${selectedGenres.includes(genre) ? "bg-accent text-white" : "bg-bg-card text-text-secondary hover:bg-bg-elevated"}`}
+                className={`px-3 py-2 rounded-lg text-sm font-body transition ${selectedGenres.includes(genre) ? "bg-accent text-bg-primary" : "bg-bg-card text-text-secondary hover:bg-bg-elevated"}`}
               >
                 {" "}
                 {genre}{" "}
@@ -125,7 +125,7 @@ export default function ProfileEditScreen() {
           {" "}
           <button
             onClick={handleSave}
-            className="w-full py-3 bg-accent text-white font-display font-bold rounded-2xl"
+            className="w-full py-3 bg-accent text-bg-primary font-body font-semibold rounded-2xl"
           >
             {" "}
             Save Changes{" "}

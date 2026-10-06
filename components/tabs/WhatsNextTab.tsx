@@ -186,7 +186,7 @@ export default function WhatsNextTab() {
                 height="20"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#8B5CF6"
+                stroke="rgb(var(--text-primary))"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -217,7 +217,7 @@ export default function WhatsNextTab() {
                 height="20"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#8B5CF6"
+                stroke="rgb(var(--text-primary))"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -251,7 +251,7 @@ export default function WhatsNextTab() {
                 height="20"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#8B5CF6"
+                stroke="rgb(var(--text-primary))"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -409,7 +409,7 @@ export default function WhatsNextTab() {
               </button>
               <button
                 onClick={handleAddToWatchlist}
-                className="flex-1 py-2.5 px-4 rounded-lg bg-accent-purple text-white text-sm font-medium hover:bg-accent-purple/90 transition-colors"
+                className="flex-1 py-2.5 px-4 rounded-lg bg-accent-purple text-bg-primary text-sm font-medium hover:bg-accent-purple/90 transition-colors"
               >
                 + Watchlist
               </button>

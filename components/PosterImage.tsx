@@ -57,7 +57,7 @@ export default function PosterImage({
       ) : (
         <div className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center">
           <p
-            className="font-display font-semibold text-text-secondary leading-tight"
+            className="font-display font-medium text-text-secondary leading-tight italic"
             style={{ fontSize: size === "sm" ? "8px" : size === "md" ? "9px" : "13px" }}
           >
             {title}

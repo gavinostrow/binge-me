@@ -34,7 +34,7 @@ function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
     <button
       onClick={() => onChange(!value)}
       className="relative w-11 h-6 rounded-full transition-colors flex-shrink-0"
-      style={{ backgroundColor: value ? "#7C5CF6" : "var(--bg-elevated)" }}
+      style={{ backgroundColor: value ? "rgb(var(--text-primary))" : "var(--bg-elevated)" }}
       aria-checked={value}
       role="switch"
     >

@@ -71,7 +71,7 @@ export default function RatingsTrio({ id, myRating }: { id: string; myRating?: n
                 <UserAvatar user={u} size="sm" />
                 <div className="flex-1 min-w-0">
                   <p className="text-text-primary text-sm font-display font-semibold truncate">{u.name}</p>
-                  {r.review && <p className="text-text-secondary text-xs italic truncate">&ldquo;{r.review}&rdquo;</p>}
+                  {r.review && <p className="text-text-secondary text-xs italic font-display truncate">&ldquo;{r.review}&rdquo;</p>}
                 </div>
                 <RatingBadge rating={r.rating} size="sm" />
               </button>
@@ -86,7 +86,7 @@ export default function RatingsTrio({ id, myRating }: { id: string; myRating?: n
 function Cell({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col items-center justify-start gap-2 px-2 py-3.5 h-full">
-      <p className="text-text-muted text-[10px] font-body uppercase tracking-wider">{label}</p>
+      <p className="text-text-primary text-[10px] font-body uppercase font-bold tracking-[0.08em]">{label}</p>
       {children}
     </div>
   );
