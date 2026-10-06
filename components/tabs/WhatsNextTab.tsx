@@ -13,6 +13,12 @@ import {
 } from "@/lib/mockData";
 import { getRatingColor } from "@/lib/utils";
 import RatingBadge from "@/components/RatingBadge";
+import { useSocial } from "@/lib/SocialContext";
+import { allFriendRatings, tasteMatch } from "@/lib/social";
+import { getMovie, getShow } from "@/lib/catalog";
+import { knownExtras } from "@/lib/useTitleExtras";
+import WhatsNextHub from "@/components/social/WhatsNextHub";
+import { ProviderLogos } from "@/components/social/ProviderChips";
 
 interface RecommendationResult {
   title: string;
@@ -20,10 +26,17 @@ interface RecommendationResult {
   genre: string | string[];
   reason: string;
   rating?: number;
+  itemId?: string;
+}
+
+function genreText(genre: string | string[]) {
+  return Array.isArray(genre) ? genre.slice(0, 2).join(", ") : genre;
 }
 
 export default function WhatsNextTab() {
-  const { movieRatings, showRatings, addToWatchlist } = useApp();
+  const { movieRatings, showRatings, addToWatchlist, pushScreen } = useApp();
+  const { followingIds, getUser, myRows, myServices } = useSocial();
+  const [onlyMyServices, setOnlyMyServices] = useState(false);
 
   const [source, setSource] = useState<RecommendationSource | null>(null);
   const [contentType, setContentType] = useState<ContentType>("movie");
@@ -80,28 +93,36 @@ export default function WhatsNextTab() {
           year: item.year,
           genre: item.genre,
           reason,
+          itemId: item.id,
         };
       });
     }
 
     if (source === "friends") {
-      const communityPool = contentType === "movie" ? communityMovies : communityShows;
-      const unrated = communityPool.filter((item) => {
-        const t = item.movie?.title ?? item.show?.title ?? "";
-        return !ratedTitles.has(t);
-      });
-      return unrated.map((item) => {
-        const friend = friends[Math.floor(Math.random() * friends.length)];
-        const matchPct = tasteMatchPercentages[friend.id] || 75;
-        const friendRating = (7 + Math.random() * 3).toFixed(1);
-        return {
-          title: item.movie?.title ?? item.show?.title ?? "",
-          year: item.movie?.year ?? item.show?.year ?? 0,
-          genre: item.movie?.genre ?? item.show?.genre ?? [],
-          reason: `${friend.displayName ?? friend.name} rated ${friendRating} — ${matchPct}% taste match`,
-          rating: item.averageRating,
-        };
-      });
+      const kind = contentType === "movie" ? "movie" : "show";
+      const best = new Map<string, { userId: string; rating: number }>();
+      allFriendRatings()
+        .filter((r) => r.type === kind && r.rating >= 8 && followingIds.includes(r.userId))
+        .forEach((r) => {
+          const cur = best.get(r.id);
+          if (!cur || r.rating > cur.rating) best.set(r.id, { userId: r.userId, rating: r.rating });
+        });
+      return Array.from(best.entries())
+        .map(([id, { userId, rating }]) => {
+          const item = kind === "movie" ? getMovie(id) : getShow(id);
+          const friend = getUser(userId);
+          if (!item || !friend || ratedTitles.has(item.title)) return null;
+          const match = tasteMatch(myRows, userId).pct;
+          return {
+            title: item.title,
+            year: item.year,
+            genre: item.genre,
+            reason: `${friend.name.split(" ")[0]} rated it ${rating.toFixed(1)} · ${match}% taste match`,
+            rating,
+            itemId: item.id,
+          };
+        })
+        .filter((x): x is NonNullable<typeof x> => x !== null);
     }
 
     // community
@@ -116,7 +137,19 @@ export default function WhatsNextTab() {
       genre: item.movie?.genre ?? item.show?.genre ?? [],
       reason: `${item.averageRating.toFixed(1)} avg from ${item.ratingCount.toLocaleString()} ratings`,
       rating: item.averageRating,
+      itemId: item.movie?.id ?? item.show?.id,
     }));
+  }
+
+  function providersOf(r: RecommendationResult) {
+    if (!r.itemId) return [];
+    const item = contentType === "movie" ? getMovie(r.itemId) : getShow(r.itemId);
+    return item ? knownExtras(contentType, item).providers : [];
+  }
+
+  function filterByServices(recs: RecommendationResult[]) {
+    if (!onlyMyServices) return recs;
+    return recs.filter((r) => providersOf(r).some((p) => myServices.includes(p.key)));
   }
 
   function spin() {
@@ -126,13 +159,15 @@ export default function WhatsNextTab() {
 
     setTimeout(() => {
       setSpinning(false);
-      const recs = getRecommendations();
+      const recs = filterByServices(getRecommendations());
       if (recs.length === 0) {
         setResult({
           title: "No recommendations",
           year: 0,
           genre: "",
-          reason: "You've rated everything! Try a different source or content type.",
+          reason: onlyMyServices
+            ? "Nothing left on your services. Turn off the services filter or try another source."
+            : "You've rated everything! Try a different source or content type.",
         });
         setSuggestions([]);
         return;
@@ -145,6 +180,17 @@ export default function WhatsNextTab() {
 
   function handleAddToWatchlist() {
     if (!result) return;
+    const item = result.itemId ? (contentType === "movie" ? getMovie(result.itemId) : getShow(result.itemId)) : undefined;
+    if (item) {
+      addToWatchlist({
+        id: "wl-" + Date.now(),
+        contentType,
+        ...(contentType === "movie" ? { movie: item as ReturnType<typeof getMovie> } : { show: item as ReturnType<typeof getShow> }),
+        addedDate: new Date().toISOString(),
+        recommendedBy: source ?? undefined,
+      });
+      return;
+    }
     addToWatchlist({
       id: "wl-" + Date.now(),
       userId: "u1",
@@ -167,6 +213,10 @@ export default function WhatsNextTab() {
           </h1>
           <p className="text-text-secondary text-sm">Find your next watch</p>
         </div>
+
+        <WhatsNextHub />
+
+        <p className="px-4 pt-2 pb-2 text-text-muted text-xs font-body uppercase tracking-wider">Spin for a pick</p>
 
         {/* Your Taste */}
         <button
@@ -337,6 +387,20 @@ export default function WhatsNextTab() {
             Shows
           </button>
         </div>
+        <button
+          onClick={() => setOnlyMyServices((v) => !v)}
+          className={`mt-3 w-full flex items-center justify-between rounded-xl px-3 py-2.5 border text-sm font-body transition-colors ${
+            onlyMyServices ? "border-rating-green/40 bg-rating-green/5 text-text-primary" : "border-border bg-bg-surface text-text-secondary"
+          }`}
+          aria-pressed={onlyMyServices}
+        >
+          <span>Only what&apos;s on my services</span>
+          <span
+            className={`w-9 h-5 rounded-full relative transition-colors ${onlyMyServices ? "bg-rating-green" : "bg-bg-hover"}`}
+          >
+            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${onlyMyServices ? "left-[18px]" : "left-0.5"}`} />
+          </span>
+        </button>
       </div>
 
       {/* Spin button */}
@@ -390,9 +454,31 @@ export default function WhatsNextTab() {
             <p className="text-text-secondary text-sm mb-1">
               {result.year > 0 && result.year}
               {result.year > 0 && result.genre && " · "}
-              {result.genre}
+              {genreText(result.genre)}
             </p>
-            <p className="text-text-secondary text-sm mb-4">{result.reason}</p>
+            <p className="text-text-secondary text-sm mb-3">{result.reason}</p>
+            {providersOf(result).length > 0 && (
+              <div className="flex items-center gap-2 mb-4">
+                <ProviderLogos providers={providersOf(result)} max={3} size="sm" />
+                <span className="text-text-muted text-xs font-body">
+                  {providersOf(result).map((p) => p.name).join(" · ")}
+                </span>
+              </div>
+            )}
+            {result.itemId && (
+              <button
+                onClick={() =>
+                  pushScreen(
+                    contentType === "movie"
+                      ? { screen: "movie-detail", movieId: result.itemId! }
+                      : { screen: "show-detail", showId: result.itemId! },
+                  )
+                }
+                className="text-accent-light text-sm font-body font-semibold mb-4"
+              >
+                See details ›
+              </button>
+            )}
             <div className="flex gap-3">
               <button
                 onClick={spin}
@@ -427,10 +513,13 @@ export default function WhatsNextTab() {
                   <h4 className="text-text-primary text-sm font-medium truncate">
                     {item.title}
                   </h4>
-                  <p className="text-text-muted text-xs">
-                    {item.year > 0 && item.year}
-                    {item.year > 0 && item.genre && " · "}
-                    {item.genre}
+                  <p className="text-text-muted text-xs flex items-center gap-1.5">
+                    <span className="truncate">
+                      {item.year > 0 && item.year}
+                      {item.year > 0 && item.genre && " · "}
+                      {genreText(item.genre)}
+                    </span>
+                    <ProviderLogos providers={providersOf(item)} max={2} />
                   </p>
                 </div>
                 {item.rating !== undefined && (

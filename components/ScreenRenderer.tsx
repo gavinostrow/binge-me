@@ -7,6 +7,13 @@ import ProfileEditScreen from "@/components/screens/ProfileEditScreen";
 import AuthScreen from "@/components/screens/AuthScreen";
 import SearchScreen from "@/components/screens/SearchScreen";
 import SettingsScreen from "@/components/screens/SettingsScreen";
+import NotificationsScreen from "@/components/screens/NotificationsScreen";
+import FindFriendsScreen from "@/components/screens/FindFriendsScreen";
+import RecRequestScreen from "@/components/screens/RecRequestScreen";
+import MyRequestScreen from "@/components/screens/MyRequestScreen";
+import PredictionsScreen from "@/components/screens/PredictionsScreen";
+import WrappedScreen from "@/components/screens/WrappedScreen";
+import ComingBackScreen from "@/components/screens/ComingBackScreen";
 export default function ScreenRenderer() {
   const { navigationStack } = useApp();
   if (navigationStack.length === 0) return null;
@@ -42,7 +49,14 @@ export default function ScreenRenderer() {
             {descriptor.screen === "search" && (
               <SearchScreen initialQuery={descriptor.query} />
             )}{" "}
-            {descriptor.screen === "settings" && <SettingsScreen />}{" "}
+            {descriptor.screen === "settings" && <SettingsScreen />}
+            {descriptor.screen === "notifications" && <NotificationsScreen />}
+            {descriptor.screen === "find-friends" && <FindFriendsScreen />}
+            {descriptor.screen === "rec-request" && <RecRequestScreen requestId={descriptor.requestId} />}
+            {descriptor.screen === "my-request" && <MyRequestScreen />}
+            {descriptor.screen === "predictions" && <PredictionsScreen showId={descriptor.showId} />}
+            {descriptor.screen === "wrapped" && <WrappedScreen period={descriptor.period} />}
+            {descriptor.screen === "coming-back" && <ComingBackScreen />}{" "}
           </div>
         );
       })}{" "}

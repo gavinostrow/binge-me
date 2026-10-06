@@ -47,6 +47,12 @@ export const friends: User[] = [
     username: "jake_p",
     favoriteGenres: ["Horror", "Thriller", "Mystery"],
   },
+  {
+    id: "u6",
+    name: "Michael Torres",
+    username: "mtorres",
+    favoriteGenres: ["Crime", "Drama", "Comedy"],
+  },
 ];
 export const movies: Movie[] = [
   {
@@ -747,7 +753,7 @@ export const myMovieRatings: MovieRating[] = [
     movie: movies[1],
     rating: 9.5,
     review: "The Joker is cinema.",
-    dateWatched: "2024-01-15",
+    dateWatched: "2026-01-11",
     isFavorite: true,
   },
   {
@@ -756,7 +762,7 @@ export const myMovieRatings: MovieRating[] = [
     movie: movies[0],
     rating: 9.2,
     review: "Layers on layers. Never gets old.",
-    dateWatched: "2023-11-20",
+    dateWatched: "2025-11-20",
   },
   {
     id: "mr3",
@@ -764,7 +770,7 @@ export const myMovieRatings: MovieRating[] = [
     movie: movies[12],
     rating: 9.3,
     review: "The standard everything gets measured against.",
-    dateWatched: "2023-09-05",
+    dateWatched: "2026-02-07",
   },
   {
     id: "mr4",
@@ -772,7 +778,7 @@ export const myMovieRatings: MovieRating[] = [
     movie: movies[9],
     rating: 9.1,
     review: "Fletcher is terrifying. The ending destroyed me.",
-    dateWatched: "2024-02-01",
+    dateWatched: "2026-03-22",
   },
   {
     id: "mr5",
@@ -780,7 +786,7 @@ export const myMovieRatings: MovieRating[] = [
     movie: movies[3],
     rating: 9.0,
     review: "Perfect structure, perfect ending. Bong is a genius.",
-    dateWatched: "2023-07-10",
+    dateWatched: "2025-07-10",
   },
   {
     id: "mr6",
@@ -788,7 +794,7 @@ export const myMovieRatings: MovieRating[] = [
     movie: movies[5],
     rating: 8.7,
     review: "Genuinely unlike anything else.",
-    dateWatched: "2023-12-12",
+    dateWatched: "2026-04-18",
   },
   {
     id: "mr7",
@@ -796,7 +802,7 @@ export const myMovieRatings: MovieRating[] = [
     movie: movies[2],
     rating: 8.8,
     review: "Hans Zimmer does half the work but earns it.",
-    dateWatched: "2024-01-03",
+    dateWatched: "2026-05-30",
   },
   {
     id: "mr8",
@@ -804,7 +810,7 @@ export const myMovieRatings: MovieRating[] = [
     movie: movies[4],
     rating: 8.5,
     review: "Could've been 30 mins shorter. Still great.",
-    dateWatched: "2023-08-21",
+    dateWatched: "2025-08-21",
   },
   {
     id: "mr9",
@@ -812,7 +818,7 @@ export const myMovieRatings: MovieRating[] = [
     movie: movies[11],
     rating: 8.6,
     review: "The one-shot gimmick earns every second.",
-    dateWatched: "2023-10-30",
+    dateWatched: "2026-07-04",
   },
   {
     id: "mr10",
@@ -820,7 +826,7 @@ export const myMovieRatings: MovieRating[] = [
     movie: movies[8],
     rating: 8.4,
     review: "Jordan Peele is a master of making you squirm.",
-    dateWatched: "2023-06-15",
+    dateWatched: "2026-08-15",
   },
   {
     id: "mr11",
@@ -828,7 +834,7 @@ export const myMovieRatings: MovieRating[] = [
     movie: movies[6],
     rating: 8.0,
     review: "Visually stunning. Patient and rewarding.",
-    dateWatched: "2024-03-08",
+    dateWatched: "2026-09-12",
   },
   {
     id: "mr12",
@@ -836,7 +842,7 @@ export const myMovieRatings: MovieRating[] = [
     movie: movies[10],
     rating: 7.8,
     review: "Clever, witty, and replayable.",
-    dateWatched: "2023-05-22",
+    dateWatched: "2025-05-22",
   },
   {
     id: "mr13",
@@ -844,7 +850,7 @@ export const myMovieRatings: MovieRating[] = [
     movie: movies[13],
     rating: 7.5,
     review: "Weird and wild. Lanthimos stays Lanthimos.",
-    dateWatched: "2024-01-28",
+    dateWatched: "2026-10-02",
   },
 ];
 export const myShowRatings: ShowRating[] = [
@@ -860,7 +866,7 @@ export const myShowRatings: ShowRating[] = [
       { season: 4, rating: 9.8 },
       { season: 5, rating: 9.9 },
     ],
-    dateWatched: "2022-08-12",
+    dateWatched: "2026-01-25",
     isFavorite: true,
   },
   {
@@ -874,7 +880,7 @@ export const myShowRatings: ShowRating[] = [
       { season: 3, rating: 9.3 },
       { season: 4, rating: 9.8 },
     ],
-    dateWatched: "2023-05-28",
+    dateWatched: "2026-06-14",
   },
   {
     id: "sr3",
@@ -882,7 +888,7 @@ export const myShowRatings: ShowRating[] = [
     show: shows[6],
     overallRating: 9.4,
     seasonRatings: [{ season: 1, rating: 9.4 }],
-    dateWatched: "2023-04-14",
+    dateWatched: "2026-03-01",
   },
   {
     id: "sr4",
@@ -894,7 +900,7 @@ export const myShowRatings: ShowRating[] = [
       { season: 2, rating: 9.0 },
       { season: 3, rating: 8.7 },
     ],
-    dateWatched: "2024-06-10",
+    dateWatched: "2026-08-30",
   },
   {
     id: "sr5",
@@ -905,7 +911,7 @@ export const myShowRatings: ShowRating[] = [
       { season: 1, rating: 8.8 },
       { season: 2, rating: 9.1 },
     ],
-    dateWatched: "2024-02-20",
+    dateWatched: "2026-05-09",
   },
   {
     id: "sr6",
@@ -918,7 +924,7 @@ export const myShowRatings: ShowRating[] = [
       { season: 3, rating: 9.0 },
       { season: 4, rating: 9.0 },
     ],
-    dateWatched: "2023-09-01",
+    dateWatched: "2025-09-01",
   },
   {
     id: "sr7",
@@ -926,7 +932,7 @@ export const myShowRatings: ShowRating[] = [
     show: shows[4],
     overallRating: 8.5,
     seasonRatings: [{ season: 1, rating: 8.5 }],
-    dateWatched: "2023-03-18",
+    dateWatched: "2026-07-20",
   },
   {
     id: "sr8",
@@ -937,7 +943,7 @@ export const myShowRatings: ShowRating[] = [
       { season: 1, rating: 8.0 },
       { season: 2, rating: 8.5 },
     ],
-    dateWatched: "2023-11-10",
+    dateWatched: "2026-09-27",
   },
   {
     id: "sr9",
@@ -950,7 +956,7 @@ export const myShowRatings: ShowRating[] = [
       { season: 3, rating: 8.0 },
       { season: 4, rating: 8.0 },
     ],
-    dateWatched: "2023-02-05",
+    dateWatched: "2025-02-05",
   },
 ];
 const now = new Date();
@@ -1298,6 +1304,7 @@ export const tasteMatchPercentages: Record<string, number> = {
   u3: 74,
   u4: 62,
   u5: 79,
+  u6: 81,
 };
 const wlNow = new Date();
 export const initialWatchlist: WatchlistItem[] = [
@@ -1405,6 +1412,36 @@ export const friendsShowRatings: Record<
   ],
 };
 export const initialNotifications: Notification[] = [
+  {
+    id: "n_req_michael",
+    type: "rec_request",
+    fromUserId: "u6",
+    fromUser: friends[4],
+    requestId: "rq_michael",
+    message: "is looking for a new show to watch",
+    timestamp: hoursAgo(2),
+    seen: false,
+  },
+  {
+    id: "n_return_slowhorses",
+    type: "return_date",
+    show: shows[14],
+    season: 5,
+    message: "Season 5 premiere date announced",
+    timestamp: hoursAgo(9),
+    seen: false,
+  },
+  {
+    id: "n_started_sofia",
+    type: "started_watching",
+    fromUserId: "u4",
+    fromUser: friends[2],
+    show: shows[1],
+    season: 3,
+    message: "started watching",
+    timestamp: hoursAgo(6),
+    seen: true,
+  },
   {
     id: "n1",
     type: "recommendation",

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { useSocial } from "@/lib/SocialContext";
 import { useApp } from "@/lib/AppContext";
 import { friends, currentUser, feedActivities } from "@/lib/mockData";
 import { nowWatching } from "@/lib/mockGroups";
@@ -1258,7 +1259,10 @@ function CreateGroupModal({ onClose }: { onClose: () => void }) {
 }
 // ─── Main GroupsTab ───────────────────────────────────────────────────────────
 export default function GroupsTab() {
-  const { groups } = useApp();
+  const { groups, pushScreen } = useApp();
+  const { questions, picks } = useSocial();
+  const openPicks = questions.filter((q) => new Date(q.locksAt).getTime() > Date.now());
+  const unpicked = openPicks.filter((q) => !picks[q.id]?.u1).length;
   const [activeGroup, setActiveGroup] = useState<GroupClub | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showFriendsWatching, setShowFriendsWatching] = useState(false); // Get currently watching across all friends
@@ -1302,6 +1306,22 @@ export default function GroupsTab() {
       </div>{" "}
       <div className="px-4 pb-6 space-y-4">
         {" "}
+        {/* Predictions */}
+        <button
+          onClick={() => pushScreen({ screen: "predictions" })}
+          className="w-full bg-gradient-to-r from-accent/25 to-accent-gold/10 border border-accent/40 rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.99] transition-transform"
+        >
+          <span className="w-11 h-11 rounded-xl bg-accent/25 flex items-center justify-center font-display font-black text-accent-light text-xl">?</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-text-primary font-display font-bold">Predictions</p>
+            <p className="text-text-secondary text-xs font-body">
+              {unpicked > 0 ? `${unpicked} open pick${unpicked === 1 ? "" : "s"} waiting on you` : `${openPicks.length} open · you're all set`} · friends leaderboard
+            </p>
+          </div>
+          {unpicked > 0 && (
+            <span className="min-w-[22px] h-[22px] px-1.5 rounded-full bg-accent text-white text-xs font-bold flex items-center justify-center">{unpicked}</span>
+          )}
+        </button>
         {/* Friends Watching Button Card */}{" "}
         {allWatching.length > 0 && (
           <button

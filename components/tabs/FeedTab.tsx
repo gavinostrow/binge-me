@@ -12,6 +12,10 @@ import {
 } from "@/lib/mockData";
 import { timeAgo, getRatingColor } from "@/lib/utils";
 import RatingBadge from "@/components/RatingBadge";
+import { useSocial } from "@/lib/SocialContext";
+import SpoilerText from "@/components/social/SpoilerText";
+import UserAvatar from "@/components/social/UserAvatar";
+import type { FeedActivity } from "@/lib/types";
 
 const reactionTypes = [
   { key: "fire", icon: "★", label: "Fire" },
@@ -23,7 +27,23 @@ const reactionTypes = [
 type ReactionType = (typeof reactionTypes)[number]["key"];
 
 export default function FeedTab() {
-  const { feedActivities, toggleReaction } = useApp();
+  const { feedActivities, toggleReaction, notifications, pushScreen, getMyShowRating } = useApp();
+  const { openFriendRequests, getUser, spoilerShield, myWatching } = useSocial();
+  const unseen = notifications.filter((n) => !n.seen).length;
+
+  // Spoiler shield: hide show reviews for seasons you haven't finished.
+  const spoilerReason = (a: FeedActivity): string | null => {
+    if (!spoilerShield || !a.show || a.type !== "show_rating") return null;
+    const mine = getMyShowRating(a.show.id);
+    const watching = myWatching.find((w) => w.showId === a.show!.id);
+    if (!mine && !watching) return "you haven't watched it";
+    if (a.season != null) {
+      const ratedSeason = mine?.seasonRatings.some((r) => r.season === a.season);
+      const behind = watching ? watching.season <= a.season : false;
+      if (!ratedSeason && (behind || !mine)) return `you're not done with S${a.season}`;
+    }
+    return null;
+  };
 
   const [feedView, setFeedView] = useState<FeedView>("friends");
   const [contentFilter, setContentFilter] = useState<ContentType>("movie");
@@ -65,10 +85,39 @@ export default function FeedTab() {
   return (
     <div className="flex flex-col gap-4 pb-24">
       {/* Header */}
-      <div className="pt-4 px-1">
+      <div className="pt-4 px-1 flex items-center justify-between">
         <h1 className="text-2xl font-bold lowercase font-display text-text-primary">
           binge
         </h1>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => pushScreen({ screen: "find-friends" })}
+            aria-label="Find friends"
+            className="w-9 h-9 flex items-center justify-center text-text-secondary active:text-text-primary"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <line x1="19" y1="8" x2="19" y2="14" />
+              <line x1="22" y1="11" x2="16" y2="11" />
+            </svg>
+          </button>
+          <button
+            onClick={() => pushScreen({ screen: "notifications" })}
+            aria-label={unseen ? `Notifications, ${unseen} new` : "Notifications"}
+            className="relative w-9 h-9 flex items-center justify-center text-text-secondary active:text-text-primary"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            {unseen > 0 && (
+              <span className="absolute top-0.5 right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-accent text-white text-[10px] font-bold flex items-center justify-center">
+                {unseen}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Search bar */}
@@ -133,6 +182,31 @@ export default function FeedTab() {
             </button>
           </div>
 
+          {/* Friends looking for something to watch */}
+          {openFriendRequests.map((req) => {
+            const u = getUser(req.userId);
+            if (!u) return null;
+            const answered = req.replies.some((r) => r.fromUserId === "u1");
+            return (
+              <button
+                key={req.id}
+                onClick={() => pushScreen({ screen: "rec-request", requestId: req.id })}
+                className="w-full bg-gradient-to-r from-accent/20 to-transparent border border-accent/40 rounded-xl p-3.5 flex items-center gap-3 text-left active:scale-[0.99] transition-transform"
+              >
+                <UserAvatar user={u} size="md" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-text-primary text-sm font-body leading-snug">
+                    <span className="font-semibold">{u.name.split(" ")[0]}</span> is looking for a new {req.kind === "any" ? "thing" : req.kind} to watch
+                  </p>
+                  {req.note && <p className="text-text-muted text-xs truncate">&ldquo;{req.note}&rdquo;</p>}
+                </div>
+                <span className={`px-3 py-1.5 rounded-lg text-xs font-display font-bold flex-shrink-0 ${answered ? "bg-bg-elevated text-text-secondary" : "bg-accent text-white"}`}>
+                  {answered ? "Sent ✓" : "Recommend"}
+                </span>
+              </button>
+            );
+          })}
+
           {/* Feed cards */}
           <div className="flex flex-col gap-3">
             {filteredActivities.map((activity) => {
@@ -182,6 +256,15 @@ export default function FeedTab() {
                   <div>
                     {activity.rating != null && <RatingBadge rating={activity.rating} />}
                   </div>
+
+                  {/* Review (spoiler-shielded for unfinished seasons) */}
+                  {activity.review && (
+                    <SpoilerText
+                      text={activity.review}
+                      hidden={spoilerReason(activity) !== null}
+                      reason={spoilerReason(activity) ?? ""}
+                    />
+                  )}
 
                   {/* Tagged users */}
                   {activity.taggedUsers && activity.taggedUsers.length > 0 && (

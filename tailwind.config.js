@@ -12,13 +12,17 @@ module.exports = {
           surface: "#15151D",
           elevated: "#1C1C28",
           hover: "#252533",
+          card: "#15151D",
         },
+        border: "#252533",
         text: {
           primary: "#E8E4DC",
           secondary: "#9994A8",
           muted: "#5E586E",
         },
         accent: {
+          DEFAULT: "#8B5CF6",
+          light: "#A78BFA",
           purple: "#8B5CF6",
           gold: "#D4A843",
         },

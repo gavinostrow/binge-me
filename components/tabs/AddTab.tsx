@@ -1,15 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApp } from "@/lib/AppContext";
+import { useSocial } from "@/lib/SocialContext";
 import { ContentType, Movie, Show } from "@/lib/types";
 import { searchableMovies, searchableShows } from "@/lib/mockData";
+import { getMovie, getShow } from "@/lib/catalog";
+import { mergeById, useLiveSearch } from "@/lib/useLiveSearch";
 import { getRatingColor } from "@/lib/utils";
 
 type Step = "choose" | "search" | "rate" | "rate-seasons" | "confirm";
 
 export default function AddTab() {
-  const { addMovieRating, addShowRating, setActiveTab } = useApp();
+  const { addMovieRating, addShowRating, setActiveTab, getMyShowRating } = useApp();
+  const { pendingRate, clearPendingRate } = useSocial();
 
   const [step, setStep] = useState<Step>("choose");
   const [contentType, setContentType] = useState<ContentType>("movie");
@@ -52,6 +56,34 @@ export default function AddTab() {
     setSeasonRatings([7.0]);
     setStep("rate");
   };
+
+  // Arriving from "Finished Season N" (or another screen asking to rate a title)
+  useEffect(() => {
+    if (!pendingRate) return;
+    if (pendingRate.type === "movie") {
+      const movie = getMovie(pendingRate.id);
+      if (movie) {
+        setContentType("movie");
+        handleSelectMovie(movie);
+      }
+    } else {
+      const show = getShow(pendingRate.id);
+      if (show) {
+        setContentType("show");
+        setSelectedShow(show);
+        const existing = getMyShowRating(show.id);
+        const upTo = Math.max(pendingRate.season ?? 1, existing?.seasonRatings.length ?? 0);
+        setRating(existing?.overallRating ?? 7.0);
+        setSeasonsWatched(upTo);
+        setSeasonRatings(
+          Array.from({ length: upTo }, (_, i) => existing?.seasonRatings.find((r) => r.season === i + 1)?.rating ?? 7.0),
+        );
+        setRateSeasons(true);
+        setStep(pendingRate.season ? "rate-seasons" : "rate");
+      }
+    }
+    clearPendingRate();
+  }, [pendingRate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSeasonsWatchedChange = (delta: number) => {
     if (!selectedShow) return;
@@ -116,14 +148,21 @@ export default function AddTab() {
     }
   };
 
-  const filteredResults =
+  const live = useLiveSearch(step === "search" ? searchQuery : "");
+  const filteredResults: (Movie | Show)[] =
     searchQuery.length >= 2
       ? contentType === "movie"
-        ? searchableMovies.filter((m) =>
-            m.title.toLowerCase().includes(searchQuery.toLowerCase())
+        ? mergeById(
+            searchableMovies.filter((m) =>
+              m.title.toLowerCase().includes(searchQuery.toLowerCase())
+            ),
+            live.movies
           )
-        : searchableShows.filter((s) =>
-            s.title.toLowerCase().includes(searchQuery.toLowerCase())
+        : mergeById(
+            searchableShows.filter((s) =>
+              s.title.toLowerCase().includes(searchQuery.toLowerCase())
+            ),
+            live.shows
           )
       : [];
 

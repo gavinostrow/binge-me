@@ -9,20 +9,27 @@ export default function AuthScreen() {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const handleSignIn = async () => {
     setLoading(true);
+    setError(null);
     try {
       await login(email, password);
       popScreen();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong. Try again.");
     } finally {
       setLoading(false);
     }
   };
   const handleSignUp = async () => {
     setLoading(true);
+    setError(null);
     try {
       await signup(name, username, email, password);
       popScreen();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong. Try again.");
     } finally {
       setLoading(false);
     }
@@ -124,6 +131,11 @@ export default function AuthScreen() {
               placeholder="••••••••"
             />{" "}
           </div>{" "}
+          {error && (
+            <p className="text-sm text-rating-red font-body text-center" role="alert">
+              {error}
+            </p>
+          )}
           <button
             onClick={mode === "signin" ? handleSignIn : handleSignUp}
             disabled={loading}

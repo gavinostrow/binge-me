@@ -1,24 +1,18 @@
 "use client";
 import { useApp } from "@/lib/AppContext";
-import {
-  shows,
-  friends,
-  friendsShowRatings,
-  communityShows,
-  communitySeasons,
-  friendsNowWatching,
-} from "@/lib/mockData";
-import { getInitial } from "@/lib/utils";
+import { communitySeasons } from "@/lib/mockData";
+import { allShows, getShow } from "@/lib/catalog";
+import { useSocial } from "@/lib/SocialContext";
+import { useTitleExtras } from "@/lib/useTitleExtras";
 import PosterImage from "@/components/PosterImage";
 import RatingBadge from "@/components/RatingBadge";
-import { useState } from "react";
-
-const FRIEND_COLORS = ["#7C5CF6", "#EC4899", "#F59E0B", "#10B981", "#3B82F6"];
-function friendColor(userId: string) {
-  return FRIEND_COLORS[
-    parseInt(userId.replace(/\D/g, "")) % FRIEND_COLORS.length
-  ];
-}
+import UserAvatar from "@/components/social/UserAvatar";
+import NextSeasonCard from "@/components/social/NextSeasonCard";
+import WhereToWatch from "@/components/social/ProviderChips";
+import RatingsTrio from "@/components/social/RatingsTrio";
+import AlsoLikedRow from "@/components/social/AlsoLikedRow";
+import WatchingControl from "@/components/social/WatchingControl";
+import { useMemo, useState } from "react";
 
 export default function ShowDetailScreen({ showId }: { showId: string }) {
   const {
@@ -30,54 +24,42 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
     addToWatchlist,
     removeFromWatchlist,
     getMyShowRating,
-    myNowWatching,
-    currentUserData,
   } = useApp();
+  const { followingIds, watchingFor, getUser, questions } = useSocial();
   const [scrolled, setScrolled] = useState(false);
 
-  const show = shows.find((s) => s.id === showId);
+  const show = getShow(showId);
+  const extras = useTitleExtras("show", show);
+
+  // Fallback for "also liked": TMDB's similar shows, else same-genre shows.
+  const similarShows = useMemo(() => {
+    if (!show) return [];
+    if (extras.similar && extras.similar.length > 0) return extras.similar;
+    return allShows()
+      .filter((s) => s.id !== showId && s.genre.some((g) => show.genre.includes(g)))
+      .sort(
+        (a, b) =>
+          b.genre.filter((g) => show.genre.includes(g)).length -
+          a.genre.filter((g) => show.genre.includes(g)).length,
+      )
+      .slice(0, 8);
+  }, [show, showId, extras.similar]);
+
   if (!show) return <div className="p-4">Show not found</div>;
 
   const myRating = getMyShowRating(showId);
-  const friendRatings = friendsShowRatings[showId] || [];
-  const communityItem = communityShows.find((c) => c.show?.id === showId);
   const inWatchlist = isInWatchlist("show", showId);
   const seasonCommunityRatings = communitySeasons.filter(
     (c) => c.show?.id === showId,
   );
-
-  // Similar shows: same genre(s), exclude current
-  const similarShows = shows
-    .filter(
-      (s) => s.id !== showId && s.genre.some((g) => show.genre.includes(g)),
-    )
-    .sort((a, b) => {
-      const aMatch = a.genre.filter((g) => show.genre.includes(g)).length;
-      const bMatch = b.genre.filter((g) => show.genre.includes(g)).length;
-      return bMatch - aMatch;
-    })
-    .slice(0, 8);
-
-  // Who is currently watching this show
-  const friendsWatchingThis = friendsNowWatching.filter(
-    (f) =>
-      f.type === "show" && f.title.toLowerCase() === show.title.toLowerCase(),
+  const openPredictions = questions.filter(
+    (q) => q.showId === showId && new Date(q.locksAt).getTime() > Date.now(),
   );
-  const iSelfWatchingThis =
-    myNowWatching?.type === "show" &&
-    myNowWatching.title.toLowerCase() === show.title.toLowerCase();
-  const watchingNow = [
-    ...(iSelfWatchingThis
-      ? [
-          {
-            ...myNowWatching!,
-            userId: currentUserData.id,
-            user: currentUserData,
-          },
-        ]
-      : []),
-    ...friendsWatchingThis,
-  ];
+
+  // Friends currently watching this show (show + season)
+  const watchingNow = followingIds
+    .flatMap((id) => watchingFor(id))
+    .filter((w) => w.showId === showId);
 
   const handleWatchlistToggle = () => {
     if (inWatchlist) {
@@ -149,6 +131,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
         {/* Back button */}
         <button
           onClick={popScreen}
+          aria-label="Back"
           className="absolute top-4 left-4 z-10 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-95 transition-all"
         >
           <svg
@@ -288,42 +271,34 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
           </button>
         )}
 
-        {/* Watching Now */}
+        <WatchingControl show={show} />
+
+        <RatingsTrio type="show" id={show.id} myRating={myRating?.overallRating} />
+
+        <NextSeasonCard next={extras.next} />
+
+        <WhereToWatch providers={extras.providers} source={extras.source} />
+
+        {/* Friends watching now */}
         {watchingNow.length > 0 && (
           <div className="bg-bg-card rounded-2xl p-4 border border-border">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
-              <p className="text-text-muted text-xs font-body uppercase tracking-wider">
-                Watching Now
-              </p>
-            </div>
-            <div className="flex gap-3 flex-wrap">
+            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-3">
+              Friends watching now
+            </p>
+            <div className="flex gap-2 flex-wrap">
               {watchingNow.map((w) => {
-                const isSelf = w.userId === currentUserData.id;
+                const u = getUser(w.userId);
+                if (!u) return null;
                 return (
                   <button
                     key={w.userId}
-                    onClick={() =>
-                      !isSelf &&
-                      pushScreen({ screen: "profile", userId: w.userId })
-                    }
+                    onClick={() => pushScreen({ screen: "profile", userId: w.userId })}
                     className="flex items-center gap-2 bg-bg-elevated rounded-xl px-3 py-2 active:opacity-80 transition-opacity"
                   >
-                    <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-display font-bold text-white flex-shrink-0"
-                      style={{ backgroundColor: friendColor(w.userId) }}
-                    >
-                      {getInitial(w.user.name)}
-                    </div>
+                    <UserAvatar user={u} size="sm" />
                     <div className="text-left">
-                      <p className="text-text-primary text-xs font-display font-semibold">
-                        {isSelf ? "You" : w.user.name}
-                      </p>
-                      {w.episode && (
-                        <p className="text-text-muted text-[10px] font-body">
-                          {w.episode}
-                        </p>
-                      )}
+                      <p className="text-text-primary text-xs font-display font-semibold">{u.name.split(" ")[0]}</p>
+                      <p className="text-text-muted text-[10px] font-body">Season {w.season}</p>
                     </div>
                   </button>
                 );
@@ -332,125 +307,52 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
           </div>
         )}
 
-        {/* Community Stats */}
-        {communityItem && (
+        {/* Predictions */}
+        {openPredictions.length > 0 && (
+          <button
+            onClick={() => pushScreen({ screen: "predictions", showId: show.id })}
+            className="w-full bg-gradient-to-r from-accent/20 to-accent-gold/10 border border-accent/40 rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.99] transition-transform"
+          >
+            <span className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center font-display font-black text-accent-light text-lg">?</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-text-primary text-sm font-display font-bold">Make your predictions</p>
+              <p className="text-text-secondary text-xs font-body">
+                {openPredictions.length} open pick{openPredictions.length === 1 ? "" : "s"} · see who calls it
+              </p>
+            </div>
+            <span className="text-text-muted text-lg">›</span>
+          </button>
+        )}
+
+        {/* Season ratings */}
+        {show.seasons > 1 && !myRating?.seasonRatings?.length && seasonCommunityRatings.length > 0 ? (
           <div className="bg-bg-card rounded-2xl p-4 border border-border">
             <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-3">
-              Community
+              Season ratings on Binge
             </p>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <RatingBadge rating={communityItem.averageRating} size="lg" />
-                <div>
-                  <p className="text-text-primary text-sm font-display font-bold">
-                    {communityItem.averageRating.toFixed(1)} avg
-                  </p>
-                  <p className="text-text-muted text-xs font-body">
-                    {communityItem.ratingCount.toLocaleString()} ratings
-                  </p>
-                </div>
-              </div>
-              {communityItem.pct9plus && (
-                <div className="flex-1 flex justify-end">
-                  <div className="bg-accent/10 border border-accent/30 rounded-xl px-3 py-2 text-center">
-                    <p className="font-display font-bold text-accent text-lg leading-none">
-                      {communityItem.pct9plus}%
-                    </p>
-                    <p className="text-accent/80 text-[10px] font-body mt-0.5">
-                      gave it a 9+
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Season community ratings */}
-            {show.seasons &&
-              show.seasons > 1 &&
-              seasonCommunityRatings.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-border">
-                  <p className="text-text-muted text-[10px] font-body uppercase tracking-wider mb-2">
-                    Season Ratings
-                  </p>
-                  <div className="grid grid-cols-4 gap-2">
-                    {Array.from({ length: show.seasons }).map((_, i) => {
-                      const season = i + 1;
-                      const mySeasonRating = myRating?.seasonRatings?.find(
-                        (sr) => sr.season === season,
-                      );
-                      const commSeasonRating = seasonCommunityRatings.find(
-                        (c) => c.season === season,
-                      );
-                      return (
-                        <div
-                          key={season}
-                          className="bg-bg-elevated rounded-xl p-2.5 text-center"
-                        >
-                          <p className="text-text-muted text-[10px] font-body mb-1">
-                            S{season}
-                          </p>
-                          {mySeasonRating ? (
-                            <RatingBadge
-                              rating={mySeasonRating.rating}
-                              size="sm"
-                            />
-                          ) : commSeasonRating ? (
-                            <span className="text-text-secondary text-xs font-display font-bold">
-                              {commSeasonRating.averageRating.toFixed(1)}
-                            </span>
-                          ) : (
-                            <span className="text-text-muted text-xs">—</span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-          </div>
-        )}
-
-        {/* Friends' Ratings */}
-        {friendRatings.length > 0 && (
-          <div>
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-3 px-1">
-              Friends' Takes
-            </p>
-            <div className="space-y-2">
-              {friendRatings.map((fr, idx) => {
-                const friend = friends.find((f) => f.id === fr.userId);
-                if (!friend) return null;
+            <div className="grid grid-cols-4 gap-2">
+              {Array.from({ length: show.seasons }).map((_, i) => {
+                const season = i + 1;
+                const mySeasonRating = myRating?.seasonRatings?.find((sr) => sr.season === season);
+                const commSeasonRating = seasonCommunityRatings.find((c) => c.season === season);
                 return (
-                  <button
-                    key={idx}
-                    onClick={() =>
-                      pushScreen({ screen: "profile", userId: fr.userId })
-                    }
-                    className="w-full bg-bg-card rounded-2xl p-4 border border-border flex items-start gap-3 active:opacity-80 transition-opacity text-left"
-                  >
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-display font-bold text-white flex-shrink-0"
-                      style={{ backgroundColor: friendColor(friend.id) }}
-                    >
-                      {friend.name.charAt(0)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-text-primary text-sm font-display font-semibold">
-                        {friend.name}
-                      </p>
-                      {fr.review && (
-                        <p className="text-text-secondary text-xs mt-1 italic leading-relaxed line-clamp-2">
-                          "{fr.review}"
-                        </p>
-                      )}
-                    </div>
-                    <RatingBadge rating={fr.rating} size="md" />
-                  </button>
+                  <div key={season} className="bg-bg-elevated rounded-xl p-2.5 text-center">
+                    <p className="text-text-muted text-[10px] font-body mb-1">S{season}</p>
+                    {mySeasonRating ? (
+                      <RatingBadge rating={mySeasonRating.rating} size="sm" />
+                    ) : commSeasonRating ? (
+                      <span className="text-text-secondary text-xs font-display font-bold">
+                        {commSeasonRating.averageRating.toFixed(1)}
+                      </span>
+                    ) : (
+                      <span className="text-text-muted text-xs">—</span>
+                    )}
+                  </div>
                 );
               })}
             </div>
           </div>
-        )}
+        ) : null}
 
         {/* Description */}
         {show.description && (
@@ -487,57 +389,7 @@ export default function ShowDetailScreen({ showId }: { showId: string }) {
           </div>
         )}
 
-        {/* Similar Shows */}
-        {similarShows.length > 0 && (
-          <div>
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-3 px-1">
-              You Might Also Like
-            </p>
-            <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
-              {similarShows.map((s) => {
-                const communityRating = communityShows.find(
-                  (c) => c.show?.id === s.id,
-                );
-                return (
-                  <button
-                    key={s.id}
-                    onClick={() =>
-                      pushScreen({ screen: "show-detail", showId: s.id })
-                    }
-                    className="flex-shrink-0 w-28 active:opacity-75 transition-opacity text-left"
-                  >
-                    <PosterImage
-                      title={s.title}
-                      year={s.year}
-                      posterPath={s.posterPath}
-                      size="md"
-                      className="w-28 h-40 rounded-xl object-cover"
-                    />
-                    <p className="text-text-primary text-xs font-display font-semibold mt-1.5 truncate leading-tight">
-                      {s.title}
-                    </p>
-                    <div className="flex items-center gap-1 mt-0.5">
-                      <span className="text-text-muted text-[10px] font-body">
-                        {s.year}
-                      </span>
-                      {communityRating && (
-                        <>
-                          <span className="text-text-muted text-[10px]">·</span>
-                          <span
-                            className="text-[10px] font-body font-semibold"
-                            style={{ color: "#A78BFA" }}
-                          >
-                            {communityRating.averageRating.toFixed(1)}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        <AlsoLikedRow type="show" id={show.id} fallback={similarShows} />
 
         {/* Watchlist button */}
         <button
