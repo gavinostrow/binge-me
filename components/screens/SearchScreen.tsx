@@ -13,6 +13,8 @@ import {
   communityShows,
 } from "@/lib/mockData";
 import type { Movie, Show, User } from "@/lib/types";
+import { mergeById, useLiveSearch } from "@/lib/useLiveSearch";
+import { useSocial } from "@/lib/SocialContext";
 import { getInitial } from "@/lib/utils";
 
 type SearchTab = "all" | "movies" | "shows" | "friends";
@@ -236,6 +238,17 @@ export default function SearchScreen({ initialQuery }: { initialQuery?: string }
     [q]
   );
 
+  const live = useLiveSearch(q);
+  const { allUsers } = useSocial();
+  const matchedPeople = useMemo(
+    () =>
+      mergeById(
+        matchedFriends,
+        allUsers.filter((u) => u.name.toLowerCase().includes(q) || u.username.toLowerCase().includes(q)),
+      ),
+    [matchedFriends, allUsers, q]
+  );
+
   const showEmpty = !q;
   const tabs: { id: SearchTab; label: string }[] = [
     { id: "all", label: "All" },
@@ -248,9 +261,9 @@ export default function SearchScreen({ initialQuery }: { initialQuery?: string }
   const showMovies = tab === "all" || tab === "movies";
   const showShows = tab === "all" || tab === "shows";
 
-  const displayFriends = showEmpty ? friends : matchedFriends;
-  const displayMovies = showEmpty ? movies.slice(0, 10) : matchedMovies;
-  const displayShows = showEmpty ? shows.slice(0, 10) : matchedShows;
+  const displayFriends = showEmpty ? friends : matchedPeople;
+  const displayMovies = showEmpty ? movies.slice(0, 10) : mergeById(matchedMovies, live.movies);
+  const displayShows = showEmpty ? shows.slice(0, 10) : mergeById(matchedShows, live.shows);
   const hasResults =
     displayFriends.length > 0 || displayMovies.length > 0 || displayShows.length > 0;
 

@@ -19,6 +19,7 @@ import type {
   NowWatching,
 } from "./types";
 import type { ScreenDescriptor } from "./navigation";
+import { getSupabase } from "./supabase";
 import {
   currentUser as mockCurrentUser,
   myMovieRatings as initialMovieRatings,
@@ -84,6 +85,15 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+async function loadProfile(id: string, email: string): Promise<User> {
+  const supabase = getSupabase();
+  const fallback: User = { id, name: email.split("@")[0], username: email.split("@")[0], bio: "" };
+  if (!supabase) return fallback;
+  const { data } = await supabase.from("profiles").select("id, username, name, bio, avatar_url").eq("id", id).single();
+  if (!data) return fallback;
+  return { id: data.id, username: data.username, name: data.name || data.username, bio: data.bio, avatarUrl: data.avatar_url ?? undefined };
+}
+
 export function AppProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
@@ -122,6 +132,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [pendingRecipientId, setPendingRecipientId] = useState<string | null>(null);
 
   useEffect(() => {
+    const supabase = getSupabase();
+    if (supabase) {
+      supabase.auth.getSession().then(async ({ data }) => {
+        const sessionUser = data.session?.user;
+        if (!sessionUser) return;
+        const user = await loadProfile(sessionUser.id, sessionUser.email ?? "");
+        setAuthUser(user);
+        setCurrentUserData(user);
+      });
+      return;
+    }
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("binge_user");
       if (saved) {
@@ -293,7 +314,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const clearStack = () => setNavigationStack([]);
 
-  const login = async (_email: string, _password: string) => {
+  const login = async (email: string, password: string) => {
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw new Error(error.message);
+      const user = await loadProfile(data.user.id, data.user.email ?? email);
+      setAuthUser(user);
+      setCurrentUserData(user);
+      return;
+    }
+    // Sample mode: no backend yet, restore the locally saved account.
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("binge_user");
       if (saved) {
@@ -304,7 +335,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signup = async (name: string, username: string, _email: string, _password: string) => {
+  const signup = async (name: string, username: string, email: string, password: string) => {
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { name, username: username.toLowerCase() } },
+      });
+      if (error) throw new Error(error.message);
+      if (!data.session) {
+        throw new Error("Check your email to confirm your account, then sign in.");
+      }
+      const user: User = { id: data.user!.id, name, username: username.toLowerCase(), bio: "", favoriteGenres: [] };
+      setAuthUser(user);
+      setCurrentUserData(user);
+      return;
+    }
     const newUser: User = { id: `u_${Date.now()}`, name, username, bio: "", favoriteGenres: [] };
     if (typeof window !== "undefined") localStorage.setItem("binge_user", JSON.stringify(newUser));
     setAuthUser(newUser);
@@ -312,6 +359,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    getSupabase()?.auth.signOut();
     if (typeof window !== "undefined") localStorage.removeItem("binge_user");
     setAuthUser(null);
     setCurrentUserData(mockCurrentUser);

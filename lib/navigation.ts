@@ -5,4 +5,11 @@ export type ScreenDescriptor =
   | { screen: "profile-edit" }
   | { screen: "auth" }
   | { screen: "search"; query?: string }
-  | { screen: "settings" };
+  | { screen: "settings" }
+  | { screen: "notifications" }
+  | { screen: "find-friends" }
+  | { screen: "rec-request"; requestId: string }
+  | { screen: "my-request" }
+  | { screen: "predictions"; showId?: string }
+  | { screen: "wrapped"; period?: string }
+  | { screen: "coming-back" };

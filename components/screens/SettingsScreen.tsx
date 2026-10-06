@@ -1,5 +1,8 @@
 "use client";
 import { useState } from "react";
+import { useSocial } from "@/lib/SocialContext";
+import { PROVIDER_LIST } from "@/lib/providers";
+import { ProviderLogo } from "@/components/social/ProviderChips";
 import { useApp } from "@/lib/AppContext";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -134,6 +137,10 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function SettingsScreen() {
   const { popScreen, theme, toggleTheme, logout, currentUserData, pushScreen } = useApp();
+  const { myServices, toggleService, spoilerShield, setSpoilerShield } = useSocial();
+  const [notifRequests, setNotifRequests] = useState(true);
+  const [notifReturns, setNotifReturns] = useState(true);
+  const [notifPredictions, setNotifPredictions] = useState(true);
 
   const [notifFriendRates, setNotifFriendRates] = useState(true);
   const [notifRecommend, setNotifRecommend] = useState(true);
@@ -185,7 +192,68 @@ export default function SettingsScreen() {
           <SettingRow icon={I.lock} label="Change Password" onPress={() => {}} />
         </Section>
 
+        <div>
+          <p className="text-[10px] font-body font-semibold uppercase tracking-widest text-text-muted px-4 mb-1 mt-6">
+            My streaming services
+          </p>
+          <div className="bg-bg-card border-y border-border px-4 py-4">
+            <p className="text-xs text-text-muted font-body mb-3">
+              Binge highlights titles you can watch tonight and can filter picks to these.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {PROVIDER_LIST.map((p) => {
+                const on = myServices.includes(p.key);
+                return (
+                  <button
+                    key={p.key}
+                    onClick={() => toggleService(p.key)}
+                    aria-pressed={on}
+                    className={`flex items-center gap-2 rounded-xl pl-1.5 pr-3 py-1.5 border text-sm font-body font-semibold transition-colors ${
+                      on ? "border-rating-green/50 bg-rating-green/10 text-text-primary" : "border-border text-text-secondary"
+                    }`}
+                  >
+                    <ProviderLogo provider={p} size="sm" />
+                    {p.name}
+                    {on && <span className="text-rating-green">✓</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <Section title="Spoilers">
+          <ToggleRow
+            icon={I.lock}
+            label="Spoiler shield"
+            sublabel="Blur friends' reviews for seasons you haven't finished"
+            value={spoilerShield}
+            onChange={setSpoilerShield}
+          />
+        </Section>
+
         <Section title="Notifications">
+          <ToggleRow
+            icon={I.user}
+            label="Friend wants a pick"
+            sublabel="When a friend is looking for something to watch"
+            value={notifRequests}
+            onChange={setNotifRequests}
+          />
+          <ToggleRow
+            icon={I.bell}
+            label="Your shows coming back"
+            sublabel="When a premiere date is announced, and a week before"
+            value={notifReturns}
+            onChange={setNotifReturns}
+          />
+          <ToggleRow
+            icon={I.film}
+            label="Predictions"
+            sublabel="Reminders before picks lock, and results"
+            value={notifPredictions}
+            onChange={setNotifPredictions}
+          />
           <ToggleRow
             icon={I.film}
             label="Friend rates something"

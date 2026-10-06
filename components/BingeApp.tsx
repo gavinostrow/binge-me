@@ -9,6 +9,7 @@ import ProfileTab from "./tabs/ProfileTab";
 import GroupsTab from "./tabs/GroupsTab";
 import ScreenRenderer from "./ScreenRenderer";
 import Onboarding from "./Onboarding";
+import Toast from "./social/Toast";
 export default function BingeApp() {
   const { activeTab } = useApp();
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -34,7 +35,7 @@ export default function BingeApp() {
           {activeTab === "profile" && <ProfileTab />}{" "}
         </div>{" "}
       </main>{" "}
-      <BottomNav /> <ScreenRenderer />{" "}
+      <BottomNav /> <ScreenRenderer /> <Toast />{" "}
       {showOnboarding && (
         <Onboarding onDone={() => setShowOnboarding(false)} />
       )}{" "}

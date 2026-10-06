@@ -1,21 +1,13 @@
 "use client";
 import { useApp } from "@/lib/AppContext";
-import {
-  movies,
-  friends,
-  friendsMovieRatings,
-  communityMovies,
-} from "@/lib/mockData";
+import { allMovies, getMovie } from "@/lib/catalog";
+import { useTitleExtras } from "@/lib/useTitleExtras";
 import PosterImage from "@/components/PosterImage";
 import RatingBadge from "@/components/RatingBadge";
-import { useState } from "react";
-
-const FRIEND_COLORS = ["#7C5CF6", "#EC4899", "#F59E0B", "#10B981", "#3B82F6"];
-function friendColor(userId: string) {
-  return FRIEND_COLORS[
-    parseInt(userId.replace(/\D/g, "")) % FRIEND_COLORS.length
-  ];
-}
+import WhereToWatch from "@/components/social/ProviderChips";
+import RatingsTrio from "@/components/social/RatingsTrio";
+import AlsoLikedRow from "@/components/social/AlsoLikedRow";
+import { useMemo, useState } from "react";
 
 export default function MovieDetailScreen({ movieId }: { movieId: string }) {
   const {
@@ -30,25 +22,27 @@ export default function MovieDetailScreen({ movieId }: { movieId: string }) {
   } = useApp();
   const [scrolled, setScrolled] = useState(false);
 
-  const movie = movies.find((m) => m.id === movieId);
+  const movie = getMovie(movieId);
+  const extras = useTitleExtras("movie", movie);
+
+  // Fallback for "also liked": TMDB's similar movies, else same-genre movies.
+  const similarMovies = useMemo(() => {
+    if (!movie) return [];
+    if (extras.similar && extras.similar.length > 0) return extras.similar;
+    return allMovies()
+      .filter((m) => m.id !== movieId && m.genre.some((g) => movie.genre.includes(g)))
+      .sort(
+        (a, b) =>
+          b.genre.filter((g) => movie.genre.includes(g)).length -
+          a.genre.filter((g) => movie.genre.includes(g)).length,
+      )
+      .slice(0, 8);
+  }, [movie, movieId, extras.similar]);
+
   if (!movie) return <div className="p-4">Movie not found</div>;
 
   const myRating = getMyMovieRating(movieId);
-  const friendRatings = friendsMovieRatings[movieId] || [];
-  const communityItem = communityMovies.find((c) => c.movie?.id === movieId);
   const inWatchlist = isInWatchlist("movie", movieId);
-
-  // Similar movies: same genre(s), exclude current
-  const similarMovies = movies
-    .filter(
-      (m) => m.id !== movieId && m.genre.some((g) => movie.genre.includes(g)),
-    )
-    .sort((a, b) => {
-      const aMatch = a.genre.filter((g) => movie.genre.includes(g)).length;
-      const bMatch = b.genre.filter((g) => movie.genre.includes(g)).length;
-      return bMatch - aMatch;
-    })
-    .slice(0, 8);
 
   const handleWatchlistToggle = () => {
     if (inWatchlist) {
@@ -118,6 +112,7 @@ export default function MovieDetailScreen({ movieId }: { movieId: string }) {
         {/* Back button always on poster */}
         <button
           onClick={popScreen}
+          aria-label="Back"
           className="absolute top-4 left-4 z-10 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-95 transition-all"
         >
           <svg
@@ -225,81 +220,9 @@ export default function MovieDetailScreen({ movieId }: { movieId: string }) {
           </button>
         )}
 
-        {/* Community Stats */}
-        {communityItem && (
-          <div className="bg-bg-card rounded-2xl p-4 border border-border">
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-3">
-              Community
-            </p>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <RatingBadge rating={communityItem.averageRating} size="lg" />
-                <div>
-                  <p className="text-text-primary text-sm font-display font-bold">
-                    {communityItem.averageRating.toFixed(1)} avg
-                  </p>
-                  <p className="text-text-muted text-xs font-body">
-                    {communityItem.ratingCount.toLocaleString()} ratings
-                  </p>
-                </div>
-              </div>
-              {communityItem.pct9plus && (
-                <div className="flex-1 flex justify-end">
-                  <div className="bg-accent/10 border border-accent/30 rounded-xl px-3 py-2 text-center">
-                    <p className="font-display font-bold text-accent text-lg leading-none">
-                      {communityItem.pct9plus}%
-                    </p>
-                    <p className="text-accent/80 text-[10px] font-body mt-0.5">
-                      gave it a 9+
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+        <RatingsTrio type="movie" id={movie.id} myRating={myRating?.rating} />
 
-        {/* Friends' Ratings */}
-        {friendRatings.length > 0 && (
-          <div>
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-3 px-1">
-              Friends' Takes
-            </p>
-            <div className="space-y-2">
-              {friendRatings.map((fr, idx) => {
-                const friend = friends.find((f) => f.id === fr.userId);
-                if (!friend) return null;
-                return (
-                  <button
-                    key={idx}
-                    onClick={() =>
-                      pushScreen({ screen: "profile", userId: fr.userId })
-                    }
-                    className="w-full bg-bg-card rounded-2xl p-4 border border-border flex items-start gap-3 active:opacity-80 transition-opacity text-left"
-                  >
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-display font-bold text-white flex-shrink-0"
-                      style={{ backgroundColor: friendColor(friend.id) }}
-                    >
-                      {friend.name.charAt(0)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-text-primary text-sm font-display font-semibold">
-                        {friend.name}
-                      </p>
-                      {fr.review && (
-                        <p className="text-text-secondary text-xs mt-1 italic leading-relaxed line-clamp-2">
-                          "{fr.review}"
-                        </p>
-                      )}
-                    </div>
-                    <RatingBadge rating={fr.rating} size="md" />
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        <WhereToWatch providers={extras.providers} source={extras.source} />
 
         {/* Description */}
         {movie.description && (
@@ -336,57 +259,7 @@ export default function MovieDetailScreen({ movieId }: { movieId: string }) {
           </div>
         )}
 
-        {/* Similar Movies */}
-        {similarMovies.length > 0 && (
-          <div>
-            <p className="text-text-muted text-xs font-body uppercase tracking-wider mb-3 px-1">
-              You Might Also Like
-            </p>
-            <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
-              {similarMovies.map((m) => {
-                const communityRating = communityMovies.find(
-                  (c) => c.movie?.id === m.id,
-                );
-                return (
-                  <button
-                    key={m.id}
-                    onClick={() =>
-                      pushScreen({ screen: "movie-detail", movieId: m.id })
-                    }
-                    className="flex-shrink-0 w-28 active:opacity-75 transition-opacity text-left"
-                  >
-                    <PosterImage
-                      title={m.title}
-                      year={m.year}
-                      posterPath={m.posterPath}
-                      size="md"
-                      className="w-28 h-40 rounded-xl object-cover"
-                    />
-                    <p className="text-text-primary text-xs font-display font-semibold mt-1.5 truncate leading-tight">
-                      {m.title}
-                    </p>
-                    <div className="flex items-center gap-1 mt-0.5">
-                      <span className="text-text-muted text-[10px] font-body">
-                        {m.year}
-                      </span>
-                      {communityRating && (
-                        <>
-                          <span className="text-text-muted text-[10px]">·</span>
-                          <span
-                            className="text-[10px] font-body font-semibold"
-                            style={{ color: "#A78BFA" }}
-                          >
-                            {communityRating.averageRating.toFixed(1)}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        <AlsoLikedRow type="movie" id={movie.id} fallback={similarMovies} />
 
         {/* Watchlist button (bottom) */}
         <button

@@ -162,12 +162,23 @@ export interface FriendShowRating {
 
 export interface Notification {
   id: string;
-  type: "recommendation" | "reaction" | "comment" | "follow";
+  type:
+    | "recommendation"
+    | "reaction"
+    | "comment"
+    | "follow"
+    | "rec_request"
+    | "rec_reply"
+    | "return_date"
+    | "started_watching"
+    | "prediction";
   fromUserId?: string;
   fromUser?: User;
   movie?: Movie;
   show?: Show;
   message?: string;
+  requestId?: string;
+  season?: number;
   seen: boolean;
   createdAt?: string;
   timestamp?: string;

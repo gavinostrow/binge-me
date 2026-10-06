@@ -1,5 +1,7 @@
 "use client";
 import { useMemo, useState, useRef } from "react";
+import CurrentlyWatchingSection from "@/components/social/CurrentlyWatchingSection";
+import WrappedEntry from "@/components/social/WrappedEntry";
 import { useApp } from "@/lib/AppContext";
 import RatingBadge from "@/components/RatingBadge";
 import PosterImage from "@/components/PosterImage";
@@ -173,221 +175,6 @@ const FRIEND_COLORS = ["#7C5CF6", "#EC4899", "#F59E0B", "#10B981", "#3B82F6"];
 function friendColor(userId: string) {
   return FRIEND_COLORS[parseInt(userId.replace(/\D/g, "")) % FRIEND_COLORS.length];
 }
-function MyWatchingStatus() {
-  const { currentUserData, myNowWatching, setMyNowWatching, clearNowWatching } = useApp();
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [draftType, setDraftType] = useState<"movie" | "show">("show");
-  const [draftTitle, setDraftTitle] = useState("");
-  const [draftEpisode, setDraftEpisode] = useState("");
-  const openSheet = () => {
-    if (myNowWatching) {
-      setDraftType(myNowWatching.type as "movie" | "show");
-      setDraftTitle(myNowWatching.title);
-      setDraftEpisode(myNowWatching.episode ?? "");
-    } else {
-      setDraftType("show");
-      setDraftTitle("");
-      setDraftEpisode("");
-    }
-    setSheetOpen(true);
-  };
-  const handleShare = () => {
-    if (!draftTitle.trim()) return;
-    setMyNowWatching({
-      userId: currentUserData.id,
-      title: draftTitle.trim(),
-      type: draftType,
-      episode: draftType === "show" && draftEpisode.trim() ? draftEpisode.trim() : undefined,
-      startedAt: new Date().toISOString(),
-    });
-    setSheetOpen(false);
-  };
-  return (
-    <div className="space-y-2">
-      {" "}
-      <div className="flex items-center justify-between px-0.5">
-        {" "}
-        <div className="flex items-center gap-2">
-          {" "}
-          {myNowWatching && (
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
-          )}{" "}
-          <span className="text-[10px] font-body font-semibold uppercase tracking-widest text-text-muted">
-            {" "}
-            {myNowWatching ? "Now Watching" : "Watching Status"}{" "}
-          </span>{" "}
-        </div>{" "}
-        <button
-          onClick={openSheet}
-          className="text-[10px] font-body font-semibold text-accent active:opacity-70 transition-opacity"
-        >
-          {" "}
-          {myNowWatching ? "Update" : "+ Set Status"}{" "}
-        </button>{" "}
-      </div>{" "}
-      {myNowWatching ? (
-        /* Active status card */ <div className="bg-bg-card rounded-2xl border border-border px-4 py-3 flex items-center gap-3">
-          {" "}
-          <div className="flex-1 min-w-0">
-            {" "}
-            <div className="flex items-center gap-2 mb-0.5">
-              {" "}
-              <span
-                className="text-[10px] font-body font-semibold px-1.5 py-0.5 rounded-full"
-                style={{
-                  backgroundColor: myNowWatching.type === "movie" ? "#7C5CF620" : "#EC489920",
-                  color: myNowWatching.type === "movie" ? "#7C5CF6" : "#EC4899",
-                }}
-              >
-                {" "}
-                {myNowWatching.type === "movie" ? "Movie" : "Show"}{" "}
-              </span>{" "}
-              <span className="text-text-muted text-[10px] font-body">
-                {timeAgo(myNowWatching.startedAt)}
-              </span>{" "}
-            </div>{" "}
-            <p className="text-text-primary font-display font-semibold text-sm truncate">
-              {myNowWatching.title}
-            </p>{" "}
-            {myNowWatching.episode && (
-              <p className="text-text-muted text-xs font-body mt-0.5">{myNowWatching.episode}</p>
-            )}{" "}
-          </div>{" "}
-          <button
-            onClick={clearNowWatching}
-            className="text-text-muted active:text-text-secondary transition-colors flex-shrink-0 p-1"
-            aria-label="Clear status"
-          >
-            {" "}
-            <XIcon />{" "}
-          </button>{" "}
-        </div>
-      ) : (
-        /* Empty prompt */ <button
-          onClick={openSheet}
-          className="w-full flex items-center gap-3 bg-bg-card border border-border rounded-2xl px-4 py-3 active:bg-bg-elevated transition-colors"
-        >
-          {" "}
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.8}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-text-muted flex-shrink-0"
-          >
-            {" "}
-            <circle cx="12" cy="12" r="10" />
-            <polygon points="10 8 16 12 10 16 10 8" />{" "}
-          </svg>{" "}
-          <span className="text-text-muted font-body text-sm">
-            What are you watching right now?
-          </span>{" "}
-          <svg
-            className="ml-auto text-text-muted flex-shrink-0"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-          >
-            {" "}
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />{" "}
-          </svg>{" "}
-        </button>
-      )}{" "}
-      {/* Bottom sheet */}{" "}
-      {sheetOpen && (
-        <>
-          {" "}
-          <div
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
-            onClick={() => setSheetOpen(false)}
-          />{" "}
-          <div className="fixed bottom-0 left-0 right-0 z-50 max-w-app mx-auto bg-bg-card border-t border-border rounded-t-3xl p-5 pb-8 animate-slideUp">
-            {" "}
-            <div className="w-10 h-1 rounded-full bg-border mx-auto mb-5" />{" "}
-            <p className="font-display font-bold text-text-primary text-base mb-4">
-              {" "}
-              {myNowWatching ? "Update your status" : "What are you watching?"}{" "}
-            </p>{" "}
-            <div className="flex gap-2 mb-4">
-              {" "}
-              {(["show", "movie"] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => {
-                    setDraftType(t);
-                    setDraftEpisode("");
-                  }}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-display font-semibold transition-all"
-                  style={
-                    draftType === t
-                      ? { background: "linear-gradient(135deg, #7C5CF6, #a78bfa)", color: "#fff" }
-                      : { backgroundColor: "var(--bg-elevated)", color: "var(--text-muted)" }
-                  }
-                >
-                  {" "}
-                  {t === "show" ? "TV Show" : "Movie"}{" "}
-                </button>
-              ))}{" "}
-            </div>{" "}
-            <div className="mb-3">
-              {" "}
-              <label className="text-[10px] font-body font-semibold uppercase tracking-wider text-text-muted block mb-1.5">
-                Title
-              </label>{" "}
-              <input
-                type="text"
-                value={draftTitle}
-                onChange={(e) => setDraftTitle(e.target.value)}
-                placeholder={draftType === "show" ? "e.g. The Bear" : "e.g. Dune: Part Two"}
-                className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-3 text-sm font-body text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent/50 transition-colors"
-                autoFocus
-              />{" "}
-            </div>{" "}
-            {draftType === "show" && (
-              <div className="mb-5">
-                {" "}
-                <label className="text-[10px] font-body font-semibold uppercase tracking-wider text-text-muted block mb-1.5">
-                  {" "}
-                  Episode{" "}
-                  <span className="normal-case font-normal text-text-muted/60">
-                    (optional)
-                  </span>{" "}
-                </label>{" "}
-                <input
-                  type="text"
-                  value={draftEpisode}
-                  onChange={(e) => setDraftEpisode(e.target.value)}
-                  placeholder="e.g. S3E4"
-                  className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-3 text-sm font-body text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent/50 transition-colors"
-                />{" "}
-              </div>
-            )}{" "}
-            {draftType === "movie" && <div className="mb-5" />}{" "}
-            <button
-              onClick={handleShare}
-              disabled={!draftTitle.trim()}
-              className="w-full py-3.5 rounded-2xl font-display font-bold text-sm text-white transition-all disabled:opacity-40"
-              style={{ background: "linear-gradient(135deg, #7C5CF6, #a78bfa)" }}
-            >
-              {" "}
-              {myNowWatching ? "Update Status" : "Share"}{" "}
-            </button>{" "}
-          </div>{" "}
-        </>
-      )}{" "}
-    </div>
-  );
-}
-// ─── Sub-components ───────────────────────────────────────────────────────────
 function UserHeader() {
   const { currentUserData, pushScreen, isAuthenticated, movieRatings, showRatings, updateProfile } =
     useApp();
@@ -1390,7 +1177,16 @@ export default function ProfileTab() {
       </div>{" "}
       <div className="px-4 pb-24 space-y-3">
         {" "}
-        <UserHeader /> <MyWatchingStatus /> <StatsGrid stats={stats} />{" "}
+        <UserHeader />
+        <button
+          onClick={() => pushScreen({ screen: "find-friends" })}
+          className="w-full py-2.5 rounded-xl bg-bg-card border border-border text-text-primary text-sm font-display font-semibold"
+        >
+          Find &amp; invite friends
+        </button>
+        <CurrentlyWatchingSection />
+        <WrappedEntry />
+        <StatsGrid stats={stats} />{" "}
         <FavoritesSection movieRatings={movieRatings} showRatings={showRatings} />{" "}
         <MyListsSection />{" "}
         {genreBreakdown.length > 0 && <GenreBreakdown breakdown={genreBreakdown} />}{" "}

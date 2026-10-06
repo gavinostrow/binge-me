@@ -1,232 +1,196 @@
 "use client";
+import { useMemo, useState } from "react";
 import { useApp } from "@/lib/AppContext";
-import { friends, myMovieRatings, myShowRatings, tasteMatchPercentages } from "@/lib/mockData";
-import { nowWatching } from "@/lib/mockGroups";
+import { useSocial } from "@/lib/SocialContext";
+import { ratingsByUser, tasteMatch } from "@/lib/social";
+import { getMovie, getShow } from "@/lib/catalog";
+import { knownExtras } from "@/lib/useTitleExtras";
 import PosterImage from "@/components/PosterImage";
 import RatingBadge from "@/components/RatingBadge";
-import { timeAgo } from "@/lib/utils";
-
-type WatchStatus = {
-  title: string;
-  type: string;
-  episode?: string;
-  startedAt: string;
-} | null;
-
-function WatchingStatusCard({ status }: { status: WatchStatus }) {
-  if (!status) return null;
-  const isShow = status.type === "show";
-  return (
-    <div className="bg-bg-card rounded-2xl border border-border px-4 py-3">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
-        <span className="text-[10px] font-body font-semibold uppercase tracking-widest text-text-muted">
-          Watching Now
-        </span>
-        <span className="ml-auto text-[10px] text-text-muted font-body">
-          {timeAgo(status.startedAt)}
-        </span>
-      </div>
-      <div className="flex items-center gap-2">
-        <span
-          className="text-[10px] font-body font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0"
-          style={{
-            backgroundColor: isShow ? "#EC489920" : "#7C5CF620",
-            color: isShow ? "#EC4899" : "#7C5CF6",
-          }}
-        >
-          {isShow ? "Show" : "Movie"}
-        </span>
-        <p className="font-display font-semibold text-text-primary text-sm truncate">
-          {status.title}
-        </p>
-        {status.episode && (
-          <span className="text-text-muted text-xs font-body flex-shrink-0">
-            · {status.episode}
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
+import ScreenHeader from "@/components/social/ScreenHeader";
+import UserAvatar from "@/components/social/UserAvatar";
+import { ProviderLogos } from "@/components/social/ProviderChips";
 
 export default function ProfileDetailScreen({ userId }: { userId: string }) {
-  const { pushScreen, popScreen, currentUserData, myNowWatching } = useApp();
-  const isSelf = userId === currentUserData.id;
-  const user = isSelf ? currentUserData : friends.find((f) => f.id === userId);
+  const { pushScreen, currentUserData } = useApp();
+  const { getUser, myRows, watchingFor, isFollowing, follow, unfollow, showToast, recRequests } = useSocial();
+  const [tab, setTab] = useState<"show" | "movie">("show");
+
+  const isSelf = userId === currentUserData.id || userId === "u1";
+  const user = getUser(userId);
+  const rows = useMemo(() => (isSelf ? myRows : ratingsByUser(userId)), [isSelf, myRows, userId]);
 
   if (!user) return <div className="p-4">User not found</div>;
 
-  const watchingStatus = isSelf
-    ? myNowWatching
-    : nowWatching.find((f) => f.userId === userId) ?? null;
-
-  const userMovieRatings = isSelf ? myMovieRatings : [];
-  const userShowRatings = isSelf ? myShowRatings : [];
-  const tasteMatch = isSelf ? undefined : tasteMatchPercentages[userId];
-  const topMovies = userMovieRatings.slice(0, 4);
-  const avgMovieRating =
-    userMovieRatings.length > 0
-      ? (
-          userMovieRatings.reduce((sum, r) => sum + r.rating, 0) / userMovieRatings.length
-        ).toFixed(1)
-      : "—";
+  const watching = watchingFor(userId);
+  const match = isSelf ? null : tasteMatch(myRows, userId);
+  const following = isFollowing(userId);
+  const openRequest = recRequests.find((r) => r.userId === userId && new Date(r.expiresAt).getTime() > Date.now());
+  const list = rows.filter((r) => r.type === tab).sort((a, b) => b.rating - a.rating);
+  const avg = rows.length ? (rows.reduce((s, r) => s + r.rating, 0) / rows.length).toFixed(1) : "—";
 
   return (
     <div className="flex flex-col h-full overflow-y-auto scrollbar-hide bg-bg-primary">
-      {/* Nav bar */}
-      <div className="sticky top-0 z-10 bg-bg-primary/95 backdrop-blur-sm border-b border-border px-4 py-3 flex items-center gap-3">
-        <button
-          onClick={popScreen}
-          className="w-8 h-8 rounded-full bg-bg-card border border-border flex items-center justify-center active:scale-95 transition-all"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-        <h2 className="font-display text-base font-bold text-text-primary">{user.name}</h2>
-      </div>
+      <ScreenHeader title={user.name} subtitle={`@${user.username}`} />
 
-      <div className="px-4 pb-8 space-y-5">
-        {/* Avatar + name */}
-        <div className="pt-4 text-center space-y-2">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-accent to-accent-light flex items-center justify-center mx-auto">
-            <span className="text-white font-display text-5xl font-bold">
-              {user.name.charAt(0)}
-            </span>
+      <div className="px-4 pb-28 space-y-4">
+        <div className="pt-5 flex items-center gap-4">
+          <UserAvatar user={user} size="lg" />
+          <div className="flex-1 min-w-0">
+            <h1 className="font-display text-xl font-bold text-text-primary truncate">{user.name}</h1>
+            <p className="text-text-secondary text-sm">@{user.username}</p>
+            {user.bio && <p className="text-text-secondary text-sm mt-1">{user.bio}</p>}
           </div>
-          <h1 className="font-display text-2xl font-bold text-text-primary">{user.name}</h1>
-          <p className="text-text-secondary text-sm">@{user.username}</p>
-          {user.bio && <p className="text-text-secondary text-sm">{user.bio}</p>}
         </div>
 
-        {/* Watching status */}
-        <WatchingStatusCard status={watchingStatus} />
-
-        {/* Taste match (friends only) */}
-        {tasteMatch !== undefined && (
-          <div className="bg-bg-card rounded-2xl p-4 text-center">
-            <p className="text-text-secondary text-xs uppercase tracking-wider font-semibold mb-2">
-              Taste Match
-            </p>
-            <div className="text-4xl font-display font-bold text-accent">{tasteMatch}%</div>
-            <p className="text-text-secondary text-sm mt-1">Compatible with you</p>
-          </div>
-        )}
-
-        {/* Edit profile (self only) */}
-        {isSelf && (
+        {isSelf ? (
           <button
             onClick={() => pushScreen({ screen: "profile-edit" })}
-            className="w-full py-3 bg-gradient-to-r from-accent to-accent-light text-white font-display font-bold rounded-2xl active:scale-[0.98] transition-all"
+            className="w-full py-2.5 rounded-xl bg-bg-card border border-border text-text-primary text-sm font-display font-semibold"
           >
-            Edit Profile
+            Edit profile
           </button>
+        ) : (
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                if (following) unfollow(userId);
+                else {
+                  follow(userId);
+                  showToast(`Added ${user.name.split(" ")[0]}`);
+                }
+              }}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-display font-bold ${
+                following ? "bg-bg-card border border-border text-text-primary" : "bg-accent text-white"
+              }`}
+            >
+              {following ? "Friends ✓" : "Add friend"}
+            </button>
+            {openRequest && (
+              <button
+                onClick={() => pushScreen({ screen: "rec-request", requestId: openRequest.id })}
+                className="flex-1 py-2.5 rounded-xl bg-accent text-white text-sm font-display font-bold"
+              >
+                Send a pick
+              </button>
+            )}
+          </div>
         )}
 
-        {/* Stats */}
+        {match && (
+          <div className="bg-bg-card border border-border rounded-2xl p-4 flex items-center gap-4">
+            <div className="relative w-16 h-16 flex-shrink-0">
+              <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="#252533" strokeWidth="3.5" />
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="15.5"
+                  fill="none"
+                  stroke="#8B5CF6"
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  strokeDasharray={`${(match.pct / 100) * 97.4} 97.4`}
+                />
+              </svg>
+              <span className="absolute inset-0 flex items-center justify-center font-display font-bold text-text-primary">
+                {match.pct}%
+              </span>
+            </div>
+            <div>
+              <p className="text-text-primary font-display font-bold">Taste match</p>
+              <p className="text-text-secondary text-xs font-body mt-0.5">
+                {match.overlap >= 3
+                  ? `Based on ${match.overlap} titles you've both rated`
+                  : match.overlap > 0
+                    ? `Only ${match.overlap} title${match.overlap === 1 ? "" : "s"} in common so far — rate more to sharpen it`
+                    : "Rate a few of the same titles to see a real match"}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {watching.length > 0 && (
+          <div className="bg-bg-card border border-border rounded-2xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-rating-green animate-pulse" />
+              <p className="text-text-muted text-xs font-body uppercase tracking-wider">Currently watching</p>
+            </div>
+            <div className="divide-y divide-border">
+              {watching.map((w) => {
+                const show = getShow(w.showId);
+                if (!show) return null;
+                return (
+                  <button
+                    key={w.showId}
+                    onClick={() => pushScreen({ screen: "show-detail", showId: show.id })}
+                    className="w-full flex items-center gap-3 py-2 text-left"
+                  >
+                    <PosterImage title={show.title} year={show.year} posterPath={show.posterPath} size="sm" />
+                    <p className="flex-1 min-w-0 text-text-primary text-sm font-display font-semibold truncate">
+                      {show.title} <span className="text-text-secondary font-body font-normal">· Season {w.season}</span>
+                    </p>
+                    <ProviderLogos providers={knownExtras("show", show).providers} max={1} size="sm" />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-3 gap-2">
-          <div className="bg-bg-card rounded-xl p-3 text-center">
-            <p className="text-text-secondary text-xs uppercase tracking-wider font-semibold">Movies</p>
-            <p className="text-2xl font-display font-bold text-text-primary mt-1">
-              {userMovieRatings.length}
-            </p>
-          </div>
-          <div className="bg-bg-card rounded-xl p-3 text-center">
-            <p className="text-text-secondary text-xs uppercase tracking-wider font-semibold">Shows</p>
-            <p className="text-2xl font-display font-bold text-text-primary mt-1">
-              {userShowRatings.length}
-            </p>
-          </div>
-          <div className="bg-bg-card rounded-xl p-3 text-center">
-            <p className="text-text-secondary text-xs uppercase tracking-wider font-semibold">Avg</p>
-            <p className="text-2xl font-display font-bold text-accent mt-1">{avgMovieRating}</p>
-          </div>
+          {[
+            { label: "Shows", value: rows.filter((r) => r.type === "show").length },
+            { label: "Movies", value: rows.filter((r) => r.type === "movie").length },
+            { label: "Avg", value: avg },
+          ].map((s) => (
+            <div key={s.label} className="bg-bg-card border border-border rounded-xl p-3 text-center">
+              <p className="text-text-muted text-[10px] uppercase tracking-wider font-body">{s.label}</p>
+              <p className="text-xl font-display font-bold text-text-primary mt-1">{s.value}</p>
+            </div>
+          ))}
         </div>
 
-        {/* Favorite genres */}
-        {user.favoriteGenres && user.favoriteGenres.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-text-secondary text-xs uppercase tracking-wider font-semibold">
-              Favorite Genres
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {user.favoriteGenres.map((g) => (
-                <span
-                  key={g}
-                  className="inline-block px-3 py-1 rounded-full bg-bg-elevated text-text-secondary text-sm font-body"
-                >
-                  {g}
-                </span>
-              ))}
-            </div>
+        <div>
+          <div className="flex bg-bg-elevated rounded-xl p-1 mb-3">
+            {(["show", "movie"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`flex-1 py-2 rounded-lg text-sm font-body font-semibold ${tab === t ? "bg-bg-hover text-text-primary" : "text-text-muted"}`}
+              >
+                {t === "show" ? "Shows" : "Movies"}
+              </button>
+            ))}
           </div>
-        )}
-
-        {/* Top movies (self only) */}
-        {isSelf && topMovies.length > 0 && (
-          <div className="space-y-3">
-            <p className="text-text-secondary text-xs uppercase tracking-wider font-semibold">
-              Top Movies
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              {topMovies.map((rating) => (
-                <button
-                  key={rating.id}
-                  onClick={() => pushScreen({ screen: "movie-detail", movieId: rating.movie.id })}
-                  className="space-y-2 active:opacity-80 transition text-left"
-                >
-                  <PosterImage
-                    title={rating.movie.title}
-                    year={rating.movie.year}
-                    posterPath={rating.movie.posterPath}
-                    size="md"
-                    className="w-full rounded-xl"
-                  />
-                  <div>
-                    <p className="text-text-primary text-sm font-semibold line-clamp-1">
-                      {rating.movie.title}
-                    </p>
-                    <RatingBadge rating={rating.rating} size="sm" />
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Recent movies (self only) */}
-        {isSelf && userMovieRatings.length > 4 && (
-          <div className="space-y-3">
-            <p className="text-text-secondary text-xs uppercase tracking-wider font-semibold">
-              Recent Movies
-            </p>
+          {list.length === 0 ? (
+            <p className="text-text-muted text-sm text-center py-6">Nothing rated yet.</p>
+          ) : (
             <div className="space-y-2">
-              {userMovieRatings.slice(4, 10).map((rating) => (
-                <button
-                  key={rating.id}
-                  onClick={() =>
-                    pushScreen({ screen: "movie-detail", movieId: rating.movie.id })
-                  }
-                  className="w-full bg-bg-card rounded-xl p-3 flex items-center gap-3 active:bg-bg-elevated transition text-left"
-                >
-                  <PosterImage
-                    title={rating.movie.title}
-                    year={rating.movie.year}
-                    posterPath={rating.movie.posterPath}
-                    size="sm"
-                    className="w-12 h-16 rounded"
-                  />
-                  <div className="flex-1">
-                    <p className="text-text-primary text-sm font-semibold">{rating.movie.title}</p>
-                    <p className="text-text-secondary text-xs">{rating.movie.year}</p>
-                  </div>
-                  <RatingBadge rating={rating.rating} size="sm" />
-                </button>
-              ))}
+              {list.map((r, i) => {
+                const item = r.type === "movie" ? getMovie(r.id) : getShow(r.id);
+                if (!item) return null;
+                return (
+                  <button
+                    key={`${r.type}:${r.id}`}
+                    onClick={() =>
+                      pushScreen(r.type === "movie" ? { screen: "movie-detail", movieId: r.id } : { screen: "show-detail", showId: r.id })
+                    }
+                    className="w-full bg-bg-card border border-border rounded-xl p-2.5 flex items-center gap-3 text-left active:bg-bg-elevated"
+                  >
+                    <span className="w-5 text-center text-text-muted text-xs font-display font-bold">{i + 1}</span>
+                    <PosterImage title={item.title} year={item.year} posterPath={item.posterPath} size="sm" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-text-primary text-sm font-display font-semibold truncate">{item.title}</p>
+                      {r.review && <p className="text-text-secondary text-xs italic truncate">&ldquo;{r.review}&rdquo;</p>}
+                    </div>
+                    <RatingBadge rating={r.rating} size="sm" />
+                  </button>
+                );
+              })}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

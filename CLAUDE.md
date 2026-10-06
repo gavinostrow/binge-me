@@ -8,8 +8,8 @@ Binge is a social movie and TV show ranking platform. Think Letterboxd meets Bel
 
 - **Framework:** Next.js 14 (App Router) with TypeScript
 - **Styling:** Tailwind CSS with a custom dark theme
-- **State:** React Context (`lib/AppContext.tsx`) for global app state
-- **Data:** Mock data in `lib/mockData.ts` (no backend yet)
+- **State:** React Context — `lib/AppContext.tsx` (ratings, feed, watchlist, navigation, auth) and `lib/SocialContext.tsx` (friends, Currently Watching, rec requests, streaming services, predictions, spoiler shield, toasts)
+- **Data:** Sample data in `lib/mockData.ts` + `lib/socialData.ts`; live TMDB via `/api/tmdb/*` (`lib/tmdb.ts`) when `TMDB_READ_TOKEN` is set; Supabase auth when `NEXT_PUBLIC_SUPABASE_*` is set (`lib/supabase.ts`, schema in `supabase/schema.sql`)
 - **Fonts:** Outfit (display/headings) + Karla (body text) via Google Fonts
 
 ## Project Structure
@@ -63,10 +63,15 @@ npm run lint         # Lint with ESLint
 - **Mock data** throughout — designed to be swapped for Supabase/TMDB API later
 - **Mobile-first** — max-width 480px, centered layout
 
-## Next Steps (not yet implemented)
+## Data layer notes
 
-- **Backend:** Supabase for auth, database, and realtime
-- **TMDB API:** Replace mock movie/show search with real API
-- **Auth:** Email/password, then social login
-- **Friends system:** Follow/unfollow, taste match calculation
-- **PWA:** Service worker for offline + home screen install
+- Look titles up with `getShow` / `getMovie` from `lib/catalog.ts` (sample catalog + anything fetched from TMDB), never `shows.find(...)`.
+- `useTitleExtras(type, item)` gives next-season status, streaming providers and similar titles (sample first, live TMDB when configured).
+- Social math (friend ratings, Binge rating, also-liked, taste match, already-watched) lives in `lib/social.ts`.
+- Wrapped math lives in `lib/wrapped.ts`.
+
+## Next Steps
+
+- Move ratings, watchlist, friends, Currently Watching, rec requests, notifications and predictions from sample state onto the Supabase tables in `supabase/schema.sql`
+- Real push notifications (PWA install + web push), social login
+- Name / trademark check before launch
